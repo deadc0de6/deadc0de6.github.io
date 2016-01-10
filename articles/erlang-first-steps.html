@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="author" content="deadc0de">
+        <meta name="description" content="deadc0de's blog">
+        <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+        <title>Getting started with erlang</title>
+        <link rel="icon" type="image/png" href="/favicon.png">
+        <link rel="stylesheet" href="deadc0de.re/theme/css/main.css" />
+        <link href="deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="deadc0de.re Atom Feed" />
+        <link href="deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="deadc0de.re RSS Feed" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="deadc0de.re/">deadc0de.re  <strong>... rocking out ...</strong></a></h1>
+                <hr/>
+                <nav><ul>
+                        <li><a href="deadc0de.re/pages/about.html">About</a></li>
+                    <li><a href="/pages/tags.html">Tags</a></li>
+                    <li><a href="/pages/archives.html">Achives</a></li>
+                </ul>
+<form id="search" action"#" onsubmit="javascript:window.open('https://duckduckgo.com/?q='+document.getElementById('keywords').value+'+site:deadc0de.re');">
+                        <input id="keywords" type="text" />
+                    </form>
+                </nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="deadc0de.re/articles/erlang-first-steps.html" rel="bookmark"
+           title="Permalink to Getting started with erlang">Getting started with erlang</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <span>Tue 01 December 2015</span>
+<span>| tags: <a href="deadc0de.re/tag/erlang.html">erlang</a>,<a href="deadc0de.re/tag/programming.html">programming</a></span></footer><!-- /.post-info -->      <p>I recently had to learn <a href="http://www.erlang.org/">Erlang</a> for a project with no prior knowledge of the language.
+In this blog post I’ll describe some of my discoveries, the resources I used to dive in
+and two simple examples that illustrate the power (and beauty) of Erlang.</p>
+<p>I won’t dig deep into the description of the language itself. Some books, listed below,
+do it much better than me. I will, however, jump directly to the heart of the language:
+Erlang is a dynamically typed functional language running in a virtual machine.
+It was developed by Ericson and then open sourced in 1998.</p>
+<p>Some of its awesome features are:</p>
+<ul>
+<li>concurrency and distributed programming: this allows you (thanks to its lightweight processes)
+to spin a lot of concurrent processes, as shown in an example down below.</li>
+<li>message passing: It uses asynchronous message passing to communicate between different processes.</li>
+<li>fault-tolerant: So you don’t impact all your software if one of your process is performing an illegal instruction.</li>
+<li>OTP: OTP (Open Telecom Platform) is an open source framework that adds a bunch of very useful libraries
+to the base language. It brings abstraction libraries and design patterns (called behaviors) that you will be
+very eager to use since they are really helpful when building complete software (most people
+that are coding in Erlang are actually coding in Erlang/OTP).</li>
+</ul>
+<p><a href="http://www.erlang.org/faq/introduction.html">Here</a>‘s a nice introduction to Erlang.</p>
+<p>So why would you use Erlang ? Well there’s many use cases one can think of, <a href="http://www.erlang.org/faq/introduction.html">here</a>‘s
+a list of nice use cases where Erlang is suitable (and some where it is not). But as stated on that page,
+Erlang is mainly suitable for</p>
+<div class="highlight"><pre>“Distributed, reliable, soft real-time concurrent systems”.
+</pre></div>
+
+
+<h1>Where and how to learn Erlang</h1>
+<p>It’s not always easy to learn a new programming language. Especially when you are used to imperative
+languages (procedural, object-oriented, …). A first question one might ask is “is Erlang difficult”.
+I would say not really, not more than any other languages, but it is different. Yes, it is
+different if you’re not used to thinking in functional. But it’s really fun and very elegant !</p>
+<p>A good starting point (which is also valid for other languages) is <a href="http://learnxinyminutes.com/docs/erlang/">http://learnxinyminutes.com/docs/erlang/</a>.
+It gives you a quick tour of the language itself (how to declare stuff, how to use variables, what is an atom,
+how to use recursion, how to export/import modules, etc). Then one might move to something more complete in order
+to understand the distinctive features of the language.</p>
+<p>I’d recommend three books that really helped me dive into Erlang:</p>
+<ul>
+<li><em>Introducing Erlang: Getting Started in Functional Programming</em> by Simon St. Laurent published by
+O’Reilly Media (<a href="http://shop.oreilly.com/product/0636920025818.do">http://shop.oreilly.com/product/0636920025818.do</a>).</li>
+<li><em>Learn You Some Erlang for Great Good!: A Beginner’s Guide</em> by Fred Hebert published by
+No Starch Press (<a href="http://learnyousomeerlang.com/">http://learnyousomeerlang.com/</a>).</li>
+<li><em>Designing for Scalability with Erlang/OTP: Implement Robust, Available, Fault-Tolerant Systems</em>
+by Francesco Cesarini and Steve Vinoski published by O’Reilly Media (<a href="http://shop.oreilly.com/product/0636920024149.do">http://shop.oreilly.com/product/0636920024149.do</a>).</li>
+</ul>
+<p>(1) will give you the basics (syntax, different types (or none of them), function declaration and so on).
+(2) will give you nice examples of concrete uses of the language as well as a deep-dive into OTP and finally (3)
+will help the most interested of you to use Erlang for developing advanced programs using its main
+features (scalability, concurrency, fault-tolerent).</p>
+<p>But as always, nothing is better than practice. So here are two examples using Erlang.</p>
+<h1>Network packet parsing using Erlang</h1>
+<p>One very elegant feature of Erlang is its pattern matching (as other functional languages).
+It is very nice when one get down to, for example, parsing packets.</p>
+<p>This is an example of a function which takes as input an Ethernet frame (in binary) and prints its content:</p>
+<div class="highlight"><pre><span class="n">parse_ethernet</span><span class="p">(</span><span class="o">&lt;&lt;</span>
+  <span class="n">Src</span><span class="p">:</span><span class="mi">48</span><span class="p">,</span>
+  <span class="n">Dst</span><span class="p">:</span><span class="mi">48</span><span class="p">,</span>
+  <span class="mi">2048</span><span class="p">:</span><span class="mi">16</span><span class="p">,</span>
+  <span class="n">Rest</span><span class="o">/</span><span class="n">binary</span><span class="o">&gt;&gt;</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;~p -&gt; ~p (~p)~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">integer_to_list</span><span class="p">(</span><span class="n">Src</span><span class="p">),</span> <span class="n">integer_to_list</span><span class="p">(</span><span class="n">Dst</span><span class="p">),</span> <span class="n">Rest</span><span class="p">]),</span>
+  <span class="n">parse_ip</span><span class="p">(</span><span class="n">Rest</span><span class="p">);</span>
+<span class="n">parse_ethernet</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;FAILED TO DECODE Ethernet~n&quot;</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+
+
+<p>Isn’t it nice? Erlang will transparently try to match the packet with the first function declaration which states:</p>
+<ul>
+<li>get me a binary packet with:<ul>
+<li>the first 48 bits are matched to Src</li>
+<li>the next 48 bits are matched to Dst</li>
+<li>the next 16 bits must have a value of 2048 (as we expect IPv4)</li>
+<li>the rest are binaries and matched to Rest</li>
+</ul>
+</li>
+</ul>
+<p>If it succeed, we can easily print the value of those fields. If it doesn’t, it will fall down
+to the second declaration which will simply output an error message.</p>
+<h1>Spinning processes with Erlang</h1>
+<p>The next example shows you how you can spin a lot of Erlang processes.
+An Erlang process is very small (309 words as stated <a href="http://www.erlang.org/doc/efficiency_guide/processes.html">here</a>).</p>
+<p>You can easily spawn a process in Erlang using the function spawn.</p>
+<div class="highlight"><pre><span class="n">spawn</span><span class="p">(</span><span class="n">Module</span><span class="p">,</span> <span class="n">Function</span><span class="p">,</span> <span class="n">Args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pid</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Then you would make the created process wait for a message (using Erlang’s message passing) before quitting:</p>
+<div class="highlight"><pre><span class="n">procc</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;[~p] Process started~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Id</span><span class="p">]),</span>
+  <span class="n">receive</span>
+    <span class="p">{</span><span class="n">stop</span><span class="p">}</span> <span class="o">-&gt;</span>
+      <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;[~p] Process stopped~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Id</span><span class="p">])</span>
+  <span class="n">end</span><span class="o">.</span>
+</pre></div>
+
+
+<p>I’ve been able to spawn 100K processes in less than 30 seconds and 200K processes in about 2 minutes on a i5!</p>
+<p>All the code above is available on github <a href="https://github.com/deadc0de6/erlang-pcap/">here</a> and
+<a href="https://github.com/deadc0de6/erlang-tests">here</a>. These were small projects I did to learn the language
+so they might have some design flaws and/or errors but it will give you an idea of the language.</p>
+<p>That’s it, hope this little overview made you want to try Erlang!</p>
+<p><em>This article was first published on <a href="http://cybermashup.com/2015/12/01/getting-started-with-erlang/">cybersmashup</a></em></p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="https://0xabe.io/">0xabe</a></li>
+                            <li><a href="http://h4ck.go.ddamn.it/">h4ck.go.damn.it</a></li>
+                            <li><a href="https://www.freeture.ch/">freeture</a></li>
+                            <li><a href="http://cybersmashup.com/">cybersmashup</a></li>
+                            <li><a href="https://rolinh.ch/">rolinh</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+                            <li><a href="deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate">rss feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer class="body" id="footerinfo">
+        <div id="noscr">
+          <noscript id="noscr">
+            <p>
+            Noscript ? Good ! No worries, there's nothing of that kind here
+            </p>
+          </noscript>
+        </div>
+        <!--<footer id="contentinfo" class="body">-->
+          <p>
+            &copy; 2015 deadc0de
+            <br/>
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+            This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+           </p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

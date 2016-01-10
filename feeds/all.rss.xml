@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deadc0de.re</title><link>deadc0de.re/</link><description>... rocking out ...</description><atom:link href="deadc0de.re/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 04 Jan 2016 00:00:00 +0100</lastBuildDate><item><title>Shell-fu - join</title><link>deadc0de.re/articles/shell-fu-join.html</link><description>&lt;p&gt;Let's say you have multiple two-fields csv files that you want to join on their
+first field. For example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;a.csv     b.csv
+-----     -----
+a,1       b,10
+b,2       c,20
+
+=&amp;gt;
+
+&lt;span class="gh"&gt;Result&lt;/span&gt;
+&lt;span class="gh"&gt;------&lt;/span&gt;
+a,1,0
+b,2,10
+c,0,20
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Here are the basic join switches that will be used:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;-a1 -a2&lt;/strong&gt;: we also want the unpairable lines of each file&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;-j1&lt;/strong&gt;: join on the first field of each file&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;-t,&lt;/strong&gt;: specify the separator&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For a more complete explanation of those options, see join's man page.&lt;/p&gt;
+&lt;p&gt;That is all what is needed to join two files (the sort command
+is added for reference although the files are already sorted):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;join -a1 -a2 -j1 -t, &amp;lt;&lt;span class="o"&gt;(&lt;/span&gt;sort -t, -k1 a.csv&lt;span class="o"&gt;)&lt;/span&gt; &amp;lt;&lt;span class="o"&gt;(&lt;/span&gt;sort -t, -k1 b.csv&lt;span class="o"&gt;)&lt;/span&gt;
+a,1
+b,2,10
+c,20
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So far so good, however we now don't know to which file belonged &lt;em&gt;a&lt;/em&gt; and &lt;em&gt;c&lt;/em&gt;.
+Let's fix that.&lt;/p&gt;
+&lt;p&gt;Now comes the &lt;strong&gt;-o&lt;/strong&gt; options which allows
+to control what will be outputted. A &lt;em&gt;'0'&lt;/em&gt; means to output the
+joined field and additional &lt;em&gt;FILENUM.FIELD&lt;/em&gt; which field of which file (&lt;em&gt;1&lt;/em&gt; or &lt;em&gt;2&lt;/em&gt;)
+is to be added to the output. There's however a nice simplification using the keyword &lt;em&gt;auto&lt;/em&gt; that automagically
+determines how many fields from each file to output based on their first line.&lt;/p&gt;
+&lt;p&gt;Using &lt;strong&gt;-o 'auto'&lt;/strong&gt; the output becomes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;join -a1 -a2 -j1 -t, -o &lt;span class="s1"&gt;&amp;#39;auto&amp;#39;&lt;/span&gt; a.csv b.csv
+a,1,
+b,2,10
+c,,20
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now it's clear that &lt;em&gt;a&lt;/em&gt; belongs to &lt;em&gt;a.csv&lt;/em&gt; and &lt;em&gt;c&lt;/em&gt; to &lt;em&gt;b.csv&lt;/em&gt;.
+It is however nice to complete the command with &lt;strong&gt;-e0&lt;/strong&gt;
+to replace missing fields with a &lt;em&gt;0&lt;/em&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;join -a1 -a2 -j1 -t, -o &lt;span class="s1"&gt;&amp;#39;auto&amp;#39;&lt;/span&gt; -e0 a.csv b.csv
+a,1,0
+b,2,10
+c,0,20
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Perfect. Now we can add a new file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gh"&gt;d.csv&lt;/span&gt;
+&lt;span class="gh"&gt;-----&lt;/span&gt;
+a,100
+x,200
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and join them all:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;join -a1 -a2 -j1 -t, -o &lt;span class="s1"&gt;&amp;#39;auto&amp;#39;&lt;/span&gt; -e0 &amp;lt;&lt;span class="o"&gt;(&lt;/span&gt;join -a1 -a2 -j1 -t, -o &lt;span class="s1"&gt;&amp;#39;auto&amp;#39;&lt;/span&gt; -e0 a.csv b.csv&lt;span class="o"&gt;)&lt;/span&gt; d.csv
+a,1,0,100
+b,2,10,0
+c,0,20,0
+x,0,0,200
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can then integrate that in some crazy one-liner or into a shell script to join any number of csv you want.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate><guid>tag:,2016-01-04:deadc0de.re/articles/shell-fu-join.html</guid><category>bash</category><category>shell</category><category>script</category><category>join</category></item><item><title>Getting started with erlang</title><link>deadc0de.re/articles/erlang-first-steps.html</link><description>&lt;p&gt;I recently had to learn &lt;a href="http://www.erlang.org/"&gt;Erlang&lt;/a&gt; for a project with no prior knowledge of the language.
+In this blog post I’ll describe some of my discoveries, the resources I used to dive in
+and two simple examples that illustrate the power (and beauty) of Erlang.&lt;/p&gt;
+&lt;p&gt;I won’t dig deep into the description of the language itself. Some books, listed below,
+do it much better than me. I will, however, jump directly to the heart of the language:
+Erlang is a dynamically typed functional language running in a virtual machine.
+It was developed by Ericson and then open sourced in 1998.&lt;/p&gt;
+&lt;p&gt;Some of its awesome features are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;concurrency and distributed programming: this allows you (thanks to its lightweight processes)
+to spin a lot of concurrent processes, as shown in an example down below.&lt;/li&gt;
+&lt;li&gt;message passing: It uses asynchronous message passing to communicate between different processes.&lt;/li&gt;
+&lt;li&gt;fault-tolerant: So you don’t impact all your software if one of your process is performing an illegal instruction.&lt;/li&gt;
+&lt;li&gt;OTP: OTP (Open Telecom Platform) is an open source framework that adds a bunch of very useful libraries
+to the base language. It brings abstraction libraries and design patterns (called behaviors) that you will be
+very eager to use since they are really helpful when building complete software (most people
+that are coding in Erlang are actually coding in Erlang/OTP).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="http://www.erlang.org/faq/introduction.html"&gt;Here&lt;/a&gt;‘s a nice introduction to Erlang.&lt;/p&gt;
+&lt;p&gt;So why would you use Erlang ? Well there’s many use cases one can think of, &lt;a href="http://www.erlang.org/faq/introduction.html"&gt;here&lt;/a&gt;‘s
+a list of nice use cases where Erlang is suitable (and some where it is not). But as stated on that page,
+Erlang is mainly suitable for&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;“Distributed, reliable, soft real-time concurrent systems”.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Where and how to learn Erlang&lt;/h1&gt;
+&lt;p&gt;It’s not always easy to learn a new programming language. Especially when you are used to imperative
+languages (procedural, object-oriented, …). A first question one might ask is “is Erlang difficult”.
+I would say not really, not more than any other languages, but it is different. Yes, it is
+different if you’re not used to thinking in functional. But it’s really fun and very elegant !&lt;/p&gt;
+&lt;p&gt;A good starting point (which is also valid for other languages) is &lt;a href="http://learnxinyminutes.com/docs/erlang/"&gt;http://learnxinyminutes.com/docs/erlang/&lt;/a&gt;.
+It gives you a quick tour of the language itself (how to declare stuff, how to use variables, what is an atom,
+how to use recursion, how to export/import modules, etc). Then one might move to something more complete in order
+to understand the distinctive features of the language.&lt;/p&gt;
+&lt;p&gt;I’d recommend three books that really helped me dive into Erlang:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Introducing Erlang: Getting Started in Functional Programming&lt;/em&gt; by Simon St. Laurent published by
+O’Reilly Media (&lt;a href="http://shop.oreilly.com/product/0636920025818.do"&gt;http://shop.oreilly.com/product/0636920025818.do&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Learn You Some Erlang for Great Good!: A Beginner’s Guide&lt;/em&gt; by Fred Hebert published by
+No Starch Press (&lt;a href="http://learnyousomeerlang.com/"&gt;http://learnyousomeerlang.com/&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Designing for Scalability with Erlang/OTP: Implement Robust, Available, Fault-Tolerant Systems&lt;/em&gt;
+by Francesco Cesarini and Steve Vinoski published by O’Reilly Media (&lt;a href="http://shop.oreilly.com/product/0636920024149.do"&gt;http://shop.oreilly.com/product/0636920024149.do&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;(1) will give you the basics (syntax, different types (or none of them), function declaration and so on).
+(2) will give you nice examples of concrete uses of the language as well as a deep-dive into OTP and finally (3)
+will help the most interested of you to use Erlang for developing advanced programs using its main
+features (scalability, concurrency, fault-tolerent).&lt;/p&gt;
+&lt;p&gt;But as always, nothing is better than practice. So here are two examples using Erlang.&lt;/p&gt;
+&lt;h1&gt;Network packet parsing using Erlang&lt;/h1&gt;
+&lt;p&gt;One very elegant feature of Erlang is its pattern matching (as other functional languages).
+It is very nice when one get down to, for example, parsing packets.&lt;/p&gt;
+&lt;p&gt;This is an example of a function which takes as input an Ethernet frame (in binary) and prints its content:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;parse_ethernet&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt;
+  &lt;span class="n"&gt;Src&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;48&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;Dst&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;48&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="mi"&gt;2048&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;Rest&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;binary&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;io&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;~p -&amp;gt; ~p (~p)~n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;integer_to_list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Src&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;integer_to_list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Dst&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;Rest&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+  &lt;span class="n"&gt;parse_ip&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Rest&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;parse_ethernet&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;io&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;FAILED TO DECODE Ethernet~n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Isn’t it nice? Erlang will transparently try to match the packet with the first function declaration which states:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;get me a binary packet with:&lt;ul&gt;
+&lt;li&gt;the first 48 bits are matched to Src&lt;/li&gt;
+&lt;li&gt;the next 48 bits are matched to Dst&lt;/li&gt;
+&lt;li&gt;the next 16 bits must have a value of 2048 (as we expect IPv4)&lt;/li&gt;
+&lt;li&gt;the rest are binaries and matched to Rest&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If it succeed, we can easily print the value of those fields. If it doesn’t, it will fall down
+to the second declaration which will simply output an error message.&lt;/p&gt;
+&lt;h1&gt;Spinning processes with Erlang&lt;/h1&gt;
+&lt;p&gt;The next example shows you how you can spin a lot of Erlang processes.
+An Erlang process is very small (309 words as stated &lt;a href="http://www.erlang.org/doc/efficiency_guide/processes.html"&gt;here&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;You can easily spawn a process in Erlang using the function spawn.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;spawn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Module&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Function&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then you would make the created process wait for a message (using Erlang’s message passing) before quitting:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;procc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;io&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;[~p] Process started~n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+  &lt;span class="n"&gt;receive&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;
+      &lt;span class="n"&gt;io&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;[~p] Process stopped~n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+  &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I’ve been able to spawn 100K processes in less than 30 seconds and 200K processes in about 2 minutes on a i5!&lt;/p&gt;
+&lt;p&gt;All the code above is available on github &lt;a href="https://github.com/deadc0de6/erlang-pcap/"&gt;here&lt;/a&gt; and
+&lt;a href="https://github.com/deadc0de6/erlang-tests"&gt;here&lt;/a&gt;. These were small projects I did to learn the language
+so they might have some design flaws and/or errors but it will give you an idea of the language.&lt;/p&gt;
+&lt;p&gt;That’s it, hope this little overview made you want to try Erlang!&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;This article was first published on &lt;a href="http://cybermashup.com/2015/12/01/getting-started-with-erlang/"&gt;cybersmashup&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Tue, 01 Dec 2015 00:00:00 +0100</pubDate><guid>tag:,2015-12-01:deadc0de.re/articles/erlang-first-steps.html</guid><category>erlang</category><category>programming</category></item></channel></rss>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="author" content="deadc0de">
+        <meta name="description" content="deadc0de's blog">
+        <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+        <title>Shell-fu - join</title>
+        <link rel="icon" type="image/png" href="/favicon.png">
+        <link rel="stylesheet" href="deadc0de.re/theme/css/main.css" />
+        <link href="deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="deadc0de.re Atom Feed" />
+        <link href="deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="deadc0de.re RSS Feed" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="deadc0de.re/">deadc0de.re  <strong>... rocking out ...</strong></a></h1>
+                <hr/>
+                <nav><ul>
+                        <li><a href="deadc0de.re/pages/about.html">About</a></li>
+                    <li><a href="/pages/tags.html">Tags</a></li>
+                    <li><a href="/pages/archives.html">Achives</a></li>
+                </ul>
+<form id="search" action"#" onsubmit="javascript:window.open('https://duckduckgo.com/?q='+document.getElementById('keywords').value+'+site:deadc0de.re');">
+                        <input id="keywords" type="text" />
+                    </form>
+                </nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="deadc0de.re/articles/shell-fu-join.html" rel="bookmark"
+           title="Permalink to Shell-fu - join">Shell-fu - join</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <span>Mon 04 January 2016</span>
+<span>| tags: <a href="deadc0de.re/tag/bash.html">bash</a>,<a href="deadc0de.re/tag/shell.html">shell</a>,<a href="deadc0de.re/tag/script.html">script</a>,<a href="deadc0de.re/tag/join.html">join</a></span></footer><!-- /.post-info -->      <p>Let's say you have multiple two-fields csv files that you want to join on their
+first field. For example:</p>
+<div class="highlight"><pre>a.csv     b.csv
+-----     -----
+a,1       b,10
+b,2       c,20
+
+=&gt;
+
+<span class="gh">Result</span>
+<span class="gh">------</span>
+a,1,0
+b,2,10
+c,0,20
+</pre></div>
+
+
+<p>Here are the basic join switches that will be used:</p>
+<ul>
+<li><strong>-a1 -a2</strong>: we also want the unpairable lines of each file</li>
+<li><strong>-j1</strong>: join on the first field of each file</li>
+<li><strong>-t,</strong>: specify the separator</li>
+</ul>
+<p>For a more complete explanation of those options, see join's man page.</p>
+<p>That is all what is needed to join two files (the sort command
+is added for reference although the files are already sorted):</p>
+<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, &lt;<span class="o">(</span>sort -t, -k1 a.csv<span class="o">)</span> &lt;<span class="o">(</span>sort -t, -k1 b.csv<span class="o">)</span>
+a,1
+b,2,10
+c,20
+</pre></div>
+
+
+<p>So far so good, however we now don't know to which file belonged <em>a</em> and <em>c</em>.
+Let's fix that.</p>
+<p>Now comes the <strong>-o</strong> options which allows
+to control what will be outputted. A <em>'0'</em> means to output the
+joined field and additional <em>FILENUM.FIELD</em> which field of which file (<em>1</em> or <em>2</em>)
+is to be added to the output. There's however a nice simplification using the keyword <em>auto</em> that automagically
+determines how many fields from each file to output based on their first line.</p>
+<p>Using <strong>-o 'auto'</strong> the output becomes:</p>
+<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> a.csv b.csv
+a,1,
+b,2,10
+c,,20
+</pre></div>
+
+
+<p>Now it's clear that <em>a</em> belongs to <em>a.csv</em> and <em>c</em> to <em>b.csv</em>.
+It is however nice to complete the command with <strong>-e0</strong>
+to replace missing fields with a <em>0</em>.</p>
+<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 a.csv b.csv
+a,1,0
+b,2,10
+c,0,20
+</pre></div>
+
+
+<p>Perfect. Now we can add a new file:</p>
+<div class="highlight"><pre><span class="gh">d.csv</span>
+<span class="gh">-----</span>
+a,100
+x,200
+</pre></div>
+
+
+<p>and join them all:</p>
+<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 &lt;<span class="o">(</span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 a.csv b.csv<span class="o">)</span> d.csv
+a,1,0,100
+b,2,10,0
+c,0,20,0
+x,0,0,200
+</pre></div>
+
+
+<p>You can then integrate that in some crazy one-liner or into a shell script to join any number of csv you want.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="https://0xabe.io/">0xabe</a></li>
+                            <li><a href="http://h4ck.go.ddamn.it/">h4ck.go.damn.it</a></li>
+                            <li><a href="https://www.freeture.ch/">freeture</a></li>
+                            <li><a href="http://cybersmashup.com/">cybersmashup</a></li>
+                            <li><a href="https://rolinh.ch/">rolinh</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+                            <li><a href="deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate">rss feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer class="body" id="footerinfo">
+        <div id="noscr">
+          <noscript id="noscr">
+            <p>
+            Noscript ? Good ! No worries, there's nothing of that kind here
+            </p>
+          </noscript>
+        </div>
+        <!--<footer id="contentinfo" class="body">-->
+          <p>
+            &copy; 2015 deadc0de
+            <br/>
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+            This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+           </p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
