@@ -1,5 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-01-04T00:00:00+01:00</updated><entry><title>Shell-fu - join</title><link href="https://deadc0de.re/articles/shell-fu-join.html" rel="alternate"></link><updated>2016-01-04T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-01-04:articles/shell-fu-join.html</id><summary type="html">&lt;p&gt;Let's say you have multiple two-fields csv files that you want to join on their
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-01-14T00:00:00+01:00</updated><entry><title>Vim's macro</title><link href="https://deadc0de.re/articles/vim-macro.html" rel="alternate"></link><updated>2016-01-14T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-01-14:articles/vim-macro.html</id><summary type="html">&lt;p&gt;Vim's macros are very efficient, elegant and worth checking out.
+If you already like the &lt;em&gt;dot&lt;/em&gt; (.) command, you will love macros.
+Vim's macros allow you to repeat a &lt;em&gt;recording&lt;/em&gt; of
+a sequence of command.&lt;/p&gt;
+&lt;p&gt;For the following examples, I will use this content,
+the goal is to remove the spaces and the trailing commas.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;a, 2,
+b, 3,
+c, 4,
+d, 5,
+e, 6,
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Using visual block mode&lt;/h2&gt;
+&lt;p&gt;Although this article is about using macros, I will start with the way I was doing it
+before I knew about macro. As you'll see later, macros are way more elegant !&lt;/p&gt;
+&lt;p&gt;This will be done using the visual block mode of vim, selecting a full column and then
+applying a command to the entire column.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Select the spaces and delete them&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;f&amp;lt;space&amp;gt;&amp;lt;CTRL&amp;gt;v99jx
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Go to the end of the line, select the commas and delete them&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;$&amp;lt;CTRL&amp;gt;v99jx
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here's a description of the different steps above:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;f&amp;lt;space&amp;gt;&lt;/code&gt; goes to the first space&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;CTRL&amp;gt;v&lt;/code&gt; enters visual block mode&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;99j&lt;/code&gt; applies 99 times &lt;code&gt;j&lt;/code&gt; in order to select the entire column in the file&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt; deletes everything that's being selected&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$&lt;/code&gt; goes to the end of the line&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This is a little screencast of this execution:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="vim visual column" src="https://deadc0de.re/gifs/vim-col.gif" /&gt;&lt;/p&gt;
+&lt;h2&gt;Using a macro I&lt;/h2&gt;
+&lt;p&gt;With a macro, you can record a single execution on the first line and then
+execute it on all the subsequent lines.
+Using macro in vim is quite easy: the recording is started with
+&lt;code&gt;q&amp;lt;register&amp;gt;&lt;/code&gt; and ended it with &lt;code&gt;q&lt;/code&gt;. It is then applied using &lt;code&gt;@&amp;lt;register&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Try it:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;start recording (here in register &lt;code&gt;a&lt;/code&gt;): &lt;code&gt;qa&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;everything is now being recorded and saved in register &lt;em&gt;a&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;find the next space: &lt;code&gt;f&amp;lt;space&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;delete it: &lt;code&gt;x&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;go to the end of line and delete the comma: &lt;code&gt;$x&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;stop recording: &lt;code&gt;q&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can visualize the list of commands saved in the &lt;em&gt;a&lt;/em&gt; register using &lt;code&gt;:reg a&lt;/code&gt;.
+And then apply that to the rest of the lines:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;select the second line up to the end of file: &lt;code&gt;:2VG&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;and execute the macro: &lt;code&gt;:norm @a&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That's it !&lt;/p&gt;
+&lt;p&gt;&lt;img alt="vim macro example 1" src="https://deadc0de.re/gifs/vim-macro-1.gif" /&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;normal&lt;/code&gt; command (here I used the shortcut &lt;code&gt;norm&lt;/code&gt;) is used to execute a set of
+vim commands as if you were in &lt;em&gt;normal&lt;/em&gt; mode (see &lt;code&gt;:help normal&lt;/code&gt; for more info).&lt;/p&gt;
+&lt;h2&gt;Using macro II&lt;/h2&gt;
+&lt;p&gt;In this second example, the goal is to change the case of the first character
+and then increment the number by one using macro:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;start by going to the beginning of the file: &lt;code&gt;gg&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;record the macro in register m: &lt;code&gt;qm&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;toggling case is done with tilde: &lt;code&gt;~&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;then go until the next comma: &lt;code&gt;t,&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;increment the number under the cursor with: &lt;code&gt;&amp;lt;CTRL&amp;gt;a&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;and go to the next line: &lt;code&gt;+&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;finally save the macro: &lt;code&gt;q&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can then apply that macro using &lt;code&gt;@m&lt;/code&gt; multiple time (since the &lt;code&gt;+&lt;/code&gt; was used,
+the macro will automatically jump on the next line). A good time saver is &lt;code&gt;@@&lt;/code&gt;
+which will repeat the last macro. Another way of repeating a macro is by prepending
+the command with a count as for example &lt;code&gt;99@m&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Using macro III&lt;/h2&gt;
+&lt;p&gt;This is another nice example of the power of vim's macro.&lt;/p&gt;
+&lt;p&gt;Our example file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;a,&amp;quot;this is a&amp;quot;
+b,&amp;quot;this is b&amp;quot;
+c,&amp;quot;this is c&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The goal is to replace what is inside the quotes with &lt;em&gt;is no more&lt;/em&gt;
+and add the first char of the line at the beginning of that text
+such that &lt;code&gt;a,"this is a"&lt;/code&gt; becomes &lt;code&gt;"a,"a is no more"&lt;/code&gt; and apply
+that to all subsequent lines.&lt;/p&gt;
+&lt;p&gt;Let's get started on the first line:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;start recording in buffer &lt;em&gt;q&lt;/em&gt;: &lt;code&gt;qq&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;go to the first space (any place inside the quotes will do): &lt;code&gt;f&amp;lt;space&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;and then edit the whole content inside the quotes: &lt;code&gt;ci"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;add the new text: &lt;code&gt;&amp;lt;space&amp;gt;is no more&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;escape editing mode&lt;/li&gt;
+&lt;li&gt;go the the beginning of the line: &lt;code&gt;0&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;copy the char under the cursor: &lt;code&gt;yl&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;go to the first quote: &lt;code&gt;f"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;paste the char: &lt;code&gt;p&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;stop the recording: &lt;code&gt;q&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And then apply it to all lines:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;go to the second line and select all lines up to the end of the file: &lt;code&gt;:2VG&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;apply the macro to these lines: &lt;code&gt;:norm @q&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here's a little screencast that demonstrates this execution.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="vim macro example 2" src="https://deadc0de.re/gifs/vim-macro-2.gif" /&gt;&lt;/p&gt;
+&lt;p&gt;One more thing: you can append more command to a macro by restarting the macro with the capital
+letter of the register where you saved your commands. For example &lt;code&gt;qA ... q&lt;/code&gt;
+for register &lt;em&gt;a&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;I hope next time you'll have to apply the same pattern to a content, you will
+try to use macros !&lt;/p&gt;</summary><category term="vim"></category></entry><entry><title>Shell-fu - join</title><link href="https://deadc0de.re/articles/shell-fu-join.html" rel="alternate"></link><updated>2016-01-04T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-01-04:articles/shell-fu-join.html</id><summary type="html">&lt;p&gt;Let's say you have multiple two-fields csv files that you want to join on their
 first field. For example:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;a.csv     b.csv
 -----     -----
