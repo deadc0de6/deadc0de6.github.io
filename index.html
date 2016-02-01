@@ -28,142 +28,118 @@
         </header><!-- /#banner -->
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="https://deadc0de.re/articles/vim-macro.html">Vim's macro</a></h1>
+                    <h1 class="entry-title"><a href="https://deadc0de.re/articles/python-es.html">Query Elasticsearch with Python</a></h1>
 <footer class="post-info">
-        <span>Thu 14 January 2016</span>
-<span>| tags: <a href="https://deadc0de.re/tag/vim.html">vim</a></span></footer><!-- /.post-info --><p>Vim's macros are very efficient, elegant and worth checking out.
-If you already like the <em>dot</em> (.) command, you will love macros.
-Vim's macros allow you to repeat a <em>recording</em> of
-a sequence of command.</p>
-<p>For the following examples, I will use this content,
-the goal is to remove the spaces and the trailing commas.</p>
-<div class="highlight"><pre>a, 2,
-b, 3,
-c, 4,
-d, 5,
-e, 6,
+        <span>Mon 01 February 2016</span>
+<span>| tags: <a href="https://deadc0de.re/tag/elasticsearch.html">elasticsearch</a>,<a href="https://deadc0de.re/tag/python.html">python</a>,<a href="https://deadc0de.re/tag/programming.html">programming</a></span></footer><!-- /.post-info --><p>Before, when I needed to query an elasticsearch cluster and retrieve data, I always
+ended up doing some curl-fu. It's nice and quick however if you want to retrieve
+a lot of data and are in the need of something more powerful you need something
+else. Moreover json is aweful to deal with on the command line !</p>
+<p>I came across those two python libraries which are quite nice:</p>
+<ul>
+<li><a href="https://elasticsearch-py.readthedocs.org/">Elasticsearch-py</a>: the
+    official low-level library for querying elasticsearch</li>
+<li><a href="https://elasticsearch-dsl.readthedocs.org/">Elasticsearch-dsl</a>: the
+    high-level library built above elasticsearch-py</li>
+</ul>
+<p>Combining those two libraries provides you with really powerful ways to
+insert, query and manage your ES's data.
+I won't describe in details the use of those libraries but there are two main
+features I've used and found very nice:</p>
+<h3>Filtering</h3>
+<p>With these libraries, constructing your query is now way easier than
+using some json:</p>
+<div class="highlight"><pre><span class="o">...</span>
+<span class="kn">import</span> <span class="nn">elasticsearch</span>
+<span class="kn">from</span> <span class="nn">elasticsearch_dsl</span> <span class="kn">import</span> <span class="n">Search</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">F</span>
+<span class="o">...</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">(</span><span class="n">ES_HOST</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">Search</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">INDEX</span><span class="p">)</span>
+
+<span class="c"># only return specific fields</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">fields</span><span class="p">([</span><span class="s">&#39;field0&#39;</span><span class="p">,</span> <span class="s">&#39;field1&#39;</span><span class="p">])</span>
+
+<span class="c"># add some filters</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">&quot;term&quot;</span><span class="p">,</span> <span class="n">_type</span><span class="o">=</span><span class="s">&quot;SOMETYPE&quot;</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">&quot;range&quot;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;gt&#39;</span><span class="p">:</span> <span class="s">&quot;1000&quot;</span><span class="p">})</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">~</span><span class="n">F</span><span class="p">(</span><span class="s">&quot;term&quot;</span><span class="p">,</span> <span class="n">othercount</span><span class="o">=</span><span class="s">&quot;0&quot;</span><span class="p">))</span>
+
+<span class="c"># sort the results</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sort</span><span class="p">({</span><span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;order&#39;</span><span class="p">:</span> <span class="s">&#39;desc&#39;</span><span class="p">}})</span>
+<span class="o">...</span>
 </pre></div>
 
 
-<h2>Using visual block mode</h2>
-<p>Although this article is about using macros, I will start with the way I was doing it
-before I knew about macro. As you'll see later, macros are way more elegant !</p>
-<p>This will be done using the visual block mode of vim, selecting a full column and then
-applying a command to the entire column.</p>
-<ul>
-<li>
-<p>Select the spaces and delete them</p>
-<div class="highlight"><pre>f&lt;space&gt;&lt;CTRL&gt;v99jx
+<p>As shown above, you can think of any type of filters without having to
+fight with json syntax and stuff. For more info on the different types of
+ES filter, see
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/2.0/query-dsl.html">ES offical query DSL</a></p>
+<h3>Query in batch</h3>
+<p>The next very interesting feature is the ability to perform
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html">scroll searches</a>.</p>
+<p>This is very efficient when you need to retrieve a bunch of documents/results on
+a very large index. And it's quite elegant in python:</p>
+<div class="highlight"><pre><span class="o">...</span>
+<span class="kn">import</span> <span class="nn">elasticsearch</span>
+<span class="kn">from</span> <span class="nn">elasticsearch_dsl</span> <span class="kn">import</span> <span class="n">Search</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">F</span>
+<span class="o">...</span>
+<span class="k">def</span> <span class="nf">es_scroll</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">search</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="c"># Initialize the scroll</span>
+    <span class="n">gotten</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">scroll</span><span class="o">=</span><span class="n">SCROLLDURATION</span><span class="p">,</span>
+      <span class="n">search_type</span><span class="o">=</span><span class="s">&#39;scan&#39;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">search</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="n">sid</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s">&#39;_scroll_id&#39;</span><span class="p">]</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">page</span><span class="p">[</span><span class="s">&#39;hits&#39;</span><span class="p">][</span><span class="s">&#39;total&#39;</span><span class="p">])</span>
+    <span class="n">batchgot</span> <span class="o">=</span> <span class="n">total</span>
+
+    <span class="c"># scrolling through this view</span>
+    <span class="k">while</span> <span class="n">batchgot</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">page</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">scroll</span><span class="p">(</span><span class="n">scroll_id</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span> <span class="n">scroll</span><span class="o">=</span><span class="n">SCROLLDURATION</span><span class="p">)</span>
+      <span class="n">sid</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s">&#39;_scroll_id&#39;</span><span class="p">]</span>
+      <span class="n">batchgot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">page</span><span class="p">[</span><span class="s">&#39;hits&#39;</span><span class="p">][</span><span class="s">&#39;hits&#39;</span><span class="p">])</span>
+      <span class="n">gotten</span> <span class="o">+=</span> <span class="n">batchgot</span>
+      <span class="c"># do something with the results</span>
+      <span class="n">func</span><span class="p">(</span><span class="n">page</span><span class="p">[</span><span class="s">&#39;hits&#39;</span><span class="p">][</span><span class="s">&#39;hits&#39;</span><span class="p">])</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">gotten</span>
+<span class="o">...</span>
 </pre></div>
 
 
-</li>
-<li>
-<p>Go to the end of the line, select the commas and delete them</p>
-<div class="highlight"><pre>$&lt;CTRL&gt;v99jx
-</pre></div>
-
-
-</li>
-</ul>
-<p>Here's a description of the different steps above:</p>
-<ul>
-<li><code>f&lt;space&gt;</code> goes to the first space</li>
-<li><code>&lt;CTRL&gt;v</code> enters visual block mode</li>
-<li><code>99j</code> applies 99 times <code>j</code> in order to select the entire column in the file</li>
-<li><code>x</code> deletes everything that's being selected</li>
-<li><code>$</code> goes to the end of the line</li>
-<li>...</li>
-</ul>
-<p>This is a little screencast of this execution:</p>
-<p><img alt="vim visual column" src="https://deadc0de.re/gifs/vim-col.gif" /></p>
-<h2>Using a macro I</h2>
-<p>With a macro, you can record a single execution on the first line and then
-execute it on all the subsequent lines.
-Using macro in vim is quite easy: the recording is started with
-<code>q&lt;register&gt;</code> and ended it with <code>q</code>. It is then applied using <code>@&lt;register&gt;</code>.</p>
-<p>Try it:</p>
-<ul>
-<li>start recording (here in register <code>a</code>): <code>qa</code></li>
-<li>everything is now being recorded and saved in register <em>a</em></li>
-<li>find the next space: <code>f&lt;space&gt;</code></li>
-<li>delete it: <code>x</code></li>
-<li>go to the end of line and delete the comma: <code>$x</code></li>
-<li>stop recording: <code>q</code></li>
-</ul>
-<p>You can visualize the list of commands saved in the <em>a</em> register using <code>:reg a</code>.
-And then apply that to the rest of the lines:</p>
-<ul>
-<li>select the second line up to the end of file: <code>:2VG</code></li>
-<li>and execute the macro: <code>:norm @a</code></li>
-</ul>
-<p>That's it !</p>
-<p><img alt="vim macro example 1" src="https://deadc0de.re/gifs/vim-macro-1.gif" /></p>
-<p>The <code>normal</code> command (here I used the shortcut <code>norm</code>) is used to execute a set of
-vim commands as if you were in <em>normal</em> mode (see <code>:help normal</code> for more info).</p>
-<h2>Using macro II</h2>
-<p>In this second example, the goal is to change the case of the first character
-and then increment the number by one using macro:</p>
-<ul>
-<li>start by going to the beginning of the file: <code>gg</code></li>
-<li>record the macro in register m: <code>qm</code></li>
-<li>toggling case is done with tilde: <code>~</code></li>
-<li>then go until the next comma: <code>t,</code></li>
-<li>increment the number under the cursor with: <code>&lt;CTRL&gt;a</code></li>
-<li>and go to the next line: <code>+</code></li>
-<li>finally save the macro: <code>q</code></li>
-</ul>
-<p>You can then apply that macro using <code>@m</code> multiple time (since the <code>+</code> was used,
-the macro will automatically jump on the next line). A good time saver is <code>@@</code>
-which will repeat the last macro. Another way of repeating a macro is by prepending
-the command with a count as for example <code>99@m</code>.</p>
-<h2>Using macro III</h2>
-<p>This is another nice example of the power of vim's macro.</p>
-<p>Our example file:</p>
-<div class="highlight"><pre>a,&quot;this is a&quot;
-b,&quot;this is b&quot;
-c,&quot;this is c&quot;
-</pre></div>
-
-
-<p>The goal is to replace what is inside the quotes with <em>is no more</em>
-and add the first char of the line at the beginning of that text
-such that <code>a,"this is a"</code> becomes <code>"a,"a is no more"</code> and apply
-that to all subsequent lines.</p>
-<p>Let's get started on the first line:</p>
-<ul>
-<li>start recording in buffer <em>q</em>: <code>qq</code></li>
-<li>go to the first space (any place inside the quotes will do): <code>f&lt;space&gt;</code></li>
-<li>and then edit the whole content inside the quotes: <code>ci"</code></li>
-<li>add the new text: <code>&lt;space&gt;is no more</code></li>
-<li>escape editing mode</li>
-<li>go the the beginning of the line: <code>0</code></li>
-<li>copy the char under the cursor: <code>yl</code></li>
-<li>go to the first quote: <code>f"</code></li>
-<li>paste the char: <code>p</code></li>
-<li>stop the recording: <code>q</code></li>
-</ul>
-<p>And then apply it to all lines:</p>
-<ul>
-<li>go to the second line and select all lines up to the end of the file: <code>:2VG</code></li>
-<li>apply the macro to these lines: <code>:norm @q</code></li>
-</ul>
-<p>Here's a little screencast that demonstrates this execution.</p>
-<p><img alt="vim macro example 2" src="https://deadc0de.re/gifs/vim-macro-2.gif" /></p>
-<p>One more thing: you can append more command to a macro by restarting the macro with the capital
-letter of the register where you saved your commands. For example <code>qA ... q</code>
-for register <em>a</em>.</p>
-<p>I hope next time you'll have to apply the same pattern to a content, you will
-try to use macros !</p>
+<p>Scroll searches provide you with a kind of snapshot of your data and
+allows you to retrieve it in batch. Called
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#scroll-search-context">Search context</a>,
+it could be seen as a view in SQL databases.</p>
+<p>The parameter <code>SCROLLDURATION</code> defines how long the view of the data is to be
+kept (this is updated at each scroll's call).
+The function <code>func</code> is called after each batch to handle the results.</p>
+<p>This is very convenient and much faster than querying ES one document at a time !</p>
+<p><strong>Happy searches in bigdata</strong></p>
+<p><img alt="bigdata searches" src="https://deadc0de.re/gifs/bigdata.gif" /></p>
                 </article>
             </aside><!-- /#featured -->
                 <section id="content" class="body">
-                    <h1>Other articles</h1>
+                    <h1>Other articles ...</h1>
                     <ol id="posts-list" class="hfeed">
             <li><article class="hentry">
                 <header>
+                    <h1><a href="https://deadc0de.re/articles/vim-macro.html" rel="bookmark"
+                           title="Permalink to Vim's macro">Vim's macro</a>
+                    </h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <span>Thu 14 January 2016</span>
+<span>| tags: <a href="https://deadc0de.re/tag/vim.html">vim</a></span></footer><!-- /.post-info -->                <p>A small introduction to vim's macros with examples</p>
+                <a class="readmore" href="https://deadc0de.re/articles/vim-macro.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+            <li><article class="hentry">
+                <header>
                     <h1><a href="https://deadc0de.re/articles/shell-fu-join.html" rel="bookmark"
-                           title="Permalink to Shell-fu - join">Shell-fu - join</a></h1>
+                           title="Permalink to Shell-fu - join">Shell-fu - join</a>
+                    </h1>
                 </header>
 
                 <div class="entry-content">
@@ -176,7 +152,8 @@ try to use macros !</p>
             <li><article class="hentry">
                 <header>
                     <h1><a href="https://deadc0de.re/articles/erlang-first-steps.html" rel="bookmark"
-                           title="Permalink to Getting started with erlang">Getting started with erlang</a></h1>
+                           title="Permalink to Getting started with erlang">Getting started with erlang</a>
+                    </h1>
                 </header>
 
                 <div class="entry-content">
