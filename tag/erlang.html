@@ -1,291 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <meta name="author" content="deadc0de">
-        <meta name="description" content="deadc0de's blog">
-        <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
-        <title>deadc0de.re - erlang</title>
-        <link rel="icon" type="image/png" href="/favicon.png">
-        <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css" />
-        <link href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="deadc0de.re Atom Feed" />
-        <link href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="deadc0de.re RSS Feed" />
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>erlang tag // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://deadc0de.re/">deadc0de.re  <strong>... rocking out ...</strong></a></h1>
-                <hr/>
-                <nav><ul>
-                        <li><a href="https://deadc0de.re/pages/about.html">About</a></li>
-                    <li><a href="/pages/tags.html">Tags</a></li>
-                    <li><a href="/pages/archives.html">Achives</a></li>
-                </ul>
-<form id="search" action"#" onsubmit="javascript:window.open('https://duckduckgo.com/?q='+document.getElementById('keywords').value+'+site:https://deadc0de.re');">
-                        <input id="keywords" type="text" />
-                    </form>
-                </nav>
-        </header><!-- /#banner -->
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="https://deadc0de.re/articles/erlang-http-parsing.html">HTTP response parsing with Erlang</a></h1>
-<footer class="post-info">
-        <span>Mon 08 February 2016</span>
-<span>| tags: <a href="https://deadc0de.re/tag/erlang.html">erlang</a>,<a href="https://deadc0de.re/tag/parsing.html">parsing</a></span></footer><!-- /.post-info --><p>The goal is to parse an HTTP response into two elements, the header
-and the body. As everyone knows, the header is separated from the
-body <a href="https://tools.ietf.org/html/rfc2616">using two CRLFs</a> (<code>\r\n</code>).
-Some freestylers (obviously not following the RFC) use two <code>\n</code>. I however won't
-deal with that in here.</p>
-<p>First get a HTTP response:</p>
-<div class="highlight"><pre><span class="nv">$ </span><span class="nb">echo</span> -e <span class="s1">&#39;GET / HTTP/1.1\r\n\r\n&#39;</span> <span class="p">|</span> nc google.com <span class="m">80</span> <span class="p">|</span> tee /tmp/response
-HTTP/1.1 <span class="m">302</span> Found
-Cache-Control: private
-Content-Type: text/html<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>UTF-8
-Location: ...
-Content-Length: 256
-Date: ...
-Server: GFE/2.0
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
 
-&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv<span class="o">=</span><span class="s2">&quot;content-type&quot;</span> <span class="nv">content</span><span class="o">=</span><span class="s2">&quot;text/html;charset=utf-8&quot;</span>&gt;
-&lt;TITLE&gt;302 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;
-&lt;H1&gt;302 Moved&lt;/H1&gt;
-The document has moved
-&lt;A <span class="nv">HREF</span><span class="o">=</span><span class="s2">&quot;...&quot;</span>&gt;here&lt;/A&gt;.
-&lt;/BODY&gt;&lt;/HTML&gt;
-</pre></div>
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Achives</a></p>
 
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
 
-<p>The response content is copied to <code>/tmp/response</code>. With erlang,
-this is easily read with <a href="http://erlang.org/doc/man/file.html#read_file-1">file:read_file</a>
-(loading the content to a Binary) and then transforming the binary to a string
-using <a href="http://erlang.org/doc/man/erlang.html#binary_to_list-1">erlang:binary_to_list</a>.</p>
-<p>Erlang provides two interesting modules which help to deal with string:
-<a href="http://erlang.org/doc/man/string.html">string</a> and <a href="http://erlang.org/doc/man/lists.html">lists</a>
-(since a string is a list in erlang).
-Looking for something to allow me to split a string into several tokens
-based on a separator lead me to these solutions:</p>
-<ol>
-<li><strong>tokenize</strong> using <a href="http://erlang.org/doc/man/string.html#tokens-2">string:tokens/2</a></li>
-<li><strong>offset and sub-string</strong> using <a href="http://erlang.org/doc/man/string.html#str-2">string:str/2</a>
-     and <a href="http://erlang.org/doc/man/string.html#substr-2">string:substr</a></li>
-<li><strong>offset and split</strong> using <a href="http://erlang.org/doc/man/string.html#str-2">string:str/2</a> and
-     <a href="http://erlang.org/doc/man/lists.html#split-2">lists:split/2</a></li>
-<li><strong>coding way</strong></li>
-</ol>
-<h2>Tokenize</h2>
-<p><a href="http://erlang.org/doc/man/string.html#tokens-2">string:tokens/2</a> allows
-to split a string into a list of tokens.</p>
-<p>For example:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="s">&quot;this is a test&quot;</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">).</span>
-<span class="p">[</span><span class="s">&quot;this&quot;</span><span class="p">,</span><span class="s">&quot;is&quot;</span><span class="p">,</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">]</span>
-</pre></div>
-
-
-<p>A disadvantage (or advantage) from this method is that adjacent separators are
-treated as one as shown here:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="s">&quot;I want to separate successive c in here&quot;</span><span class="p">,</span> <span class="s">&quot;cc&quot;</span><span class="p">).</span>
-<span class="p">[</span><span class="s">&quot;I want to separate su&quot;</span><span class="p">,</span><span class="s">&quot;essive &quot;</span><span class="p">,</span><span class="s">&quot; in here&quot;</span><span class="p">]</span>
-</pre></div>
-
-
-<p>instead of the expected <code>["I want to separate su","essive c in here"]</code> :-(</p>
-<p>Similarly when parsing HTTP response, we're looking to separate the
-header from the body using the separator <code>\r\n\r\n</code>. As shown this won't work
-with <code>tokens</code> since <code>\r\n\r\n</code> will be treated as <code>\r\n</code> and thus result in
-the following:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">3</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="nv">Content</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\r\n\r\n</span><span class="s">&quot;</span><span class="p">).</span>
-<span class="p">[</span><span class="s">&quot;HTTP/1.1 302 Found&quot;</span><span class="p">,</span><span class="s">&quot;Cache-Control: private&quot;</span><span class="p">,</span>
- <span class="s">&quot;Content-Type: text/html; charset=UTF-8&quot;</span><span class="p">,</span>
- <span class="s">&quot;Location: ...&quot;</span><span class="p">,</span>
- <span class="s">&quot;Content-Length: 256&quot;</span><span class="p">,</span><span class="s">&quot;Date: ...&quot;</span><span class="p">,</span>
- <span class="s">&quot;Server: GFE/2.0&quot;</span><span class="p">,</span>
- <span class="s">&quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=</span><span class="se">\&quot;</span><span class="s">content-type</span><span class="se">\&quot;</span><span class="s"> content=</span><span class="se">\&quot;</span><span class="s">text/html;charset=utf-8</span><span class="se">\&quot;</span><span class="s">&gt;&quot;</span><span class="p">,</span>
- <span class="s">&quot;&lt;TITLE&gt;302 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;&quot;</span><span class="p">,</span>
- <span class="s">&quot;&lt;H1&gt;302 Moved&lt;/H1&gt;&quot;</span><span class="p">,</span><span class="s">&quot;The document has moved&quot;</span><span class="p">,</span>
- <span class="s">&quot;&lt;A HREF=</span><span class="se">\&quot;</span><span class="s">...</span><span class="se">\&quot;</span><span class="s">&gt;here&lt;/A&gt;.&quot;</span><span class="p">,</span>
- <span class="s">&quot;&lt;/BODY&gt;&lt;/HTML&gt;&quot;</span><span class="p">]</span>
-</pre></div>
-
-
-<p>Let's try something else ...</p>
-<h2>Offset and sub-string</h2>
-<p><a href="http://erlang.org/doc/man/string.html#str-2">string:str/2</a> allows you to retrieve
-the offset of a specific sequence in a string while
-<a href="http://erlang.org/doc/man/string.html#substr-2">string:substr</a> helps you extract
-a sub-string based on its starting offset and its length.</p>
-<p>One way of doing it would then be:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">3</span><span class="o">&gt;</span> <span class="nv">Offset</span> <span class="o">=</span> <span class="nn">string</span><span class="p">:</span><span class="nf">str</span><span class="p">(</span><span class="nv">Content</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\r\n\r\n</span><span class="s">&quot;</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">4</span><span class="o">&gt;</span> <span class="c">% first retrieve the header</span>
-<span class="mi">4</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">substr</span><span class="p">(</span><span class="nv">Content</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">Offset</span><span class="o">+</span><span class="mi">1</span><span class="p">).</span>
-<span class="s">&quot;HTTP/1.1 302 Found</span><span class="se">\r\n</span><span class="s">Cache-Control: private</span><span class="se">\r\n</span><span class="s">Content-Type: text/html; charset=UTF-8</span><span class="se">\r\n</span><span class="s">Location: ...</span><span class="se">\r\n</span><span class="s">Content-Length: 256</span><span class="se">\r\n</span><span class="s">Date: ...</span><span class="se">\r\n</span><span class="s">Server: GFE/2.0</span><span class="se">\r\n</span><span class="s">&quot;</span>
-<span class="mi">5</span><span class="o">&gt;</span> <span class="c">% then the body</span>
-<span class="mi">5</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">substr</span><span class="p">(</span><span class="nv">Content</span><span class="p">,</span> <span class="nv">Offset</span><span class="o">+</span><span class="mi">4</span><span class="p">).</span>
-<span class="s">&quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=</span><span class="se">\&quot;</span><span class="s">content-type</span><span class="se">\&quot;</span><span class="s"> content=</span><span class="se">\&quot;</span><span class="s">text/html;charset=utf-8</span><span class="se">\&quot;</span><span class="s">&gt;</span><span class="se">\n</span><span class="s">&lt;TITLE&gt;302 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;</span><span class="se">\n</span><span class="s">&lt;H1&gt;302 Moved&lt;/H1&gt;</span><span class="se">\n</span><span class="s">The document has moved</span><span class="se">\n</span><span class="s">&lt;A HREF=</span><span class="se">\&quot;</span><span class="s">...</span><span class="se">\&quot;</span><span class="s">&gt;here&lt;/A&gt;.</span><span class="se">\r\n</span><span class="s">&lt;/BODY&gt;&lt;/HTML&gt;</span><span class="se">\r\n</span><span class="s">&quot;</span>
-</pre></div>
-
-
-<p>This works but you must admit it is not very elegant. Moreover you have to
-play with the offset value to get exactly the part you want. Not nice !
-Moreover you can only split a string in two and thus wouldn't easily be
-able to split a string in more than two fields.</p>
-<h2>Offset and split</h2>
-<p><a href="http://erlang.org/doc/man/lists.html#split-2">lists:split/2</a> will split the
-list provided in argument in two lists with the first one containing the N first
-char(s):</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">3</span><span class="o">&gt;</span> <span class="nv">Offset</span> <span class="o">=</span> <span class="nn">string</span><span class="p">:</span><span class="nf">str</span><span class="p">(</span><span class="nv">Content</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\r\n\r\n</span><span class="s">&quot;</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">4</span><span class="o">&gt;</span> <span class="p">{</span><span class="nv">Header</span><span class="p">,</span> <span class="nv">Body</span><span class="p">}</span> <span class="o">=</span> <span class="nn">lists</span><span class="p">:</span><span class="nf">split</span><span class="p">(</span><span class="nv">Offset</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nv">Content</span><span class="p">).</span>
-<span class="p">{</span><span class="s">&quot;HTTP/1.1 302 Found</span><span class="se">\r\n</span><span class="s">Cache-Control: private</span><span class="se">\r\n</span><span class="s">Content-Type: text/html; charset=UTF-8</span><span class="se">\r\n</span><span class="s">Location: ...</span><span class="se">\r\n</span><span class="s">Content-Length: 256</span><span class="se">\r\n</span><span class="s">Date: ...</span><span class="se">\r\n</span><span class="s">Server: GFE/2.0</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span>
- <span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=</span><span class="se">\&quot;</span><span class="s">content-type</span><span class="se">\&quot;</span><span class="s"> content=</span><span class="se">\&quot;</span><span class="s">text/html;charset=utf-8</span><span class="se">\&quot;</span><span class="s">&gt;</span><span class="se">\n</span><span class="s">&lt;TITLE&gt;302 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;</span><span class="se">\n</span><span class="s">&lt;H1&gt;302 Moved&lt;/H1&gt;</span><span class="se">\n</span><span class="s">The document has moved</span><span class="se">\n</span><span class="s">&lt;A HREF=</span><span class="se">\&quot;</span><span class="s">...</span><span class="se">\&quot;</span><span class="s">&gt;here&lt;/A&gt;.</span><span class="se">\r\n</span><span class="s">&lt;/BODY&gt;&lt;/HTML&gt;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">}</span>
-</pre></div>
-
-
-<p>This is a bit better but we still have to strip the two returned strings in order
-to remove the separator <code>\r\n</code>. Moreover, as the previous example, you cannot
-easily split a string in more than two fields.</p>
-<h2>Coding way</h2>
-<p>This is IMHO the best way for our use-case. Unlike the other
-solutions this:</p>
-<ul>
-<li>is easily customizable</li>
-<li>handles errors and cases when no match is found</li>
-<li>looks very elegant and uses erlang's power</li>
-<li>[bonus] allows to split in more than two fields</li>
-</ul>
-<p>Without further introduction, here's how I did this:</p>
-<div class="highlight"><pre><span class="p">-</span><span class="ni">define</span><span class="p">(</span><span class="no">CRLF</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">).</span>
-
-<span class="nf">parse_response</span><span class="p">(</span><span class="o">?</span><span class="nv">CRLF</span> <span class="o">++</span> <span class="o">?</span><span class="nv">CRLF</span> <span class="o">++</span> <span class="nv">Rest</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="p">[</span><span class="nn">lists</span><span class="p">:</span><span class="nf">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">)</span><span class="o">++?</span><span class="nv">CRLF</span><span class="p">,</span> <span class="nv">Rest</span><span class="p">];</span>
-<span class="nf">parse_response</span><span class="p">([</span><span class="nv">H</span><span class="p">|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="n">parse_response</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="p">[</span><span class="nv">H</span><span class="p">|</span><span class="nv">Acc</span><span class="p">]);</span>
-<span class="nf">parse_response</span><span class="p">([],</span> <span class="p">_</span><span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="p">[</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">].</span>
-</pre></div>
-
-
-<p>This allows, using list comprehension and pattern matching, to nicely
-separate the header of the body:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
-<span class="p">...</span>
-<span class="mi">3</span><span class="o">&gt;</span> <span class="nn">tmp</span><span class="p">:</span><span class="nf">parse_response</span><span class="p">(</span><span class="nv">Content</span><span class="p">,</span> <span class="p">[]).</span>
-<span class="p">[</span><span class="s">&quot;HTTP/1.1 302 Found</span><span class="se">\r\n</span><span class="s">Cache-Control: private</span><span class="se">\r\n</span><span class="s">Content-Type: text/html; charset=UTF-8</span><span class="se">\r\n</span><span class="s">Location: ...</span><span class="se">\r\n</span><span class="s">Content-Length: 256</span><span class="se">\r\n</span><span class="s">Date: ...</span><span class="se">\r\n</span><span class="s">Server: GFE/2.0</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span>
- <span class="s">&quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=</span><span class="se">\&quot;</span><span class="s">content-type</span><span class="se">\&quot;</span><span class="s"> content=</span><span class="se">\&quot;</span><span class="s">text/html;charset=utf-8</span><span class="se">\&quot;</span><span class="s">&gt;</span><span class="se">\n</span><span class="s">&lt;TITLE&gt;302 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;</span><span class="se">\n</span><span class="s">&lt;H1&gt;302 Moved&lt;/H1&gt;</span><span class="se">\n</span><span class="s">The document has moved</span><span class="se">\n</span><span class="s">&lt;A HREF=</span><span class="se">\&quot;</span><span class="s">...</span><span class="se">\&quot;</span><span class="s">&gt;here&lt;/A&gt;.</span><span class="se">\r\n</span><span class="s">&lt;/BODY&gt;&lt;/HTML&gt;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">]</span>
-</pre></div>
-
-
-<p>A little explanation on how that works:</p>
-<p>While no successive CRLFs are found, go through the string, char by char
-(using <code>[H|T]</code>), and prepend the processed char (<code>H</code>) to the accumulator.
-Once two CRLFs are found, we reverse the accumulator (since
-it was built in reverse order) and construct the resulting list.
-If no <code>\r\n\r\n</code> is found, a list of two empty lists is returned.</p>
-<p>This function can then be improved to handle the splitting of several fields,
-as for example in a csv line where fields are separated by a comma. We wouldn't
-be able to use <code>string:tokens</code> since we want to be able to see empty fields:</p>
-<div class="highlight"><pre><span class="p">-</span><span class="ni">define</span><span class="p">(</span><span class="no">SEP</span><span class="p">,</span> <span class="s">&quot;,&quot;</span><span class="p">).</span>
-
-<span class="nf">parse_line</span><span class="p">(</span><span class="o">?</span><span class="nv">SEP</span> <span class="o">++</span> <span class="nv">Rest</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="p">[</span><span class="nn">string</span><span class="p">:</span><span class="nf">strip</span><span class="p">(</span><span class="nn">lists</span><span class="p">:</span><span class="nf">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">))|</span><span class="n">parse_line</span><span class="p">(</span><span class="nv">Rest</span><span class="p">,</span> <span class="p">[])];</span>
-<span class="nf">parse_line</span><span class="p">([</span><span class="nv">H</span><span class="p">|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="n">parse_line</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="p">[</span><span class="nv">H</span><span class="p">|</span><span class="nv">Acc</span><span class="p">]);</span>
-<span class="nf">parse_line</span><span class="p">([],</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="p">[</span><span class="nn">string</span><span class="p">:</span><span class="nf">strip</span><span class="p">(</span><span class="nn">lists</span><span class="p">:</span><span class="nf">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">))].</span>
-</pre></div>
-
-
-<p>resulting in (you can see the difference with <code>string:tokens</code>):</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="nv">Line</span> <span class="o">=</span> <span class="s">&quot;field1,ofjeofje    ,field3, foefjoejfe,    field5,,&quot;</span><span class="p">.</span>
-<span class="s">&quot;field1,ofjeofje    ,field3, foefjoejfe,    field5,,&quot;</span>
-<span class="mi">2</span><span class="o">&gt;</span> <span class="nn">tmp</span><span class="p">:</span><span class="nf">parse_line</span><span class="p">(</span><span class="nv">Line</span><span class="p">,</span> <span class="p">[]).</span>
-<span class="p">[</span><span class="s">&quot;field1&quot;</span><span class="p">,</span><span class="s">&quot;ofjeofje&quot;</span><span class="p">,</span><span class="s">&quot;field3&quot;</span><span class="p">,</span><span class="s">&quot;foefjoejfe&quot;</span><span class="p">,</span><span class="s">&quot;field5&quot;</span><span class="p">,[],[]]</span>
-<span class="mi">3</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="nv">Line</span><span class="p">,</span> <span class="s">&quot;,&quot;</span><span class="p">).</span>
-<span class="p">[</span><span class="s">&quot;field1&quot;</span><span class="p">,</span><span class="s">&quot;ofjeofje    &quot;</span><span class="p">,</span><span class="s">&quot;field3&quot;</span><span class="p">,</span><span class="s">&quot; foefjoejfe&quot;</span><span class="p">,</span>
- <span class="s">&quot;    field5&quot;</span><span class="p">]</span>
-</pre></div>
-
-
-<p>Since this is easily customizable, one could think of parsing the header's fields
-(the fields separator is <code>\r\n</code> and the key-value separator is <code>:</code>) and put
-them in a <a href="http://erlang.org/doc/man/maps.html">map</a> for easy retrieval. I let
-that coding exercise to the reader ;-)</p>
-<p><strong>Happy coding !!</strong></p>
-                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles ...</h1>
-                    <ol id="posts-list" class="hfeed">
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="https://deadc0de.re/articles/erlang-first-steps.html" rel="bookmark"
-                           title="Permalink to Getting started with erlang">Getting started with erlang</a>
-                    </h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <span>Tue 01 December 2015</span>
-<span>| tags: <a href="https://deadc0de.re/tag/erlang.html">erlang</a>,<a href="https://deadc0de.re/tag/programming.html">programming</a></span></footer><!-- /.post-info -->                <p>Here’s a quick introduction to Erlang programming language as well as some basic examples to show you what it looks like and why you should try it !</p>
-                <a class="readmore" href="https://deadc0de.re/articles/erlang-first-steps.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-            </ol><!-- /#posts-list -->
-<p class="paginator">
-    Page 1 / 1
-</p>
-            </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>blogroll</h2>
-                        <ul>
-                            <li><a href="https://0xabe.io/">0xabe</a></li>
-                            <li><a href="http://h4ck.go.ddamn.it/">h4ck.go.damn.it</a></li>
-                            <li><a href="https://www.freeture.ch/">freeture</a></li>
-                            <li><a href="http://cybersmashup.com/">cybersmashup</a></li>
-                            <li><a href="https://rolinh.ch/">rolinh</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
-                            <li><a href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate">rss feed</a></li>
-
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <footer class="body" id="footerinfo">
-        <div id="noscr">
-          <noscript id="noscr">
-            <p>
-            Noscript ? Good ! No worries, there's nothing of that kind here
-            </p>
-          </noscript>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
         </div>
-        <!--<footer id="contentinfo" class="body">-->
-          <p>
-            &copy; 2015 deadc0de
-            <br/>
-            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
-            This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
-           </p>
-        </footer><!-- /#contentinfo -->
-
+    <div class="pure-u">
+        <div class="content">
+            <!-- A wrapper for all the blog posts -->
+            <div class="posts">
+                <h1 class="content-subhead">
+Posts tagged 'erlang'                </h1>
+                    <section class="post">
+                        <header class="post-header">
+                            <h3><a class="post-title" href="https://deadc0de.re/articles/erlang-http-parsing.html">HTTP response parsing with Erlang</a></h3>
+                            <p class="post-meta"><p>HTTP response parsing with Erlang</p></p>
+                            <p class="post-meta">// 2016-02-08 under                                 <a class="post-category" href="https://deadc0de.re/tag/erlang.html">erlang</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/parsing.html">parsing</a>
+ &middot;
+                            </p>
+                        </header>
+                    </section>
+                    <section class="post">
+                        <header class="post-header">
+                            <h3><a class="post-title" href="https://deadc0de.re/articles/erlang-first-steps.html">Getting started with erlang</a></h3>
+                            <p class="post-meta"><p>Here’s a quick introduction to Erlang programming language as well as some basic examples to show you what it looks like and why you should try it !</p></p>
+                            <p class="post-meta">// 2015-12-01 under                                 <a class="post-category" href="https://deadc0de.re/tag/erlang.html">erlang</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/programming.html">programming</a>
+ &middot;
+                            </p>
+                        </header>
+                    </section>
+<div class="pagination-wrapper content-subhead">
+    <div class="pagination">
+        <div class="pagination-left">
+                &nbsp;
+        </div>
+        <span>Page 1 / 1</span>
+        <div class="pagination-right">
+        </div>
+    </div>
+</div><footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>            </div>
+        </div>
+    </div>
+    </div>
 </body>
 </html>

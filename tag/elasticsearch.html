@@ -1,165 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <meta name="author" content="deadc0de">
-        <meta name="description" content="deadc0de's blog">
-        <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
-        <title>deadc0de.re - elasticsearch</title>
-        <link rel="icon" type="image/png" href="/favicon.png">
-        <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css" />
-        <link href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="deadc0de.re Atom Feed" />
-        <link href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="deadc0de.re RSS Feed" />
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>elasticsearch tag // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://deadc0de.re/">deadc0de.re  <strong>... rocking out ...</strong></a></h1>
-                <hr/>
-                <nav><ul>
-                        <li><a href="https://deadc0de.re/pages/about.html">About</a></li>
-                    <li><a href="/pages/tags.html">Tags</a></li>
-                    <li><a href="/pages/archives.html">Achives</a></li>
-                </ul>
-<form id="search" action"#" onsubmit="javascript:window.open('https://duckduckgo.com/?q='+document.getElementById('keywords').value+'+site:https://deadc0de.re');">
-                        <input id="keywords" type="text" />
-                    </form>
-                </nav>
-        </header><!-- /#banner -->
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="https://deadc0de.re/articles/python-es.html">Query Elasticsearch with Python</a></h1>
-<footer class="post-info">
-        <span>Mon 01 February 2016</span>
-<span>| tags: <a href="https://deadc0de.re/tag/elasticsearch.html">elasticsearch</a>,<a href="https://deadc0de.re/tag/python.html">python</a>,<a href="https://deadc0de.re/tag/programming.html">programming</a></span></footer><!-- /.post-info --><p>Before, when I needed to query an elasticsearch cluster and retrieve data, I always
-ended up doing some curl-fu. It's nice and quick however if you want to retrieve
-a lot of data and are in the need of something more powerful you need something
-else. Moreover json is aweful to deal with on the command line !</p>
-<p>I came across those two python libraries which are quite nice:</p>
-<ul>
-<li><a href="https://elasticsearch-py.readthedocs.org/">Elasticsearch-py</a>: the
-    official low-level library for querying elasticsearch</li>
-<li><a href="https://elasticsearch-dsl.readthedocs.org/">Elasticsearch-dsl</a>: the
-    high-level library built above elasticsearch-py</li>
-</ul>
-<p>Combining those two libraries provides you with really powerful ways to
-insert, query and manage your ES's data.
-I won't describe in details the use of those libraries but there are two main
-features I've used and found very nice:</p>
-<h3>Filtering</h3>
-<p>With these libraries, constructing your query is now way easier than
-using some json:</p>
-<div class="highlight"><pre><span class="o">...</span>
-<span class="kn">import</span> <span class="nn">elasticsearch</span>
-<span class="kn">from</span> <span class="nn">elasticsearch_dsl</span> <span class="kn">import</span> <span class="n">Search</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">F</span>
-<span class="o">...</span>
-<span class="n">client</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">(</span><span class="n">ES_HOST</span><span class="p">)</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">Search</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">INDEX</span><span class="p">)</span>
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
 
-<span class="c"># only return specific fields</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">fields</span><span class="p">([</span><span class="s">&#39;field0&#39;</span><span class="p">,</span> <span class="s">&#39;field1&#39;</span><span class="p">])</span>
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Achives</a></p>
 
-<span class="c"># add some filters</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">&quot;term&quot;</span><span class="p">,</span> <span class="n">_type</span><span class="o">=</span><span class="s">&quot;SOMETYPE&quot;</span><span class="p">)</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">&quot;range&quot;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;gt&#39;</span><span class="p">:</span> <span class="s">&quot;1000&quot;</span><span class="p">})</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">~</span><span class="n">F</span><span class="p">(</span><span class="s">&quot;term&quot;</span><span class="p">,</span> <span class="n">othercount</span><span class="o">=</span><span class="s">&quot;0&quot;</span><span class="p">))</span>
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
 
-<span class="c"># sort the results</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sort</span><span class="p">({</span><span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;order&#39;</span><span class="p">:</span> <span class="s">&#39;desc&#39;</span><span class="p">}})</span>
-<span class="o">...</span>
-</pre></div>
-
-
-<p>As shown above, you can think of any type of filters without having to
-fight with json syntax and stuff. For more info on the different types of
-ES filter, see
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/2.0/query-dsl.html">ES offical query DSL</a></p>
-<h3>Query in batch</h3>
-<p>The next very interesting feature is the ability to perform
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html">scroll searches</a>.</p>
-<p>This is very efficient when you need to retrieve a bunch of documents/results on
-a very large index. And it's quite elegant in python:</p>
-<div class="highlight"><pre><span class="o">...</span>
-<span class="kn">import</span> <span class="nn">elasticsearch</span>
-<span class="kn">from</span> <span class="nn">elasticsearch_dsl</span> <span class="kn">import</span> <span class="n">Search</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">F</span>
-<span class="o">...</span>
-<span class="k">def</span> <span class="nf">es_scroll</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">search</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-    <span class="c"># Initialize the scroll</span>
-    <span class="n">gotten</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">page</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">scroll</span><span class="o">=</span><span class="n">SCROLLDURATION</span><span class="p">,</span>
-      <span class="n">search_type</span><span class="o">=</span><span class="s">&#39;scan&#39;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">search</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
-    <span class="n">sid</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s">&#39;_scroll_id&#39;</span><span class="p">]</span>
-    <span class="n">total</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">page</span><span class="p">[</span><span class="s">&#39;hits&#39;</span><span class="p">][</span><span class="s">&#39;total&#39;</span><span class="p">])</span>
-    <span class="n">batchgot</span> <span class="o">=</span> <span class="n">total</span>
-
-    <span class="c"># scrolling through this view</span>
-    <span class="k">while</span> <span class="n">batchgot</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="n">page</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">scroll</span><span class="p">(</span><span class="n">scroll_id</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span> <span class="n">scroll</span><span class="o">=</span><span class="n">SCROLLDURATION</span><span class="p">)</span>
-      <span class="n">sid</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s">&#39;_scroll_id&#39;</span><span class="p">]</span>
-      <span class="n">batchgot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">page</span><span class="p">[</span><span class="s">&#39;hits&#39;</span><span class="p">][</span><span class="s">&#39;hits&#39;</span><span class="p">])</span>
-      <span class="n">gotten</span> <span class="o">+=</span> <span class="n">batchgot</span>
-      <span class="c"># do something with the results</span>
-      <span class="n">func</span><span class="p">(</span><span class="n">page</span><span class="p">[</span><span class="s">&#39;hits&#39;</span><span class="p">][</span><span class="s">&#39;hits&#39;</span><span class="p">])</span>
-    <span class="o">...</span>
-    <span class="k">return</span> <span class="n">gotten</span>
-<span class="o">...</span>
-</pre></div>
-
-
-<p>Scroll searches provide you with a kind of snapshot of your data and
-allows you to retrieve it in batch. Called
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#scroll-search-context">Search context</a>,
-it could be seen as a view in SQL databases.</p>
-<p>The parameter <code>SCROLLDURATION</code> defines how long the view of the data is to be
-kept (this is updated at each scroll's call).
-The function <code>func</code> is called after each batch to handle the results.</p>
-<p>This is very convenient and much faster than querying ES one document at a time !</p>
-<p><strong>Happy searches in bigdata</strong></p>
-<p><img alt="bigdata searches" src="https://deadc0de.re/gifs/bigdata.gif" /></p>
-                </article>
-<p class="paginator">
-    Page 1 / 1
-</p>
-            </aside><!-- /#featured -->
-            </ol><!-- /#posts-list -->
-            </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>blogroll</h2>
-                        <ul>
-                            <li><a href="https://0xabe.io/">0xabe</a></li>
-                            <li><a href="http://h4ck.go.ddamn.it/">h4ck.go.damn.it</a></li>
-                            <li><a href="https://www.freeture.ch/">freeture</a></li>
-                            <li><a href="http://cybersmashup.com/">cybersmashup</a></li>
-                            <li><a href="https://rolinh.ch/">rolinh</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
-                            <li><a href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" rel="alternate">rss feed</a></li>
-
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <footer class="body" id="footerinfo">
-        <div id="noscr">
-          <noscript id="noscr">
-            <p>
-            Noscript ? Good ! No worries, there's nothing of that kind here
-            </p>
-          </noscript>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
         </div>
-        <!--<footer id="contentinfo" class="body">-->
-          <p>
-            &copy; 2015 deadc0de
-            <br/>
-            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
-            This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
-           </p>
-        </footer><!-- /#contentinfo -->
-
+    <div class="pure-u">
+        <div class="content">
+            <!-- A wrapper for all the blog posts -->
+            <div class="posts">
+                <h1 class="content-subhead">
+Posts tagged 'elasticsearch'                </h1>
+                    <section class="post">
+                        <header class="post-header">
+                            <h3><a class="post-title" href="https://deadc0de.re/articles/python-es.html">Query Elasticsearch with Python</a></h3>
+                            <p class="post-meta"><p>Query Elasticsearch using Python and scroll</p></p>
+                            <p class="post-meta">// 2016-02-01 under                                 <a class="post-category" href="https://deadc0de.re/tag/elasticsearch.html">elasticsearch</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/python.html">python</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/programming.html">programming</a>
+ &middot;
+                            </p>
+                        </header>
+                    </section>
+<div class="pagination-wrapper content-subhead">
+    <div class="pagination">
+        <div class="pagination-left">
+                &nbsp;
+        </div>
+        <span>Page 1 / 1</span>
+        <div class="pagination-right">
+        </div>
+    </div>
+</div><footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>            </div>
+        </div>
+    </div>
+    </div>
 </body>
 </html>
