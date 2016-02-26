@@ -1,5 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deadc0de.re</title><link>https://deadc0de.re/</link><description>... rocking out ...</description><atom:link href="https://deadc0de.re/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 08 Feb 2016 00:00:00 +0100</lastBuildDate><item><title>HTTP response parsing with Erlang</title><link>https://deadc0de.re/articles/erlang-http-parsing.html</link><description>&lt;p&gt;The goal is to parse an HTTP response into two elements, the header
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deadc0de.re</title><link>https://deadc0de.re/</link><description>... rocking out ...</description><atom:link href="https://deadc0de.re/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 26 Feb 2016 00:00:00 +0100</lastBuildDate><item><title>Unix tricks</title><link>https://deadc0de.re/articles/unix-tricks.html</link><description>&lt;p&gt;Some neat unix tricks&lt;/p&gt;
+&lt;h2&gt;port scanning using the shell&lt;/h2&gt;
+&lt;p&gt;It is easy to port scan using simple unix tools&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;some host&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;$ port&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;some port&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;timeout &lt;span class="m"&gt;3&lt;/span&gt; bash -c &lt;span class="s2"&gt;&amp;quot;echo &amp;gt;/dev/tcp/&lt;/span&gt;&lt;span class="nv"&gt;$host&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$port&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;echo &lt;/span&gt;open &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nb"&gt;echo &lt;/span&gt;closed
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;sed in-place replacement with backup&lt;/h2&gt;
+&lt;p&gt;Sed is often used to act on file in-place. It is very convenient to be able
+on a single command line to also backup the file.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# replace SOMETHING by ELSE in the file&lt;/span&gt;
+&lt;span class="c"&gt;# and create a backup file named bar.txt.bak&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;sed -i.bak &lt;span class="s1"&gt;&amp;#39;s/SOMETHING/ELSE/g&amp;#39;&lt;/span&gt; bar.txt
+&lt;span class="c"&gt;# remove from the third to the last line of the file&lt;/span&gt;
+&lt;span class="c"&gt;# and create a backup file named bar.txt.bak&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;sed -i.bak &lt;span class="s1"&gt;&amp;#39;3,$d&amp;#39;&lt;/span&gt; bar.txt
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;remove empty lines in file&lt;/h2&gt;
+&lt;p&gt;Getting rid of empty lines in a file is easy with sed.
+&lt;code&gt;/^$/&lt;/code&gt; will find lines with nothing between the beginning of the line (&lt;code&gt;^&lt;/code&gt;)
+and the end of it (&lt;code&gt;$&lt;/code&gt;) and then &lt;code&gt;d&lt;/code&gt; deletes it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sed &lt;span class="s1"&gt;&amp;#39;/^$/d&amp;#39;&lt;/span&gt; &amp;lt;file-path&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;insert file in vim&lt;/h2&gt;
+&lt;p&gt;It sometimes happen you want to insert a entire file at the cursor position
+in vim. This is the command that will do that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;:r &amp;lt;file-path&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;remove file with weird names&lt;/h2&gt;
+&lt;p&gt;Sometimes you have files that get created (or you created them by error) that
+are not that easy to remove without potentially messing things up
+like for example &lt;em&gt;--&lt;/em&gt;, &lt;em&gt;~&lt;/em&gt;, &lt;em&gt;/&lt;/em&gt;, ...&lt;/p&gt;
+&lt;p&gt;The trick is first to retrieve the inode number of that file by listing
+all files in the directory:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;ls -i
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And then remove the file by its inode number using find:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;find . -inum &amp;lt;inode-num&amp;gt; -exec rm &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;reverse lines in file&lt;/h2&gt;
+&lt;p&gt;You probably know &lt;code&gt;cat&lt;/code&gt;, well there's also &lt;code&gt;tac&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat /tmp/foo
+Line 1
+Line 2
+Line 3
+&lt;span class="nv"&gt;$ &lt;/span&gt;tac /tmp/foo
+Line 3
+Line 2
+Line 1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;get N random lines from a file&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;randomize-lines&lt;/code&gt; is a nice tool allowing to quickly (and easily) randomize
+lines of a file. After installation, its binary is &lt;code&gt;rl&lt;/code&gt; (at least on debian).
+Combining it with &lt;code&gt;head&lt;/code&gt; allows to retrieve N random lines from a file&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# retrieveing 100 random lines from foo.txt&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;rl foo.txt &lt;span class="p"&gt;|&lt;/span&gt; head -100
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;execute last command as root&lt;/h2&gt;
+&lt;p&gt;I rarely use sudo, but when I need to, I usually forget it.
+This allows to execute latest command with sudo:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo !!
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;get your bandwidth from the cli&lt;/h2&gt;
+&lt;p&gt;The tool &lt;a href="https://github.com/sivel/speedtest-cli"&gt;speedtest-cli&lt;/a&gt; is very useful
+to retrieve the current download/upload speed.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;speedtest-cli &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s1"&gt;&amp;#39;Download\|Upload&amp;#39;&lt;/span&gt;
+Download: 711.94 Mbit/s
+Upload: 264.28 Mbit/s
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Fri, 26 Feb 2016 00:00:00 +0100</pubDate><guid>tag:deadc0de.re,2016-02-26:articles/unix-tricks.html</guid><category>unix</category><category>cli</category><category>shell</category></item><item><title>HTTP response parsing with Erlang</title><link>https://deadc0de.re/articles/erlang-http-parsing.html</link><description>&lt;p&gt;The goal is to parse an HTTP response into two elements, the header
 and the body. As everyone knows, the header is separated from the
 body &lt;a href="https://tools.ietf.org/html/rfc2616"&gt;using two CRLFs&lt;/a&gt; (&lt;code&gt;\r\n&lt;/code&gt;).
 Some freestylers (obviously not following the RFC) use two &lt;code&gt;\n&lt;/code&gt;. I however won't
