@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Unix tricks // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Achives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Unix tricks</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/unix.html">unix</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/cli.html">cli</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/shell.html">shell</a>
+                            <br/>
+                            // Fri 26 February 2016
+                        </p>
+                </header>
+            </section>
+            <p>Some neat unix tricks</p>
+<h2>port scanning using the shell</h2>
+<p>It is easy to port scan using simple unix tools</p>
+<div class="highlight"><pre><span class="nv">$ host</span><span class="o">=</span><span class="s2">&quot;some host&quot;</span>
+<span class="nv">$ port</span><span class="o">=</span><span class="s2">&quot;some port&quot;</span>
+<span class="nv">$ </span>timeout <span class="m">3</span> bash -c <span class="s2">&quot;echo &gt;/dev/tcp/</span><span class="nv">$host</span><span class="s2">/</span><span class="nv">$port</span><span class="s2">&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">echo </span>open <span class="o">||</span> <span class="nb">echo </span>closed
+</pre></div>
+
+
+<h2>sed in-place replacement with backup</h2>
+<p>Sed is often used to act on file in-place. It is very convenient to be able
+on a single command line to also backup the file.</p>
+<div class="highlight"><pre><span class="c"># replace SOMETHING by ELSE in the file</span>
+<span class="c"># and create a backup file named bar.txt.bak</span>
+<span class="nv">$ </span>sed -i.bak <span class="s1">&#39;s/SOMETHING/ELSE/g&#39;</span> bar.txt
+<span class="c"># remove from the third to the last line of the file</span>
+<span class="c"># and create a backup file named bar.txt.bak</span>
+<span class="nv">$ </span>sed -i.bak <span class="s1">&#39;3,$d&#39;</span> bar.txt
+</pre></div>
+
+
+<h2>remove empty lines in file</h2>
+<p>Getting rid of empty lines in a file is easy with sed.
+<code>/^$/</code> will find lines with nothing between the beginning of the line (<code>^</code>)
+and the end of it (<code>$</code>) and then <code>d</code> deletes it:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sed <span class="s1">&#39;/^$/d&#39;</span> &lt;file-path&gt;
+</pre></div>
+
+
+<h2>insert file in vim</h2>
+<p>It sometimes happen you want to insert a entire file at the cursor position
+in vim. This is the command that will do that:</p>
+<div class="highlight"><pre>:r &lt;file-path&gt;
+</pre></div>
+
+
+<h2>remove file with weird names</h2>
+<p>Sometimes you have files that get created (or you created them by error) that
+are not that easy to remove without potentially messing things up
+like for example <em>--</em>, <em>~</em>, <em>/</em>, ...</p>
+<p>The trick is first to retrieve the inode number of that file by listing
+all files in the directory:</p>
+<div class="highlight"><pre><span class="nv">$ </span>ls -i
+</pre></div>
+
+
+<p>And then remove the file by its inode number using find:</p>
+<div class="highlight"><pre><span class="nv">$ </span>find . -inum &lt;inode-num&gt; -exec rm <span class="o">{}</span> <span class="se">\;</span>
+</pre></div>
+
+
+<h2>reverse lines in file</h2>
+<p>You probably know <code>cat</code>, well there's also <code>tac</code>:</p>
+<div class="highlight"><pre><span class="nv">$ </span>cat /tmp/foo
+Line 1
+Line 2
+Line 3
+<span class="nv">$ </span>tac /tmp/foo
+Line 3
+Line 2
+Line 1
+</pre></div>
+
+
+<h2>get N random lines from a file</h2>
+<p><code>randomize-lines</code> is a nice tool allowing to quickly (and easily) randomize
+lines of a file. After installation, its binary is <code>rl</code> (at least on debian).
+Combining it with <code>head</code> allows to retrieve N random lines from a file</p>
+<div class="highlight"><pre><span class="c"># retrieveing 100 random lines from foo.txt</span>
+<span class="nv">$ </span>rl foo.txt <span class="p">|</span> head -100
+</pre></div>
+
+
+<h2>execute last command as root</h2>
+<p>I rarely use sudo, but when I need to, I usually forget it.
+This allows to execute latest command with sudo:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo !!
+</pre></div>
+
+
+<h2>get your bandwidth from the cli</h2>
+<p>The tool <a href="https://github.com/sivel/speedtest-cli">speedtest-cli</a> is very useful
+to retrieve the current download/upload speed.</p>
+<div class="highlight"><pre><span class="nv">$ </span>speedtest-cli <span class="p">|</span> grep <span class="s1">&#39;Download\|Upload&#39;</span>
+Download: 711.94 Mbit/s
+Upload: 264.28 Mbit/s
+</pre></div>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
