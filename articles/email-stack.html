@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Email stack FTW // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Achives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Email stack FTW</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/email.html">email</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/offlineimap.html">offlineimap</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/alot.html">alot</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/notmuch.html">notmuch</a>
+                            <br/>
+                            // Sat 12 March 2016
+                        </p>
+                </header>
+            </section>
+            <p><em>If you wake up looking forward to booting your shiny new Windows 10 with your
+flashy outlook, well this is way too advanced for you, pass on.
+One advice though: get a grown-up OS ;-)</em></p>
+<p>Since I moved out of gmail (for obvious privacy reasons), I was using simultaneously
+<a href="http://www.mutt.org/">mutt</a> and <a href="https://roundcube.net/">roundcube</a>
+to access my emails.</p>
+<p>mutt is a really powerful tool to help you quickly get things done
+(reading, writing, searching emails).
+Roundcube on the other hand allowed me to access my emails from anywhere
+without having to setup all the needed tools.</p>
+<p>Those tools were nice but I was missing some features.
+I thus decided to move to something faster, more complete with specific features:</p>
+<ul>
+<li><strong>TUI</strong>:
+    I hate using the mouse and want something fast with great keybindings
+    preferably vim-like</li>
+<li><strong>fast search</strong>:
+    Ability to search in all my emails quickly (independently if the searched term
+    is in the body or the header)</li>
+<li><strong>tags</strong>:
+    Ability to tag my emails</li>
+<li><strong>webmail-compatible</strong>:
+    Retro-compatibility with webmail (roundcube or similar)
+    such that I could still access my emails from another computer without having to
+    setup all needed tools</li>
+<li><strong>Auto-tag</strong>:
+    Ability to auto-tag my emails (specific mailing-list to a specific
+    tag/folder, ...)</li>
+</ul>
+<p>So in short I wanted to be able to read my emails from a TUI that
+allows me to tag (auto-tag) my emails but also allows in some way to synchronize
+the changes (tags, flags, ...) with the remote IMAP server. Such that I would
+be able, if needed, to read my emails remotely and still be able to find my
+way across the structure (folder hierarchy for roundcube).</p>
+<p>I first came across <a href="http://supmua.org/">sup</a> which is a really nice mail user
+agent. Sup didn't match my criteria for two reasons:</p>
+<ul>
+<li>inability to synchronize tags on IMAP server (especially regarding folder
+    structure).</li>
+<li>ruby (nothing against ruby but I'm more into Python)</li>
+</ul>
+<p>I then discovered <a href="https://notmuchmail.org/">notmuch</a> which is a rewrite of sup
+with performance in mind. Notmuch is surrounded with very neat tools in the
+UNIX-philosophy "<em>Do one thing and do it right</em>". <em>notmuch</em> is not as complete as
+sup, it does not allow to read or write emails but only cares for indexing,
+searching and tagging emails. The rest is done by other specific tools as
+described below.</p>
+<p>Before I dig into the different blocks that are now building my email stack I
+would like to mention that there are three ways (with pros and cons) to
+synchronize your email's tags with a remote IMAP servers:</p>
+<ul>
+<li>
+<p><strong>using X-Keywords</strong>
+    This method will add (or complete) the header's key named <em>X-Keywords</em> with a
+    list of tags (separated by a comma).</p>
+<ul>
+<li><a href="https://github.com/gauteh/abunchoftags">abunchoftags</a></li>
+<li><a href="https://offlineimap.readthedocs.org/en/next/MANUAL.html?highlight=keywords#sync-from-gmail-to-a-local-maildir-with-labels">offlineimap with labels</a></li>
+<li><a href="http://www.offlineimap.org/doc/use_cases.html">offlineimap for gmail</a></li>
+</ul>
+</li>
+<li>
+<p><strong>using X-labels</strong>
+    As for previous solution, but by using the header's key named
+    <em>X-labels</em> with tags separated by a space.</p>
+</li>
+<li>
+<p><strong>using folders</strong>
+    Tags are considered as virtual folders and thus translated into folders in
+    <a href="https://cr.yp.to/proto/maildir.html">maildir</a> (filesystem) and on the remote
+    mail server (IMAP server) and vice-versa.</p>
+</li>
+</ul>
+<p>I chose to use latest method for the following reasons:</p>
+<ul>
+<li><strong>immutability of email</strong>: I didn't feel comfortable changing email's content</li>
+<li><strong>webmail (retro-)compatibility</strong>: Roundcube is using folders to structure emails and
+    has no understanding of <em>X-labels</em> or <em>X-keywords</em>. It thus would have been
+    quite a mess when accessing my emails from a browser (flat structure, ...)</li>
+<li><strong>sync only subset</strong>: To quickly sync your emails, you might want to only synchronize a specific
+    subset of them, for example <em>INBOX</em>. If your emails are structured in folders
+    on the remote IMAP server (maildir or similar), this is much easier to do</li>
+</ul>
+<p>Now let's get down to the email stack itself. It is made of multiple tools, each of
+them doing a specific thing (and doing it right). It might seems a bit awkward
+at first but once setup, it is a killing email setup !</p>
+<p><img alt="mailstack" src="https://deadc0de.re/images/mailstack.png" /></p>
+<ul>
+<li><strong>offlineimap</strong>:
+    sync emails with a remote IMAP server</li>
+<li><strong>notmuch</strong>:
+    index all emails and provide tagging and searching features</li>
+<li><strong>notmuch auto-tagging</strong>:
+    auto-tag new emails</li>
+<li><strong>maildir-notmuch-sync</strong>:
+    sync tags to folders and vice-versa</li>
+<li><strong>msmtp</strong>:
+    send emails</li>
+<li><strong>alot</strong>:
+    view, search and tag emails in a nice ncurses interface</li>
+<li><strong>abook</strong>:
+    store contacts and provide auto-completion when writing new emails</li>
+</ul>
+<p>Now let's view all these tools in details ...</p>
+<h2>offlineimap - the email fetcher</h2>
+<p><a href="http://www.offlineimap.org/">offlineimap</a> downloads emails from
+an IMAP server and store them locally. It also sync your changes
+back to the remote server.</p>
+<p>Here's my config file:</p>
+<div class="highlight"><pre><span class="c"># author: deadc0de</span>
+<span class="p">[</span><span class="n">general</span><span class="p">]</span>
+<span class="n">accounts</span> <span class="o">=</span> <span class="n">personal</span>
+<span class="n">pythonfile</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c"># path to below script</span>
+<span class="n">fsync</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="p">[</span><span class="n">Account</span> <span class="n">personal</span><span class="p">]</span>
+<span class="n">localrepository</span> <span class="o">=</span> <span class="n">personal</span><span class="o">-</span><span class="n">local</span>
+<span class="n">remoterepository</span> <span class="o">=</span> <span class="n">remote</span>
+
+<span class="n">presynchook</span> <span class="o">=</span> <span class="n">maildir</span><span class="o">-</span><span class="n">notmuch</span><span class="o">-</span><span class="n">sync</span> <span class="n">pre</span> <span class="n">TODO</span> <span class="c"># path to your maildir</span>
+<span class="n">postsynchook</span> <span class="o">=</span> <span class="n">maildir</span><span class="o">-</span><span class="n">notmuch</span><span class="o">-</span><span class="n">sync</span> <span class="n">post</span> <span class="n">TODO</span> <span class="c"># path to your maildir</span>
+
+<span class="c"># use sqlite for quicker sync</span>
+<span class="n">status_backend</span> <span class="o">=</span> <span class="n">sqlite</span>
+<span class="c"># number of concurrent connection to imap server</span>
+<span class="n">maxconnections</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c"># auto-refresh every X minutes</span>
+<span class="n">autorefresh</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c"># quick refresh N times between the autorefresh</span>
+<span class="c"># won&#39;t update the flags though</span>
+<span class="n">quick</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="p">[</span><span class="n">Repository</span> <span class="n">personal</span><span class="o">-</span><span class="n">local</span><span class="p">]</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="n">Maildir</span>
+<span class="n">localfolders</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c"># maildir path</span>
+<span class="n">nametrans</span><span class="p">:</span> <span class="n">local_to_remote</span> <span class="c"># ext call</span>
+
+<span class="p">[</span><span class="n">Repository</span> <span class="n">remote</span><span class="p">]</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="n">IMAP</span>
+<span class="n">remotehost</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c"># remote IMAP server</span>
+<span class="n">remoteuser</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c"># login username</span>
+<span class="n">remotepasseval</span> <span class="o">=</span> <span class="n">mailpasswd</span><span class="p">()</span> <span class="c"># ext call</span>
+<span class="n">ssl</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">realdelete</span> <span class="o">=</span> <span class="n">no</span>
+<span class="n">remoteport</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c"># remote port</span>
+<span class="n">sslcacertfile</span> <span class="o">=</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="n">certs</span><span class="o">/</span><span class="n">ca</span><span class="o">-</span><span class="n">certificates</span><span class="o">.</span><span class="n">crt</span>
+<span class="n">nametrans</span><span class="p">:</span> <span class="n">remote_to_local</span> <span class="c"># ext call</span>
+<span class="n">idlefolders</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;INBOX&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<p>The script <code>maildir-notmuch-sync</code> used as a pre- and
+post-hook is described in its own section below.</p>
+<p>And the python script providing the functions for translating folder's names
+(<code>local_to_remote</code> and <code>remote_to_local</code>)
+and retrieving the password using gpg2 (<code>mailpasswd</code>):</p>
+<div class="highlight"><pre><span class="c"># author: deadc0de</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="c"># upload name translator</span>
+<span class="k">def</span> <span class="nf">local_to_remote</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+  <span class="c"># TODO - do your translations with re here</span>
+  <span class="k">return</span> <span class="n">folder</span>
+
+<span class="c"># download name translator</span>
+<span class="k">def</span> <span class="nf">remote_to_local</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+  <span class="c"># TODO - do your translations with re here</span>
+  <span class="k">return</span> <span class="n">folder</span>
+
+<span class="c"># password helper</span>
+<span class="k">def</span> <span class="nf">mailpasswd</span><span class="p">():</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s">&quot;TODO&quot;</span> <span class="c"># gpg file path</span>
+    <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&quot;/usr/bin/gpg2&quot;</span><span class="p">,</span> <span class="s">&quot;--batch&quot;</span><span class="p">,</span> <span class="s">&quot;-d&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+
+
+<p>For more information on how to configure/use offlineimap, see the
+<a href="http://www.offlineimap.org/documentation.html">official doc</a>.</p>
+<p>In order to avoid putting my password in clear text in the config, I used
+gpg-agent to query the password from a gpg encrypted file created with</p>
+<div class="highlight"><pre><span class="c"># gpg key</span>
+<span class="nb">echo</span> <span class="s2">&quot;YOURPASSWORD&quot;</span> <span class="p">|</span> gpg2 --encrypt --recipient <span class="s2">&quot;YOURNAME&quot;</span> -o &lt;password-file&gt;.gpg
+</pre></div>
+
+
+<p>or</p>
+<div class="highlight"><pre><span class="c"># symmetric</span>
+<span class="nb">echo</span> <span class="s2">&quot;YOURPASSWORD&quot;</span> <span class="p">|</span> gpg2 -c &gt; &lt;password-file&gt;.gpg
+</pre></div>
+
+
+<p>Offlineimap can easily be used as a service to continuously refresh and sync
+your emails with following systemd unit:</p>
+<div class="highlight"><pre><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>Offlineimap daemon
+<span class="nv">Requires</span><span class="o">=</span>network-online.target
+<span class="nv">After</span><span class="o">=</span>network.target
+
+<span class="o">[</span>Service<span class="o">]</span>
+<span class="nv">User</span><span class="o">=</span>TODO
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/local/bin/offlineimap
+<span class="nv">KillSignal</span><span class="o">=</span>SIGUSR2
+<span class="nv">Restart</span><span class="o">=</span>always
+
+<span class="o">[</span>Install<span class="o">]</span>
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</pre></div>
+
+
+<h2>notmuch - the indexer</h2>
+<p><a href="https://notmuchmail.org/">notmuch</a> is a rewrite of <em>sup</em> with performance in
+mind. It allows to tag emails and search among them. It is very fast
+and able to handle very large quantity of emails.</p>
+<p>Its configuration is very easy. You simply provide it with basic information on
+your emails and specify the tags with which each new emails is to be tagged
+with. This will be useful for <code>maildir-notmuch-sync</code> used below as well as for
+auto-tagging.</p>
+<p><em>notmuch</em> is to be setup using <code>notmuch setup</code>. Then each time you have
+synchronized your emails (with <em>offlineimap</em>), simply run <code>notmuch
+new</code> to index new mails.</p>
+<h2>notmuch auto-tagging script</h2>
+<p><em>notmuch</em> itself can be used to auto-tag new emails. The easiest way
+is to add a specific tag to new emails (<em>tofilter</em> for example) and then
+process all new emails right after calling <code>notmuch new</code>.</p>
+<p>First make sure you add a specific tag to new emails through
+notmuch's config <code>tags=...</code>. For the following example, the entry in notmuch
+config would be:</p>
+<div class="highlight"><pre>...
+<span class="nv">tags</span><span class="o">=</span>new,tofilter
+...
+</pre></div>
+
+
+<p>This means that after running <code>notmuch new</code>, any new email will be
+automatically tagged with two tags: <em>new</em> and <em>tofilter</em>. <em>tofilter</em> will be
+used here to auto-tag emails while <em>new</em> will be used by <code>maildir-notmuch-sync</code>
+described in following section.</p>
+<p>Now let's say you want all emails coming from
+<code>debian-bugs-rc@lists.debian.org</code> to be tagged with <em>debian</em>.</p>
+<div class="highlight"><pre>notmuch tag -tofilter +debian -- tag:tofilter and from:debian-bugs-rc@lists.debian.org
+</pre></div>
+
+
+<p>This will remove the tag <em>tofilter</em> and add the tag <em>debian</em> to all emails which
+are tagged <em>tofilter</em> and are from the <em>debian bugs mailing list</em>. For more information, see
+the <a href="https://notmuchmail.org/initial_tagging/">doc about initial tagging</a>.</p>
+<p>Since a new tag is added to all new emails (<em>tofilter</em> in this example),
+make sure you remove it from all emails that you don't process.
+Otherwise you will have mails hanging around with the tag <em>tofilter</em>:</p>
+<div class="highlight"><pre>notmuch tag -tofilter -- tag:tofilter
+</pre></div>
+
+
+<p>Theses steps can be put in a bash script and run from <em>maildir-notmuch-sync</em> through
+the <em>TAG_SCRIPT</em> config.</p>
+<h2>maildir-notmuch-sync - the tags/folders sync script</h2>
+<p>This script was originally written by <a href="http://ethanschoonover.com/">Ethan
+Schoonover</a>.
+It is available on github under <a href="https://github.com/mturquette/ghar-email/blob/master/.local/bin/maildir-notmuch-sync">this
+link</a>.
+The original script's purpose is to synchronize notmuch tags with remote IMAP servers
+and more specifically with gmail.</p>
+<p>I modified it to be able to translate notmuch's tags into a maildir folder and
+thus get my emails structured on the IMAP server for access with webmail.
+My modified version is available
+<a href="https://github.com/deadc0de6/scripts/blob/master/maildir-notmuch-sync">here</a>.</p>
+<p>The modified version will create a new folder (locally in maildir and remotely
+through offlineimap) when a new
+tag is used for the first time. Also emails will be copied around depending on
+their tags.</p>
+<p>Let's say for example that you tag a new email with two tags: <em>family</em> and
+<em>toremember</em>. This script will copy the email to two different folders in the
+maildir, the <em>family</em> folder and the <em>toremember</em> folder (and create them if
+they don't exist).
+When offlineimap will be run, those will be copied to the remote IMAP server to
+their respective folders.</p>
+<p>It is very convenient but also has its drawbacks. A single email might
+co-exist in several different folders on your maildir and on your IMAP
+server.</p>
+<h2>alot - the MUA</h2>
+<p><a href="https://github.com/pazz/alot">alot</a> is the interface to your emails.
+It is terminal based and fully compatible with notmuch.</p>
+<p>Its main features (to me at least):</p>
+<ul>
+<li>modular and implemented in Python</li>
+<li>based on ncurses (through the <a href="http://urwid.org/">urwid toolkit</a>)</li>
+<li>vim/pentadactyl keybindings (although fully customizable)</li>
+<li>slick and powerful interface (buffer-based, colors, ...)</li>
+<li>PGP/MIME support</li>
+</ul>
+<p>Some useful configs:</p>
+<ul>
+<li>
+<p>sync INBOX folder and refresh when hitting comma</p>
+<div class="highlight"><pre><span class="p">,</span> <span class="o">=</span> <span class="n">shellescape</span> <span class="o">--</span><span class="n">refocus</span><span class="o">=</span><span class="n">true</span> <span class="s">&#39;offlineimap -o -f INBOX&#39;</span><span class="p">;</span> <span class="n">search</span> <span class="n">tag</span><span class="p">:</span><span class="n">inbox</span> <span class="n">OR</span> <span class="n">tag</span><span class="p">:</span><span class="n">unread</span> <span class="n">OR</span> <span class="n">tag</span><span class="p">:</span><span class="n">flagged</span>
+</pre></div>
+
+
+</li>
+<li>
+<p>edit new email with vim</p>
+<div class="highlight"><pre><span class="n">editor_cmd</span> <span class="o">=</span> <span class="s">&#39;vim -c &quot;set textwidth=72&quot; -c &quot;set wrap&quot; -c &quot;set spell&quot; -c &quot;set nocp&quot;&#39;</span>
+</pre></div>
+
+
+</li>
+<li>
+<p>use msmtp to send emails</p>
+<div class="highlight"><pre><span class="p">[</span><span class="n">accounts</span><span class="p">]</span>
+    <span class="p">[[</span><span class="n">personal</span><span class="p">]]</span>
+      <span class="n">realname</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c"># your real name</span>
+      <span class="n">address</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c"># your email address</span>
+      <span class="n">sendmail_command</span> <span class="o">=</span> <span class="n">msmtp</span> <span class="o">--</span><span class="n">account</span><span class="o">=</span><span class="n">TODO</span> <span class="o">-</span><span class="n">t</span>
+      <span class="n">sent_box</span> <span class="o">=</span> <span class="n">maildir</span><span class="p">:</span><span class="o">//</span><span class="n">TODO</span> <span class="c"># the sent maildir folder</span>
+      <span class="n">draft_box</span> <span class="o">=</span> <span class="n">maildir</span><span class="p">:</span><span class="o">//</span><span class="n">TODO</span> <span class="c"># the drafts maildir folder</span>
+</pre></div>
+
+
+</li>
+<li>
+<p>use abook to search for contacts</p>
+<div class="highlight"><pre><span class="p">[</span><span class="n">accounts</span><span class="p">]</span>
+  <span class="p">[[[</span><span class="n">abook</span><span class="p">]]]</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">abook</span>
+    <span class="n">abook_contacts_file</span> <span class="o">=</span> <span class="s">&quot;TODO&quot;</span> <span class="c"># path to abook file</span>
+</pre></div>
+
+
+</li>
+</ul>
+<p>You can find more themes (with screenshots)
+<a href="https://github.com/pazz/alot/tree/master/extra/themes">here</a>.</p>
+<p><a href="https://youtu.be/D0Yuc_25ySw">This (old) screencast</a> shows the use of alot.
+A good resource is the <a href="https://alot.readthedocs.org/en/latest/installation.html">alot
+documentation</a> which
+lists all needed configuration options.</p>
+<h2>msmtp - the email sender</h2>
+<p><a href="http://msmtp.sourceforge.net/">msmtp</a> is a SMTP client that allows to easily
+transfer emails to an SMTP server.
+It is easily integrated into <em>alot</em> by providing an account in its config files
+as mentioned <a href="https://alot.readthedocs.org/en/latest/configuration/accounts.html">here</a>.</p>
+<p><a href="http://msmtp.sourceforge.net/doc/msmtp.html">Here</a>'s the complete manual on
+msmtp to help correctly configure msmtp.</p>
+<p>You can also use gpg2/gpg-agent to provide a password to msmtp without writing it in
+clear text in the config file.</p>
+<div class="highlight"><pre>passwordeval <span class="s2">&quot;gpg2 --quiet --for-your-eyes-only --no-tty --decrypt &lt;password-file&gt;.gpg&quot;</span>
+</pre></div>
+
+
+<h2>abook - the contact manager</h2>
+<p>One last thing missing to get a complete email stack is a contact manager. I
+found <a href="http://abook.sourceforge.net/">abook</a> to fill all needed requirements.
+Moreover it is fully compatible with alot which uses it to auto-complete <em>TO</em>
+when redacting.</p>
+<p>BTW <a href="https://raw.githubusercontent.com/yaroot/scripts/master/vcard2abook.py">this
+script</a>
+converts vcard to abook.</p>
+<h2>Conclusion</h2>
+<p>I've been using that setup for some weeks now and am very happy with it. It is
+fast and the search feature is really doing it ! It takes some time to setup
+all the right configs and keybindings but once settle, it's a bomb !
+Last but not least, TUI rocks !</p>
+<p>Some more references:</p>
+<ul>
+<li><a href="https://cr.yp.to/proto/maildir.html">maildir</a></li>
+<li><a href="http://deferred.io/2016/01/18/notmuch-tags-gmail-labels-bidirectional-sync">notmuch-maildir-sync post</a></li>
+<li><a href="http://deferred.io/2016/01/18/how-i-email">how I email in 2016</a></li>
+<li><a href="http://deferred.io/posts/2013/01/13/email-workflow-for-champions.html">email workflow for champions</a></li>
+<li><a href="https://offlineimap.readthedocs.org/en/next/MANUAL.html?highlight=keywords#sync-from-gmail-to-a-local-maildir-with-labels">offlineimap sync gmail</a></li>
+<li><a href="https://github.com/gauteh/abunchoftags">abunchoftags</a></li>
+<li><a href="http://catern.com/2014/05/15/mail-setup.html">A modern Unix mail setup</a></li>
+<li><a href="http://sirex.bitbucket.org/alot.html">alot post</a></li>
+<li><a href="https://f-koehler.github.io/posts/2015-03-17-offlineimap-msmtp-gnupg.html">offlineimap and msmtp with gnupg</a></li>
+</ul>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
