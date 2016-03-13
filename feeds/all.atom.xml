@@ -1,5 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-03-12T00:00:00+01:00</updated><entry><title>Email stack FTW</title><link href="https://deadc0de.re/articles/email-stack.html" rel="alternate"></link><updated>2016-03-12T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-03-12:articles/email-stack.html</id><summary type="html">&lt;p&gt;&lt;em&gt;If you wake up looking forward to booting your shiny new Windows 10 with your
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-03-13T00:00:00+01:00</updated><entry><title>Streamline sysadmin tasks with fabric</title><link href="https://deadc0de.re/articles/fabric.html" rel="alternate"></link><updated>2016-03-13T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-03-13:articles/fabric.html</id><summary type="html">&lt;p&gt;&lt;a href="http://www.fabfile.org/"&gt;Fabric&lt;/a&gt; is a Python command-line tool and library for
+streamlining sysadmins tasks. It is very useful when you have multiple
+hosts dedicated for a specific purpose (for example for an elasticsearch
+cluster) and you want to administer them without the hassle of connecting to
+each of them individually.&lt;/p&gt;
+&lt;p&gt;It allows to quickly execute the same command/task on different hosts through
+ssh. It's one way of doing it though, there are many other alternatives:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/sfermigier/tentakel"&gt;tentakel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/pkittenis/parallel-ssh"&gt;parallel-ssh&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/duncs/clusterssh/wiki"&gt;clusterssh&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.netfort.gr.jp/~dancer/software/dsh.html.en"&gt;dsh&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/rlewczuk/pssh"&gt;pssh&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;... and many more ...&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I like fabric because it gives you a lot of power thanks to Python. I haven't
+yet tried &lt;em&gt;parallel-ssh&lt;/em&gt; which looks like a good alternative.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/deadc0de6/scripts/blob/master/nodes-mgmt.py"&gt;Here&lt;/a&gt;'s a little
+template I tend to complete depending on the job I have to do. It's a nice starting
+point if one wants to try fabric&lt;/p&gt;
+&lt;p&gt;Simply complete the &lt;em&gt;TODO&lt;/em&gt; and get going.&lt;/p&gt;
+&lt;p&gt;An example of the run against 3 different hosts:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;./nodes-mgmt.py top
+&lt;span class="c"&gt;##################################################################&lt;/span&gt;
+task: &lt;span class="s2"&gt;&amp;quot;top&amp;quot;&lt;/span&gt;
+&lt;span class="c"&gt;##################################################################&lt;/span&gt;
+------------ host &lt;span class="s2"&gt;&amp;quot;node1&amp;quot;&lt;/span&gt; -------------
+top - 14:11:51 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;45&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: 0.98, 0.97, 1.01
+------------ host &lt;span class="s2"&gt;&amp;quot;node0&amp;quot;&lt;/span&gt; -------------
+top - 14:11:51 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;44&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: 1.64, 1.16, 1.10
+------------ host &lt;span class="s2"&gt;&amp;quot;node2&amp;quot;&lt;/span&gt; -------------
+top - 14:11:52 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;45&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: 0.96, 0.96, 1.02
+
+Duration: 0:00:02
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Streamline everything !!&lt;/p&gt;</summary><category term="fabric"></category><category term="python"></category><category term="sysadmin"></category></entry><entry><title>Email stack FTW</title><link href="https://deadc0de.re/articles/email-stack.html" rel="alternate"></link><updated>2016-03-12T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-03-12:articles/email-stack.html</id><summary type="html">&lt;p&gt;&lt;em&gt;If you wake up looking forward to booting your shiny new Windows 10 with your
 flashy outlook, well this is way too advanced for you, pass on.
 One advice though: get a grown-up OS ;-)&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Since I moved out of gmail (for obvious privacy reasons), I was using simultaneously

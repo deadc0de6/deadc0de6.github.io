@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Streamline sysadmin tasks with fabric // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Achives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Streamline sysadmin tasks with fabric</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/fabric.html">fabric</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/python.html">python</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/sysadmin.html">sysadmin</a>
+                            <br/>
+                            // Sun 13 March 2016
+                        </p>
+                </header>
+            </section>
+            <p><a href="http://www.fabfile.org/">Fabric</a> is a Python command-line tool and library for
+streamlining sysadmins tasks. It is very useful when you have multiple
+hosts dedicated for a specific purpose (for example for an elasticsearch
+cluster) and you want to administer them without the hassle of connecting to
+each of them individually.</p>
+<p>It allows to quickly execute the same command/task on different hosts through
+ssh. It's one way of doing it though, there are many other alternatives:</p>
+<ul>
+<li><a href="https://github.com/sfermigier/tentakel">tentakel</a></li>
+<li><a href="https://github.com/pkittenis/parallel-ssh">parallel-ssh</a></li>
+<li><a href="https://github.com/duncs/clusterssh/wiki">clusterssh</a></li>
+<li><a href="https://www.netfort.gr.jp/~dancer/software/dsh.html.en">dsh</a></li>
+<li><a href="https://github.com/rlewczuk/pssh">pssh</a></li>
+<li>... and many more ...</li>
+</ul>
+<p>I like fabric because it gives you a lot of power thanks to Python. I haven't
+yet tried <em>parallel-ssh</em> which looks like a good alternative.</p>
+<p><a href="https://github.com/deadc0de6/scripts/blob/master/nodes-mgmt.py">Here</a>'s a little
+template I tend to complete depending on the job I have to do. It's a nice starting
+point if one wants to try fabric</p>
+<p>Simply complete the <em>TODO</em> and get going.</p>
+<p>An example of the run against 3 different hosts:</p>
+<div class="highlight"><pre><span class="nv">$ </span>./nodes-mgmt.py top
+<span class="c">##################################################################</span>
+task: <span class="s2">&quot;top&quot;</span>
+<span class="c">##################################################################</span>
+------------ host <span class="s2">&quot;node1&quot;</span> -------------
+top - 14:11:51 up <span class="m">1</span> day, <span class="m">45</span> min,  <span class="m">1</span> user,  load average: 0.98, 0.97, 1.01
+------------ host <span class="s2">&quot;node0&quot;</span> -------------
+top - 14:11:51 up <span class="m">1</span> day, <span class="m">44</span> min,  <span class="m">1</span> user,  load average: 1.64, 1.16, 1.10
+------------ host <span class="s2">&quot;node2&quot;</span> -------------
+top - 14:11:52 up <span class="m">1</span> day, <span class="m">45</span> min,  <span class="m">1</span> user,  load average: 0.96, 0.96, 1.02
+
+Duration: 0:00:02
+</pre></div>
+
+
+<p>Streamline everything !!</p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
