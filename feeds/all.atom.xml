@@ -202,7 +202,7 @@ xor edi, edi                    |
 call sym.imp.fflush ;[b]        |
 xor edi, edi                    | 0 == stdin
 mov rsi, rsp                    | buffer on the stack
-mov edx, section..rela.plt      | 1024 bytes (0x800)
+mov edx, section..rela.plt      | 0x800
 xor eax, eax                    |
 call sym.imp.read ;[c]          |
 lea rdi, [rip + 0x1aa1]         |
