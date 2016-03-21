@@ -168,7 +168,7 @@ Twitter account
 and will be used later:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;em&gt;0x7ffff7...&lt;/em&gt; look like libc addresses&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;0x555555556ac0&lt;/em&gt; looks like the canary&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;0xeaa546f902a74f00&lt;/em&gt; looks like the canary&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;Vuln2: stack overflow&lt;/h3&gt;
 &lt;p&gt;The second vulnerability is triggered when reading the content to tweet.
