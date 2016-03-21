@@ -464,6 +464,15 @@ magic addr: 0x7f192237652c
 <span class="nv">LD_PRELOAD</span><span class="o">=</span>./libc.so.6 ./microwave_61f50dba931bb10ab3089215b2e188f4
 <span class="nv">$ </span>socat tcp-l:1337,reuseaddr,fork <span class="nb">exec</span>:./doit.sh
 </pre></div>
+
+
+<h3>Note</h3>
+<p>On some systems, using <a href="http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html">LD_PRELOAD</a> won't
+work and thus <a href="http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html">LD_LIBRARY_PATH</a> with the
+full path to the folder containing the provided libc (<em>libc.so.6</em>) should be provided.</p>
+<p>It is indeed a better way of doing it since <em>LD_PRELOAD</em> should be used when replacing only some specific functions
+of a library and not a full library (in which case <em>LD_LIBRARY_PATH</em> is to be used).</p>
+<p>Thanks to <a href="https://twitter.com/dummys1337">Dummys1337</a> for pointing that out !!</p>
 <footer class="footer">
     <p>
     &copy; 2015 deadc0de

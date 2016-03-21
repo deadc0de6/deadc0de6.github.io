@@ -412,7 +412,16 @@ magic addr: 0x7f192237652c
 &lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class="nv"&gt;LD_PRELOAD&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;./libc.so.6 ./microwave_61f50dba931bb10ab3089215b2e188f4
 &lt;span class="nv"&gt;$ &lt;/span&gt;socat tcp-l:1337,reuseaddr,fork &lt;span class="nb"&gt;exec&lt;/span&gt;:./doit.sh
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Mon, 21 Mar 2016 00:00:00 +0100</pubDate><guid>tag:deadc0de.re,2016-03-21:articles/microwave-write-up.html</guid><category>ctf</category><category>exploit</category><category>write-up</category><category>rop</category></item><item><title>Streamline sysadmin tasks with fabric</title><link>https://deadc0de.re/articles/fabric.html</link><description>&lt;p&gt;&lt;a href="http://www.fabfile.org/"&gt;Fabric&lt;/a&gt; is a Python command-line tool and library for
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Note&lt;/h3&gt;
+&lt;p&gt;On some systems, using &lt;a href="http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html"&gt;LD_PRELOAD&lt;/a&gt; won't
+work and thus &lt;a href="http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html"&gt;LD_LIBRARY_PATH&lt;/a&gt; with the
+full path to the folder containing the provided libc (&lt;em&gt;libc.so.6&lt;/em&gt;) should be provided.&lt;/p&gt;
+&lt;p&gt;It is indeed a better way of doing it since &lt;em&gt;LD_PRELOAD&lt;/em&gt; should be used when replacing only some specific functions
+of a library and not a full library (in which case &lt;em&gt;LD_LIBRARY_PATH&lt;/em&gt; is to be used).&lt;/p&gt;
+&lt;p&gt;Thanks to &lt;a href="https://twitter.com/dummys1337"&gt;Dummys1337&lt;/a&gt; for pointing that out !!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Mon, 21 Mar 2016 00:00:00 +0100</pubDate><guid>tag:deadc0de.re,2016-03-21:articles/microwave-write-up.html</guid><category>ctf</category><category>exploit</category><category>write-up</category><category>rop</category></item><item><title>Streamline sysadmin tasks with fabric</title><link>https://deadc0de.re/articles/fabric.html</link><description>&lt;p&gt;&lt;a href="http://www.fabfile.org/"&gt;Fabric&lt;/a&gt; is a Python command-line tool and library for
 streamlining sysadmins tasks. It is very useful when you have multiple
 hosts dedicated for a specific purpose (for example for an elasticsearch
 cluster) and you want to administer them without the hassle of connecting to
