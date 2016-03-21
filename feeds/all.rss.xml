@@ -188,7 +188,7 @@ It reads from stdin (0) and store the result on the stack&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;We read 0x800 (1024) from stdin to the buffer (on the stack).
+&lt;p&gt;We read up to 0x800 (2048) from stdin to the buffer (on the stack).
 If we consider the whole block, only 0x418 (1048) are reserved
 on the stack. We can thus overwrite saved RIP&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;sub rsp, 0x418                  | reserve 1048
