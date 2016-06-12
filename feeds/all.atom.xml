@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-03-21T00:00:00+01:00</updated><entry><title>Insomni'hack microwave write-up</title><link href="https://deadc0de.re/articles/microwave-write-up.html" rel="alternate"></link><updated>2016-03-21T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-03-21:articles/microwave-write-up.html</id><summary type="html">&lt;p&gt;This is a write-up for the &lt;em&gt;microwave&lt;/em&gt; pwn of
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-06-12T00:00:00+02:00</updated><entry><title>Blocking Ads and malware with unbound</title><link href="https://deadc0de.re/articles/unbound-blocking-ads.html" rel="alternate"></link><updated>2016-06-12T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-06-12:articles/unbound-blocking-ads.html</id><summary type="html">&lt;p&gt;Here's a small post on how to (DNS-)block ads, malwares, social networks and whatnot
+on your network using unbound.&lt;/p&gt;
+&lt;p&gt;Unbound is the default DNS resolver on Pfsense 2.2. Adding a list of domains to block
+will help you speed up your connections, potentially secure it (malwares, ...) and
+might also avoid being tracked.&lt;/p&gt;
+&lt;p&gt;To get a good list of domains, the consolidated lists of StevenBlack are very
+useful and can be downloaded from &lt;a href="https://github.com/StevenBlack/hosts"&gt;his github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Here are the different steps to set it up for unbound:&lt;/p&gt;
+&lt;p&gt;Download the list you're interested to block (for example ads+malwares+social networks)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;wget https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/social/hosts
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Entries in the host file are in the form &lt;code&gt;0.0.0.0 &amp;lt;domain&amp;gt;&lt;/code&gt; and unbound needs something like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nb"&gt;local&lt;/span&gt;-zone: &lt;span class="s2"&gt;&amp;quot;&amp;lt;domain&amp;gt;&amp;quot;&lt;/span&gt; redirect
+&lt;span class="nb"&gt;local&lt;/span&gt;-data: &lt;span class="s2"&gt;&amp;quot;&amp;lt;domain&amp;gt; A 0.0.0.0&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Following awk command will transform the list into something that unbound understands:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat hosts &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s1"&gt;&amp;#39;^0\.0\.0\.0&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk &lt;span class="s1"&gt;&amp;#39;{print &amp;quot;local-zone: \&amp;quot;&amp;quot;$2&amp;quot;\&amp;quot; redirect\nlocal-data: \&amp;quot;&amp;quot;$2&amp;quot; A 0.0.0.0\&amp;quot;&amp;quot;}&amp;#39;&lt;/span&gt; &amp;gt; ads.conf
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Finally copy the resulting file to pfsense (or to your DNS resolver running unbound).&lt;/p&gt;
+&lt;p&gt;For pfsense, copy the file to &lt;code&gt;/var/unbound/&lt;/code&gt; and paste following lines into the
+&lt;code&gt;Display Custom Option&lt;/code&gt; field on Unbound config page on pfsense's web interface.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Ads overrides&lt;/span&gt;
+include: /var/unbound/ads.conf
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For other unbound setups, edit the &lt;code&gt;unbound.conf&lt;/code&gt; file and add previous lines (do not
+forget to update the path to the file as it might not be &lt;code&gt;/var/unbound&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;You can then reload unbound config with the following command on pfsense:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;unbound-control -c /var/unbound/unbound.conf reload
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That's it, added domains will resolve to 0.0.0.0 on your DNS resolver and thus
+would be blocked. Be aware that if some of those are already in the cache of your
+host, they would resolve until cache is cleared.&lt;/p&gt;</summary><category term="unbound"></category><category term="ads"></category><category term="malware"></category></entry><entry><title>Insomni'hack microwave write-up</title><link href="https://deadc0de.re/articles/microwave-write-up.html" rel="alternate"></link><updated>2016-03-21T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-03-21:articles/microwave-write-up.html</id><summary type="html">&lt;p&gt;This is a write-up for the &lt;em&gt;microwave&lt;/em&gt; pwn of
 &lt;a href="https://insomnihack.ch/"&gt;Insomni'hack&lt;/a&gt; CTF.&lt;/p&gt;
 &lt;p&gt;Following binaries were given:&lt;/p&gt;
 &lt;ul&gt;

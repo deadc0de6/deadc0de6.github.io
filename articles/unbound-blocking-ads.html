@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Blocking Ads and malware with unbound // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Achives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Blocking Ads and malware with unbound</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/unbound.html">unbound</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/ads.html">ads</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/malware.html">malware</a>
+                            <br/>
+                            // Sun 12 June 2016
+                        </p>
+                </header>
+            </section>
+            <p>Here's a small post on how to (DNS-)block ads, malwares, social networks and whatnot
+on your network using unbound.</p>
+<p>Unbound is the default DNS resolver on Pfsense 2.2. Adding a list of domains to block
+will help you speed up your connections, potentially secure it (malwares, ...) and
+might also avoid being tracked.</p>
+<p>To get a good list of domains, the consolidated lists of StevenBlack are very
+useful and can be downloaded from <a href="https://github.com/StevenBlack/hosts">his github</a>.</p>
+<p>Here are the different steps to set it up for unbound:</p>
+<p>Download the list you're interested to block (for example ads+malwares+social networks)</p>
+<div class="highlight"><pre><span class="nv">$ </span>wget https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/social/hosts
+</pre></div>
+
+
+<p>Entries in the host file are in the form <code>0.0.0.0 &lt;domain&gt;</code> and unbound needs something like this:</p>
+<div class="highlight"><pre><span class="nb">local</span>-zone: <span class="s2">&quot;&lt;domain&gt;&quot;</span> redirect
+<span class="nb">local</span>-data: <span class="s2">&quot;&lt;domain&gt; A 0.0.0.0&quot;</span>
+</pre></div>
+
+
+<p>Following awk command will transform the list into something that unbound understands:</p>
+<div class="highlight"><pre><span class="nv">$ </span>cat hosts <span class="p">|</span> grep <span class="s1">&#39;^0\.0\.0\.0&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{print &quot;local-zone: \&quot;&quot;$2&quot;\&quot; redirect\nlocal-data: \&quot;&quot;$2&quot; A 0.0.0.0\&quot;&quot;}&#39;</span> &gt; ads.conf
+</pre></div>
+
+
+<p>Finally copy the resulting file to pfsense (or to your DNS resolver running unbound).</p>
+<p>For pfsense, copy the file to <code>/var/unbound/</code> and paste following lines into the
+<code>Display Custom Option</code> field on Unbound config page on pfsense's web interface.</p>
+<div class="highlight"><pre><span class="c"># Ads overrides</span>
+include: /var/unbound/ads.conf
+</pre></div>
+
+
+<p>For other unbound setups, edit the <code>unbound.conf</code> file and add previous lines (do not
+forget to update the path to the file as it might not be <code>/var/unbound</code>).</p>
+<p>You can then reload unbound config with the following command on pfsense:</p>
+<div class="highlight"><pre><span class="nv">$ </span>unbound-control -c /var/unbound/unbound.conf reload
+</pre></div>
+
+
+<p>That's it, added domains will resolve to 0.0.0.0 on your DNS resolver and thus
+would be blocked. Be aware that if some of those are already in the cache of your
+host, they would resolve until cache is cleared.</p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
