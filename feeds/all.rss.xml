@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deadc0de.re</title><link>https://deadc0de.re/</link><description>... rocking out ...</description><atom:link href="https://deadc0de.re/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 12 Jun 2016 00:00:00 +0200</lastBuildDate><item><title>Blocking ads and malwares with unbound</title><link>https://deadc0de.re/articles/unbound-blocking-ads.html</link><description>&lt;p&gt;Here's a small post on how to (DNS-)block ads, malwares, social networks and whatnot
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deadc0de.re</title><link>https://deadc0de.re/</link><description>... rocking out ...</description><atom:link href="https://deadc0de.re/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 04 Aug 2016 00:00:00 +0200</lastBuildDate><item><title>Unix porn</title><link>https://deadc0de.re/articles/unix-porn.html</link><description>&lt;p&gt;After &lt;a href="https://i3wm.org/"&gt;i3&lt;/a&gt; and more recently &lt;a href="https://awesome.naquadah.org/"&gt;awesome3.4&lt;/a&gt;,
+I finally moved to &lt;a href="https://github.com/baskerville/bspwm"&gt;bspwm&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Here are two screenshots of what my desktop looked like under &lt;a href="https://awesome.naquadah.org/"&gt;awesome&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://i.imgur.com/i3eVXPe.jpg"&gt;&lt;img alt="awesome wm clean" src="http://i.imgur.com/i3eVXPe.jpg" title="awesome clean" width="800px" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://i.imgur.com/fypLp5T.jpg"&gt;&lt;img alt="awesome wm dirty" src="http://i.imgur.com/fypLp5T.jpg" title="awesome dirty" width="800px" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I recently stumbled upon this very nice subreddit &lt;a href="https://www.reddit.com/r/unixporn/"&gt;unix porn&lt;/a&gt;.
+On it I came across some great desktops using that new window manager &lt;a href="https://github.com/baskerville/bspwm"&gt;bspwm&lt;/a&gt;
+with &lt;a href="https://github.com/jaagr/lemonbuddy"&gt;lemonbuddy&lt;/a&gt; bar
+and decided to give it a try. Here's how my desktop now looks like:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://i.imgur.com/DAaUb8V.jpg"&gt;&lt;img alt="bspwm clean" src="http://i.imgur.com/DAaUb8V.jpg" title="bspwm clean" width="800px" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://i.imgur.com/9hcxr2s.jpg"&gt;&lt;img alt="bspwm dirty" src="http://i.imgur.com/9hcxr2s.jpg" title="bspwm dirty" width="800px" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I based my configs on dotfiles found on &lt;a href="https://www.reddit.com/r/unixporn/"&gt;unix porn&lt;/a&gt;
+and bar's configurations from the creator of &lt;a href="https://github.com/jaagr/lemonbuddy"&gt;lemonbuddy&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Besides its beauty, &lt;a href="https://github.com/baskerville/bspwm"&gt;bspwm&lt;/a&gt; is definitely a very nice
+tiling window manager, the simplicity of its configuration,
+and the fact it is so easily customizable makes
+it the perfect wm for tiling wm's lovers !&lt;/p&gt;
+&lt;p&gt;Happy ricing guys !&lt;/p&gt;
+&lt;p&gt;references:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://imgur.com/a/3c5f2"&gt;my desktops printscreens&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/baskerville/bspwm"&gt;bspwm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jaagr/lemonbuddy"&gt;lemonbuddy&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://alpha.wallhaven.cc/wallpaper/12018"&gt;wallpaper awesome&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://alpha.wallhaven.cc/wallpaper/418672"&gt;wallpaper bspwm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.reddit.com/r/unixporn/"&gt;unix porn on reddit&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jaagr/dots/tree/master/.local/etc/themer/themes/darkpx"&gt;lemonbuddy config 1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jaagr/lemonbuddy/blob/master/config"&gt;lemonbuddy config 2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/stark/siji"&gt;siji fonts&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/osense/bar"&gt;lemonbar&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://git.2f30.org/colors/"&gt;png colors tool&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/pvinis/colortools"&gt;colortools&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/dylanaraps/neofetch"&gt;neofetch&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://romainl.github.io/Apprentice/"&gt;vim colorscheme&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;BTW here are some links I use to find nice colorschemes for my desktops:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.xcolors.net/"&gt;xcolors&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://terminal.sexy/"&gt;terminal.sexy&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://ciembor.github.io/4bit/"&gt;4bit&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://dotshare.it/"&gt;dotshare.it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://sweyla.com/themes/"&gt;sweyla&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://vimcolors.com/"&gt;vimcolors&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://cocopon.me/app/vim-color-gallery/"&gt;vim colorscheme gallery&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://bytefluent.com/vivify/"&gt;vivify&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Thu, 04 Aug 2016 00:00:00 +0200</pubDate><guid>tag:deadc0de.re,2016-08-04:articles/unix-porn.html</guid><category>unix porn</category><category>bspwm</category><category>lemonbar</category><category>lemonbuddy</category><category>awesome</category></item><item><title>Blocking ads and malwares with unbound</title><link>https://deadc0de.re/articles/unbound-blocking-ads.html</link><description>&lt;p&gt;Here's a small post on how to (DNS-)block ads, malwares, social networks and whatnot
 on your network using unbound.&lt;/p&gt;
 &lt;p&gt;Unbound is the default DNS resolver on Pfsense 2.2. Adding a list of domains to block
 will help you speed up your connections, potentially secure it (malwares, ...) and
