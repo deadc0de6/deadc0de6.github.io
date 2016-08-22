@@ -1,5 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deadc0de.re</title><link>https://deadc0de.re/</link><description>... rocking out ...</description><atom:link href="https://deadc0de.re/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 04 Aug 2016 00:00:00 +0200</lastBuildDate><item><title>Unix porn</title><link>https://deadc0de.re/articles/unix-porn.html</link><description>&lt;p&gt;After &lt;a href="https://i3wm.org/"&gt;i3&lt;/a&gt; and more recently &lt;a href="https://awesome.naquadah.org/"&gt;awesome3.4&lt;/a&gt;,
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deadc0de.re</title><link>https://deadc0de.re/</link><description>... rocking out ...</description><atom:link href="https://deadc0de.re/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 22 Aug 2016 00:00:00 +0200</lastBuildDate><item><title>Unix tricks 2</title><link>https://deadc0de.re/articles/unix-tricks-2.html</link><description>&lt;p&gt;some more neat unix tricks&lt;/p&gt;
+&lt;h2&gt;Editing binary with vim&lt;/h2&gt;
+&lt;p&gt;Open the binary in vim with&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;:% !xxd &amp;lt;file-path&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;change the needed parts and then save it with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;:% !xxd -r
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Ssh escape sequences&lt;/h2&gt;
+&lt;p&gt;You can control some SSH settings when inside an SSH
+session using the escape sequences: &lt;code&gt;&amp;lt;enter&amp;gt;~&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;With &lt;code&gt;?&lt;/code&gt; you get a list of available options:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;when &lt;a href="https://www.youtube.com/watch?v=Wn2w3j_xmbw"&gt;all hope is gone&lt;/a&gt;
+    use &lt;code&gt;&amp;lt;enter&amp;gt;~.&lt;/code&gt; to close the session&lt;/li&gt;
+&lt;li&gt;when you want to increase/decrease verbosity use
+    &lt;code&gt;&amp;lt;enter&amp;gt;~V/v&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;when you want to put in background use &lt;code&gt;&amp;lt;enter&amp;gt;~&amp;amp;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For a list of all options, see ssh's man page under &lt;code&gt;ESCAPE CHARACTERS&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;man --pager&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;less -p ^ESCAPE&amp;#39;&lt;/span&gt; ssh
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Average over multiple lines&lt;/h2&gt;
+&lt;p&gt;Use &lt;code&gt;awk&lt;/code&gt; to sum all lines and get the average of the sum at the end.
+This is useful for example for a stripped &lt;code&gt;wc&lt;/code&gt; command's output.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;... &lt;span class="p"&gt;|&lt;/span&gt; awk &lt;span class="s1"&gt;&amp;#39;{ sum += $1; n++ } END { if (n &amp;gt; 0) printf &amp;quot;%.f\n&amp;quot;,(sum / n); }&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Quick'n'dirty share on LAN&lt;/h2&gt;
+&lt;p&gt;Let's say you want to quickly share something without much
+  fuss, use python &lt;a href="https://docs.python.org/2/library/simplehttpserver.html"&gt;SimpleHTTPServer&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;SHARE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/tmp/share&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; mkdir -p &lt;span class="nv"&gt;$SHARE&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="nv"&gt;$SHARE&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; python -m SimpleHTTPServer
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then copy what to want to share into &lt;code&gt;$SHARE&lt;/code&gt; and simply access it on http://your-ip-here:8000&lt;/p&gt;
+&lt;h2&gt;Add comma to all lines except the last one&lt;/h2&gt;
+&lt;p&gt;Easily append a comma to each line except the last one:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat /tmp/tmp
+a
+b
+c
+d
+e
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;use &lt;code&gt;awk&lt;/code&gt; to transform each line and &lt;code&gt;wc&lt;/code&gt; to calculate the total number of line for the if clause:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat /tmp/tmp &lt;span class="p"&gt;|&lt;/span&gt; awk -v &lt;span class="nv"&gt;nlines&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;wc -l &amp;lt; /tmp/tmp&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{if (NR == nlines) {print $0} else {print $0&amp;quot;,&amp;quot;}}&amp;#39;&lt;/span&gt;
+a,
+b,
+c,
+d,
+e
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Unix time (epoch)&lt;/h2&gt;
+&lt;p&gt;A nice &lt;code&gt;dmesg&lt;/code&gt; switch is &lt;code&gt;-T&lt;/code&gt; which translates the unix times of each line
+  into human readable date/time.&lt;/p&gt;
+&lt;p&gt;Otherwise you could always use the unix tool &lt;code&gt;date&lt;/code&gt; to transform epoch to
+  human readable date/time with following command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;date -d @&amp;lt;epoch&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Bash script duration&lt;/h2&gt;
+&lt;p&gt;I often use either &lt;code&gt;time&lt;/code&gt; or enclose my process within two &lt;code&gt;date&lt;/code&gt; calls to
+monitor the duration of a script.&lt;/p&gt;
+&lt;p&gt;One interesting built-in shell variable is &lt;code&gt;SECONDS&lt;/code&gt; which will output, each time
+it is referenced, the number of seconds ellapsed since shell invocation.&lt;/p&gt;
+&lt;p&gt;This example script&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$SECONDS&lt;/span&gt;
+sleep 10
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$SECONDS&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;will produce&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;0
+10
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;see more info on built-in shell variables &lt;a href="http://wiki.bash-hackers.org/syntax/shellvars"&gt;here&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Mon, 22 Aug 2016 00:00:00 +0200</pubDate><guid>tag:deadc0de.re,2016-08-22:articles/unix-tricks-2.html</guid><category>unix</category><category>cli</category><category>shell</category></item><item><title>Unix porn</title><link>https://deadc0de.re/articles/unix-porn.html</link><description>&lt;p&gt;After &lt;a href="https://i3wm.org/"&gt;i3&lt;/a&gt; and more recently &lt;a href="https://awesome.naquadah.org/"&gt;awesome3.4&lt;/a&gt;,
 I finally moved to &lt;a href="https://github.com/baskerville/bspwm"&gt;bspwm&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Here are two screenshots of what my desktop looked like under &lt;a href="https://awesome.naquadah.org/"&gt;awesome&lt;/a&gt;:&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://i.imgur.com/i3eVXPe.jpg"&gt;&lt;img alt="awesome wm clean" src="http://i.imgur.com/i3eVXPe.jpg" title="awesome clean" width="800px" /&gt;&lt;/a&gt;&lt;/p&gt;
@@ -85,7 +178,7 @@ forget to update the path to the file as it might not be &lt;code&gt;/var/unboun
 
 &lt;p&gt;That's it, added domains will resolve to 0.0.0.0 on your DNS resolver and thus
 would be blocked. Be aware that if some of those are already in the cache of your
-host, they would resolve until cache is cleared.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Sun, 12 Jun 2016 00:00:00 +0200</pubDate><guid>tag:deadc0de.re,2016-06-12:articles/unbound-blocking-ads.html</guid><category>unbound</category><category>ads</category><category>malware</category></item><item><title>Insomni'hack microwave write-up</title><link>https://deadc0de.re/articles/microwave-write-up.html</link><description>&lt;p&gt;This is a write-up for the &lt;em&gt;microwave&lt;/em&gt; pwn of
+host, they would resolve until cache is cleared.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">deadc0de</dc:creator><pubDate>Sun, 12 Jun 2016 00:00:00 +0200</pubDate><guid>tag:deadc0de.re,2016-06-12:articles/unbound-blocking-ads.html</guid><category>unbound</category><category>ads</category><category>malware</category><category>pfsense</category></item><item><title>Insomni'hack microwave write-up</title><link>https://deadc0de.re/articles/microwave-write-up.html</link><description>&lt;p&gt;This is a write-up for the &lt;em&gt;microwave&lt;/em&gt; pwn of
 &lt;a href="https://insomnihack.ch/"&gt;Insomni'hack&lt;/a&gt; CTF.&lt;/p&gt;
 &lt;p&gt;Following binaries were given:&lt;/p&gt;
 &lt;ul&gt;
