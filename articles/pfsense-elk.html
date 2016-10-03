@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Monitor pfsense firewall with ELK // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Monitor pfsense firewall with ELK</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/elk.html">elk</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/pfsense.html">pfsense</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/monitoring.html">monitoring</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/docker.html">docker</a>
+                            <br/>
+                            // Sun 02 October 2016
+                        </p>
+                </header>
+            </section>
+            <p>This is a post on how to monitor your <a href="https://pfsense.org/">Pfsense</a> firewall with
+an ELK stack (<a href="https://www.elastic.co/">Elasticsearch</a>, <a href="https://www.elastic.co/products/logstash">Logstash</a>
+and <a href="https://www.elastic.co/products/kibana">Kibana</a>)
+running on <a href="https://www.docker.com">docker</a>.</p>
+<p>The final goal is to be able to view what is being blocked by your firewall. It
+is always fun and interesting to be able to review who's scanning you, on what port.
+With ELK (thanks to logstash), we'll add geoip information to each blocked IPs to be
+able to draw a map of who's scanning you from which country.</p>
+<p>Here are the different steps for this setup:</p>
+<ul>
+<li>install docker</li>
+<li>prepare the configs files</li>
+<li>prepare docker image</li>
+<li>run docker container</li>
+<li>play with the data on Kibana</li>
+</ul>
+<p>Once done, that's the kind of dashboard you could have to monitor your firewall:
+<a href="https://deadc0de.re/images/kibana.png"><img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px" /></a></p>
+<h2>Install docker</h2>
+<p>Follow the instructions for your distribution on
+the <a href="https://docs.docker.com/engine/installation/linux/">docker's installation doc</a>.</p>
+<p>Once docker's installed, retrieve the <a href="https://hub.docker.com/r/sebp/elk/">docker image</a>
+on which we will base our stack:</p>
+<div class="highlight"><pre>docker pull sebp/elk
+</pre></div>
+
+
+<p>All the below files need to be put in the same folder to ease the setup
+with docker, so start by creating a folder, like for example <em>docker-elk</em>.</p>
+<h2>Logstash</h2>
+<p>Logstash is the tool that parses the logs and formats them to a
+viable structure for Elasticsearch.</p>
+<p>The below grok file is used to match each log entry to different fields in order to
+be correctly parsed by Elasticsearch/kibana.</p>
+<p>This file is originally from
+<a href="https://gist.github.com/bradvido/4e6501222b8f7dbe3ba8">this gist</a>, save it into <code>docker-elk/pfsense.2.2.grok</code>.</p>
+<div class="highlight"><pre># GROK match pattern for logstash.conf filter: %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
+
+# GROK Custom Patterns (add to patterns directory and reference in GROK filter for pfSense events):
+
+# GROK Patterns for pfSense 2.2 Logging Format
+#
+# Created 27 Jan 2015 by J. Pisano (Handles TCP, UDP, and ICMP log entries)
+# Edited 14 Feb 2015 by E. Paul
+#
+# Usage: Use with following GROK match pattern
+#
+# %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
+
+LOG_DATA (%{INT:rule}),(%{INT:sub_rule}),,(%{INT:tracker}),(%{WORD:iface}),(%{NOTSPACE:reason}),(%{WORD:action}),(%{WORD:rule_direction}),(%{INT:ip_ver}),
+
+IP_SPECIFIC_DATA (%{IPv4_SPECIFIC_DATA}|%{IPv6_SPECIFIC_DATA})
+
+IPv4_SPECIFIC_DATA (%{BASE16NUM:tos}),,(%{INT:ttl}),(%{INT:id}),(%{INT:offset}),(%{WORD:flags}),(%{INT:proto_id}),(%{WORD:proto}),
+
+IPv6_SPECIFIC_DATA (%{BASE16NUM:class}),(%{DATA:flow_label}),(%{INT:hop_limit}),(%{WORD:proto}),(%{INT:proto_id}),
+
+IP_DATA (%{INT:length}),(%{IP:src_ip}),(%{IP:dest_ip}),
+
+PROTOCOL_DATA (%{TCP_DATA}|%{UDP_DATA}|%{ICMP_DATA})
+
+TCP_DATA (%{INT:src_port}),(%{INT:dest_port}),(%{INT:data_length}),(%{WORD:tcp_flags}),(%{NOTSPACE:sequence_number}),(%{INT:ack_number}?),(%{INT:tcp_window}),(%{DATA:urg_data}),(%{DATA:tcp_options})
+
+UDP_DATA (%{INT:src_port}),(%{INT:dest_port}),(%{INT:data_length})
+
+ICMP_DATA (%{ICMP_TYPE}%{ICMP_RESPONSE})
+
+ICMP_TYPE (?&lt;icmp_type&gt;(request|reply|unreachproto|unreachport|unreach|timeexceed|paramprob|redirect|maskreply|needfrag|tstamp|tstampreply)),
+
+ICMP_RESPONSE (%{ICMP_ECHO_REQ_REPLY}|%{ICMP_UNREACHPORT}| %{ICMP_UNREACHPROTO}|%{ICMP_UNREACHABLE}|%{ICMP_NEED_FLAG}|%{ICMP_TSTAMP}|%{ICMP_TSTAMP_REPLY})
+
+ICMP_ECHO_REQ_REPLY (%{INT:icmp_echo_id}),(%{INT:icmp_echo_sequence})
+
+ICMP_UNREACHPORT (%{IP:icmp_unreachport_dest_ip}),(%{WORD:icmp_unreachport_protocol}),(%{INT:icmp_unreachport_port})
+
+ICMP_UNREACHPROTO (%{IP:icmp_unreach_dest_ip}),(%{WORD:icmp_unreachproto_protocol})
+
+ICMP_UNREACHABLE (%{GREEDYDATA:icmp_unreachable})
+
+ICMP_NEED_FLAG (%{IP:icmp_need_flag_ip}),(%{INT:icmp_need_flag_mtu})
+
+ICMP_TSTAMP (%{INT:icmp_tstamp_id}),(%{INT:icmp_tstamp_sequence})
+
+ICMP_TSTAMP_REPLY (%{INT:icmp_tstamp_reply_id}),(%{INT:icmp_tstamp_reply_sequence}),(%{INT:icmp_tstamp_reply_otime}),(%{INT:icmp_tstamp_reply_rtime}),(%{INT:icmp_tstamp_reply_ttime})
+</pre></div>
+
+
+<p>Then we need to setup the logstash config so that it:</p>
+<ul>
+<li>listens on UDP port 5000 for logs to parse</li>
+<li>uses the above grok file to parse the entries</li>
+<li>adds geoip to each entry</li>
+<li>outputs to Elasticsearch</li>
+</ul>
+<p>Save the following into <code>docker-elk/pfsense.conf</code></p>
+<div class="highlight"><pre>input {
+  udp {
+    port =&gt; 5000
+    type =&gt; &quot;syslog&quot;
+  }
+}
+
+filter {
+  grok {
+    patterns_dir =&gt; &quot;/etc/logstash/patterns&quot;
+    match =&gt; [ &quot;message&quot;, &quot;%{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}&quot; ]
+  }
+  geoip {
+    source =&gt; &quot;src_ip&quot;
+  }
+}
+
+output {
+        elasticsearch {
+          hosts =&gt; [&quot;localhost:9200&quot;]
+          codec =&gt; &quot;json&quot;
+          workers =&gt; 1
+          index =&gt; &quot;logstash-%{+YYYY.MM.dd}&quot;
+          manage_template =&gt; true
+          template_name =&gt; &quot;logstash&quot;
+          template_overwrite =&gt; false
+          flush_size =&gt; 100
+          idle_flush_time =&gt; 1
+        }
+}
+</pre></div>
+
+
+<p>Pfsense usually uses <em>re{0-9}</em> as interface names. You could rename those fields
+directly in logstash by adding an entry like this in the above config under the <em>filter</em> element:</p>
+<div class="highlight"><pre>if [iface] == &quot;re0&quot; {
+  mutate {
+    replace =&gt; [ &quot;iface&quot;, &quot;WAN&quot; ]
+  }
+}
+</pre></div>
+
+
+<h2>Run the stack</h2>
+<p>Now that we have the configs, let's create the dockerfile as <em>docker-elk/dockerfile</em>:</p>
+<div class="highlight"><pre>FROM sebp/elk
+
+# remove logstash config files
+RUN rm /etc/logstash/conf.d/01-lumberjack-input.conf
+RUN rm /etc/logstash/conf.d/02-beats-input.conf
+RUN rm /etc/logstash/conf.d/10-syslog.conf
+RUN rm /etc/logstash/conf.d/11-nginx.conf
+RUN rm /etc/logstash/conf.d/30-output.conf
+
+# add specific configs
+ADD ./pfsense.conf /etc/logstash/conf.d/pfsense.conf
+ADD ./pfsense.2.2.grok /etc/logstash/patterns/pfsense.2.2.grok
+</pre></div>
+
+
+<p>This tells docker to:</p>
+<ul>
+<li>use <a href="https://hub.docker.com/r/sebp/elk/">sebp/elk</a> as a base image</li>
+<li>remove the configs distributed with the image</li>
+<li>add our specific config files (defined above)</li>
+</ul>
+<p>Having all the above files in the same folder, build the docker image with:</p>
+<div class="highlight"><pre>cd docker-elk/ &amp;&amp; docker build -t elk-pfsense .
+</pre></div>
+
+
+<p>And finally run that container with:</p>
+<div class="highlight"><pre>docker run -p 5601:5601 -p 9200:9200 -p 5000:5000/udp -v elk-data:/var/lib/elasticsearch -it --name elk elk-pfsense
+</pre></div>
+
+
+<p>This does the following:</p>
+<ul>
+<li>link container's port 5601 to your host port 5601 (for Kibana)</li>
+<li>link container's port 9200 to your host port 9200 (for Elasticsearch)</li>
+<li>link container's port 5000 to your host port 5000 (for Logstash)</li>
+<li>create a volume called <em>elk-data</em> to store the data</li>
+</ul>
+<p>You can then detach from the docker shell using <em>CTRL + p + CTRL + q</em></p>
+<p>Before getting any further, there are two tweaks than need to be applied to
+Elasticsearch.</p>
+<p>Since we're running a single ES node, the number of replicas must be set to 0. This
+is done with following command:</p>
+<div class="highlight"><pre>curl -XPUT http://localhost:9200/_settings -d <span class="s1">&#39;{ &quot;number_of_replicas&quot; :0 }&#39;</span>
+</pre></div>
+
+
+<p>You might also want to increase the queue to avoid timeouts on kibana when
+querying large quantity of data:</p>
+<div class="highlight"><pre>curl -XPUT localhost:9200/_cluster/settings -d <span class="s1">&#39;{&quot;transient&quot; : {&quot;threadpool.search.queue_size&quot; : 2000}}&#39;</span>
+</pre></div>
+
+
+<h2>Pfsense</h2>
+<p>Now that our ELK stack si ready, let's
+redirect the firewall logs from Pfsense to it.
+Login to Pfsense's web interface and go to <strong>Status</strong> -&gt; <strong>System Logs</strong> -&gt; <strong>Settings</strong>,
+then scroll down to <strong>Remote Logging Options</strong> and tick <strong>Send log messages to remote syslog server</strong>.</p>
+<p>Fill the entry <strong>Remote log servers</strong> with your host running the stack (on port 5000).
+Also tick the <strong>Firewall Events</strong> and untick all the others.</p>
+<p>See <a href="https://doc.pfsense.org/index.php/Log_Settings">https://doc.pfsense.org/index.php/Log_Settings</a> for more.</p>
+<h2>Kibana</h2>
+<p>Connect to Kibana (http://[host-ip]:5601) and create a new time-based index based off this pattern: <em>logstash-</em>*</p>
+<p>Then, after a while you should see points coming in kibana on the <em>Discover</em> tab.</p>
+<p>Finally create a dashboard with these information:</p>
+<p><a href="https://deadc0de.re/images/kibana.png"><img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px" /></a></p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

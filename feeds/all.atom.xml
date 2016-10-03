@@ -1,5 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-08-22T00:00:00+02:00</updated><entry><title>Unix tricks 2</title><link href="https://deadc0de.re/articles/unix-tricks-2.html" rel="alternate"></link><updated>2016-08-22T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-08-22:articles/unix-tricks-2.html</id><summary type="html">&lt;p&gt;some more neat unix tricks&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-10-02T00:00:00+02:00</updated><entry><title>Monitor pfsense firewall with ELK</title><link href="https://deadc0de.re/articles/pfsense-elk.html" rel="alternate"></link><updated>2016-10-02T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-10-02:articles/pfsense-elk.html</id><summary type="html">&lt;p&gt;This is a post on how to monitor your &lt;a href="https://pfsense.org/"&gt;Pfsense&lt;/a&gt; firewall with
+an ELK stack (&lt;a href="https://www.elastic.co/"&gt;Elasticsearch&lt;/a&gt;, &lt;a href="https://www.elastic.co/products/logstash"&gt;Logstash&lt;/a&gt;
+and &lt;a href="https://www.elastic.co/products/kibana"&gt;Kibana&lt;/a&gt;)
+running on &lt;a href="https://www.docker.com"&gt;docker&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The final goal is to be able to view what is being blocked by your firewall. It
+is always fun and interesting to be able to review who's scanning you, on what port.
+With ELK (thanks to logstash), we'll add geoip information to each blocked IPs to be
+able to draw a map of who's scanning you from which country.&lt;/p&gt;
+&lt;p&gt;Here are the different steps for this setup:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;install docker&lt;/li&gt;
+&lt;li&gt;prepare the configs files&lt;/li&gt;
+&lt;li&gt;prepare docker image&lt;/li&gt;
+&lt;li&gt;run docker container&lt;/li&gt;
+&lt;li&gt;play with the data on Kibana&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once done, that's the kind of dashboard you could have to monitor your firewall:
+&lt;a href="https://deadc0de.re/images/kibana.png"&gt;&lt;img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Install docker&lt;/h2&gt;
+&lt;p&gt;Follow the instructions for your distribution on
+the &lt;a href="https://docs.docker.com/engine/installation/linux/"&gt;docker's installation doc&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Once docker's installed, retrieve the &lt;a href="https://hub.docker.com/r/sebp/elk/"&gt;docker image&lt;/a&gt;
+on which we will base our stack:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;docker pull sebp/elk
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All the below files need to be put in the same folder to ease the setup
+with docker, so start by creating a folder, like for example &lt;em&gt;docker-elk&lt;/em&gt;.&lt;/p&gt;
+&lt;h2&gt;Logstash&lt;/h2&gt;
+&lt;p&gt;Logstash is the tool that parses the logs and formats them to a
+viable structure for Elasticsearch.&lt;/p&gt;
+&lt;p&gt;The below grok file is used to match each log entry to different fields in order to
+be correctly parsed by Elasticsearch/kibana.&lt;/p&gt;
+&lt;p&gt;This file is originally from
+&lt;a href="https://gist.github.com/bradvido/4e6501222b8f7dbe3ba8"&gt;this gist&lt;/a&gt;, save it into &lt;code&gt;docker-elk/pfsense.2.2.grok&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# GROK match pattern for logstash.conf filter: %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
+
+# GROK Custom Patterns (add to patterns directory and reference in GROK filter for pfSense events):
+
+# GROK Patterns for pfSense 2.2 Logging Format
+#
+# Created 27 Jan 2015 by J. Pisano (Handles TCP, UDP, and ICMP log entries)
+# Edited 14 Feb 2015 by E. Paul
+#
+# Usage: Use with following GROK match pattern
+#
+# %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
+
+LOG_DATA (%{INT:rule}),(%{INT:sub_rule}),,(%{INT:tracker}),(%{WORD:iface}),(%{NOTSPACE:reason}),(%{WORD:action}),(%{WORD:rule_direction}),(%{INT:ip_ver}),
+
+IP_SPECIFIC_DATA (%{IPv4_SPECIFIC_DATA}|%{IPv6_SPECIFIC_DATA})
+
+IPv4_SPECIFIC_DATA (%{BASE16NUM:tos}),,(%{INT:ttl}),(%{INT:id}),(%{INT:offset}),(%{WORD:flags}),(%{INT:proto_id}),(%{WORD:proto}),
+
+IPv6_SPECIFIC_DATA (%{BASE16NUM:class}),(%{DATA:flow_label}),(%{INT:hop_limit}),(%{WORD:proto}),(%{INT:proto_id}),
+
+IP_DATA (%{INT:length}),(%{IP:src_ip}),(%{IP:dest_ip}),
+
+PROTOCOL_DATA (%{TCP_DATA}|%{UDP_DATA}|%{ICMP_DATA})
+
+TCP_DATA (%{INT:src_port}),(%{INT:dest_port}),(%{INT:data_length}),(%{WORD:tcp_flags}),(%{NOTSPACE:sequence_number}),(%{INT:ack_number}?),(%{INT:tcp_window}),(%{DATA:urg_data}),(%{DATA:tcp_options})
+
+UDP_DATA (%{INT:src_port}),(%{INT:dest_port}),(%{INT:data_length})
+
+ICMP_DATA (%{ICMP_TYPE}%{ICMP_RESPONSE})
+
+ICMP_TYPE (?&amp;lt;icmp_type&amp;gt;(request|reply|unreachproto|unreachport|unreach|timeexceed|paramprob|redirect|maskreply|needfrag|tstamp|tstampreply)),
+
+ICMP_RESPONSE (%{ICMP_ECHO_REQ_REPLY}|%{ICMP_UNREACHPORT}| %{ICMP_UNREACHPROTO}|%{ICMP_UNREACHABLE}|%{ICMP_NEED_FLAG}|%{ICMP_TSTAMP}|%{ICMP_TSTAMP_REPLY})
+
+ICMP_ECHO_REQ_REPLY (%{INT:icmp_echo_id}),(%{INT:icmp_echo_sequence})
+
+ICMP_UNREACHPORT (%{IP:icmp_unreachport_dest_ip}),(%{WORD:icmp_unreachport_protocol}),(%{INT:icmp_unreachport_port})
+
+ICMP_UNREACHPROTO (%{IP:icmp_unreach_dest_ip}),(%{WORD:icmp_unreachproto_protocol})
+
+ICMP_UNREACHABLE (%{GREEDYDATA:icmp_unreachable})
+
+ICMP_NEED_FLAG (%{IP:icmp_need_flag_ip}),(%{INT:icmp_need_flag_mtu})
+
+ICMP_TSTAMP (%{INT:icmp_tstamp_id}),(%{INT:icmp_tstamp_sequence})
+
+ICMP_TSTAMP_REPLY (%{INT:icmp_tstamp_reply_id}),(%{INT:icmp_tstamp_reply_sequence}),(%{INT:icmp_tstamp_reply_otime}),(%{INT:icmp_tstamp_reply_rtime}),(%{INT:icmp_tstamp_reply_ttime})
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then we need to setup the logstash config so that it:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;listens on UDP port 5000 for logs to parse&lt;/li&gt;
+&lt;li&gt;uses the above grok file to parse the entries&lt;/li&gt;
+&lt;li&gt;adds geoip to each entry&lt;/li&gt;
+&lt;li&gt;outputs to Elasticsearch&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Save the following into &lt;code&gt;docker-elk/pfsense.conf&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;input {
+  udp {
+    port =&amp;gt; 5000
+    type =&amp;gt; &amp;quot;syslog&amp;quot;
+  }
+}
+
+filter {
+  grok {
+    patterns_dir =&amp;gt; &amp;quot;/etc/logstash/patterns&amp;quot;
+    match =&amp;gt; [ &amp;quot;message&amp;quot;, &amp;quot;%{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}&amp;quot; ]
+  }
+  geoip {
+    source =&amp;gt; &amp;quot;src_ip&amp;quot;
+  }
+}
+
+output {
+        elasticsearch {
+          hosts =&amp;gt; [&amp;quot;localhost:9200&amp;quot;]
+          codec =&amp;gt; &amp;quot;json&amp;quot;
+          workers =&amp;gt; 1
+          index =&amp;gt; &amp;quot;logstash-%{+YYYY.MM.dd}&amp;quot;
+          manage_template =&amp;gt; true
+          template_name =&amp;gt; &amp;quot;logstash&amp;quot;
+          template_overwrite =&amp;gt; false
+          flush_size =&amp;gt; 100
+          idle_flush_time =&amp;gt; 1
+        }
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Pfsense usually uses &lt;em&gt;re{0-9}&lt;/em&gt; as interface names. You could rename those fields
+directly in logstash by adding an entry like this in the above config under the &lt;em&gt;filter&lt;/em&gt; element:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;if [iface] == &amp;quot;re0&amp;quot; {
+  mutate {
+    replace =&amp;gt; [ &amp;quot;iface&amp;quot;, &amp;quot;WAN&amp;quot; ]
+  }
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Run the stack&lt;/h2&gt;
+&lt;p&gt;Now that we have the configs, let's create the dockerfile as &lt;em&gt;docker-elk/dockerfile&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;FROM sebp/elk
+
+# remove logstash config files
+RUN rm /etc/logstash/conf.d/01-lumberjack-input.conf
+RUN rm /etc/logstash/conf.d/02-beats-input.conf
+RUN rm /etc/logstash/conf.d/10-syslog.conf
+RUN rm /etc/logstash/conf.d/11-nginx.conf
+RUN rm /etc/logstash/conf.d/30-output.conf
+
+# add specific configs
+ADD ./pfsense.conf /etc/logstash/conf.d/pfsense.conf
+ADD ./pfsense.2.2.grok /etc/logstash/patterns/pfsense.2.2.grok
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This tells docker to:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;use &lt;a href="https://hub.docker.com/r/sebp/elk/"&gt;sebp/elk&lt;/a&gt; as a base image&lt;/li&gt;
+&lt;li&gt;remove the configs distributed with the image&lt;/li&gt;
+&lt;li&gt;add our specific config files (defined above)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Having all the above files in the same folder, build the docker image with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;cd docker-elk/ &amp;amp;&amp;amp; docker build -t elk-pfsense .
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And finally run that container with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;docker run -p 5601:5601 -p 9200:9200 -p 5000:5000/udp -v elk-data:/var/lib/elasticsearch -it --name elk elk-pfsense
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This does the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;link container's port 5601 to your host port 5601 (for Kibana)&lt;/li&gt;
+&lt;li&gt;link container's port 9200 to your host port 9200 (for Elasticsearch)&lt;/li&gt;
+&lt;li&gt;link container's port 5000 to your host port 5000 (for Logstash)&lt;/li&gt;
+&lt;li&gt;create a volume called &lt;em&gt;elk-data&lt;/em&gt; to store the data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can then detach from the docker shell using &lt;em&gt;CTRL + p + CTRL + q&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Before getting any further, there are two tweaks than need to be applied to
+Elasticsearch.&lt;/p&gt;
+&lt;p&gt;Since we're running a single ES node, the number of replicas must be set to 0. This
+is done with following command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;curl -XPUT http://localhost:9200/_settings -d &lt;span class="s1"&gt;&amp;#39;{ &amp;quot;number_of_replicas&amp;quot; :0 }&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You might also want to increase the queue to avoid timeouts on kibana when
+querying large quantity of data:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;curl -XPUT localhost:9200/_cluster/settings -d &lt;span class="s1"&gt;&amp;#39;{&amp;quot;transient&amp;quot; : {&amp;quot;threadpool.search.queue_size&amp;quot; : 2000}}&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Pfsense&lt;/h2&gt;
+&lt;p&gt;Now that our ELK stack si ready, let's
+redirect the firewall logs from Pfsense to it.
+Login to Pfsense's web interface and go to &lt;strong&gt;Status&lt;/strong&gt; -&amp;gt; &lt;strong&gt;System Logs&lt;/strong&gt; -&amp;gt; &lt;strong&gt;Settings&lt;/strong&gt;,
+then scroll down to &lt;strong&gt;Remote Logging Options&lt;/strong&gt; and tick &lt;strong&gt;Send log messages to remote syslog server&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Fill the entry &lt;strong&gt;Remote log servers&lt;/strong&gt; with your host running the stack (on port 5000).
+Also tick the &lt;strong&gt;Firewall Events&lt;/strong&gt; and untick all the others.&lt;/p&gt;
+&lt;p&gt;See &lt;a href="https://doc.pfsense.org/index.php/Log_Settings"&gt;https://doc.pfsense.org/index.php/Log_Settings&lt;/a&gt; for more.&lt;/p&gt;
+&lt;h2&gt;Kibana&lt;/h2&gt;
+&lt;p&gt;Connect to Kibana (http://[host-ip]:5601) and create a new time-based index based off this pattern: &lt;em&gt;logstash-&lt;/em&gt;*&lt;/p&gt;
+&lt;p&gt;Then, after a while you should see points coming in kibana on the &lt;em&gt;Discover&lt;/em&gt; tab.&lt;/p&gt;
+&lt;p&gt;Finally create a dashboard with these information:&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://deadc0de.re/images/kibana.png"&gt;&lt;img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px" /&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="elk"></category><category term="pfsense"></category><category term="monitoring"></category><category term="docker"></category></entry><entry><title>Unix tricks 2</title><link href="https://deadc0de.re/articles/unix-tricks-2.html" rel="alternate"></link><updated>2016-08-22T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-08-22:articles/unix-tricks-2.html</id><summary type="html">&lt;p&gt;some more neat unix tricks&lt;/p&gt;
 &lt;h2&gt;Editing binary with vim&lt;/h2&gt;
 &lt;p&gt;Open the binary in vim with&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;:% !xxd &amp;lt;file-path&amp;gt;
