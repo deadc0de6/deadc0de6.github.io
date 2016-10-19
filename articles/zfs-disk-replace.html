@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Replacing a disk on a ZFS pool // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Replacing a disk on a ZFS pool</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/zfs.html">zfs</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/disk.html">disk</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/failure.html">failure</a>
+                            <br/>
+                            // Wed 19 October 2016
+                        </p>
+                </header>
+            </section>
+            <p>This is what happened to me the other day on my RAIDZ-1:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status apool -x
+  pool: apool
+ state: DEGRADED
+status: One or more devices are faulted in response to persistent errors.
+  Sufficient replicas exist <span class="k">for</span> the pool to <span class="k">continue</span> functioning in a
+  degraded state.
+action: Replace the faulted device, or use <span class="s1">&#39;zpool clear&#39;</span> to mark the device
+  repaired.
+  scan: scrub repaired <span class="m">0</span> in 3h53m with <span class="m">0</span> errors
+config:
+
+  NAME        STATE     READ WRITE CKSUM
+  apool       DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+    raidz1-0  DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+      b       ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+      c       FAULTED      <span class="m">0</span>   <span class="m">140</span>     <span class="m">0</span>  too many errors
+      d       ONLINE       <span class="m">0</span>     <span class="m">0</span>    11
+
+errors: No known data errors
+</pre></div>
+
+
+<p>It is as bad as it looks like. I had a ZFS pool with 3 disks and one decided to fail.
+I had seen some smart warning but never gave it the attention needed
+... my bad ... now it needs to be taken care of.</p>
+<h1>Identifying the device</h1>
+<p>The first step is to identify the device. A first method is to get each device's serial
+number using <a href="https://www.smartmontools.org/">smartctl</a>. Obviously if your disk is unreachable
+by <code>smartctl</code>, you'll have to get the healthy ones's serials and go by deduction from there.</p>
+<p>Here's the <code>smartctl</code> command to get a device's serial:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo smartctl -i /dev/sdXXX <span class="p">|</span> grep -i <span class="s1">&#39;Serial Number&#39;</span>
+</pre></div>
+
+
+<p>Another way is to use <code>ledctl</code> from the <a href="https://sourceforge.net/projects/ledmon/">ledmon</a>
+tool. A little software which will allow you to control storage leds and thus identify physically
+your device.</p>
+<p>Here's how the pool looks like once the failing disk has been removed:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status
+  pool: apool
+ state: DEGRADED
+status: One or more devices could not be used because the label is missing or
+  invalid.  Sufficient replicas exist <span class="k">for</span> the pool to <span class="k">continue</span>
+  functioning in a degraded state.
+action: Replace the device using <span class="s1">&#39;zpool replace&#39;</span>.
+   see: http://zfsonlinux.org/msg/ZFS-8000-4J
+  scan: scrub repaired <span class="m">0</span> in 4h5m with <span class="m">0</span> errors
+config:
+
+  NAME                      STATE     READ WRITE CKSUM
+  apool                     DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+    raidz1-0                DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+      b                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+      <span class="m">11743263287665849900</span>  FAULTED      <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  was /dev/mapper/c
+      c                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+
+errors: No known data errors
+</pre></div>
+
+
+<p>It is still working but in a <em>degraded</em> state, what means that hopefully no other disk
+goes sick !</p>
+<h1>Replacing the disk in the pool</h1>
+<p>Once you get your new device, here's the process to replace it in the zfs pool.</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status
+  pool: apool
+ state: DEGRADED
+status: One or more devices could not be used because the label is missing or
+        invalid.  Sufficient replicas exist <span class="k">for</span> the pool to <span class="k">continue</span>
+        functioning in a degraded state.
+action: Replace the device using <span class="s1">&#39;zpool replace&#39;</span>.
+   see: http://zfsonlinux.org/msg/ZFS-8000-4J
+  scan: scrub repaired <span class="m">0</span> in 3h55m with <span class="m">0</span> errors
+config:
+
+        NAME                      STATE     READ WRITE CKSUM
+        apool                     DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+          raidz1-0                DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+            b                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+            <span class="m">11743263287665849900</span>  UNAVAIL      <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  was /dev/mapper/c
+            d                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+
+errors: No known data errors
+</pre></div>
+
+
+<p>First put the old device offline:</p>
+<div class="highlight"><pre>sudo zpool offline apool 11743263287665849900
+</pre></div>
+
+
+<p>And finally replace with the new mounted disk:</p>
+<div class="highlight"><pre>sudo zpool replace apool /dev/mapper/c
+</pre></div>
+
+
+<p>Now the pool is rebuilding using the new disk (<em>resilvering</em> in the zfs world):</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status
+  pool: apool
+ state: DEGRADED
+status: One or more devices is currently being resilvered.  The pool will
+        <span class="k">continue</span> to <span class="k">function</span>, possibly in a degraded state.
+action: Wait <span class="k">for</span> the resilver to complete.
+  scan: resilver in progress
+    116G scanned out of 4.53T at 264M/s, 4h52m to go
+    38.5G resilvered, 2.49% <span class="k">done</span>
+config:
+
+        NAME                        STATE     READ WRITE CKSUM
+        apool                       DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+          raidz1-0                  DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
+            b                       ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+            replacing-1             OFFLINE      <span class="m">0</span>     <span class="m">0</span>     0
+              <span class="m">11743263287665849900</span>  OFFLINE      <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  was /dev/mapper/c/old
+              c                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  <span class="o">(</span>resilvering<span class="o">)</span>
+            d                       ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+
+errors: No known data errors
+</pre></div>
+
+
+<p>With the above command, you can see the progress <code>...resilvered, 2.49% done...</code> and the
+expected duration: <code>4h52m to go</code>.</p>
+<p>Hopefully, you will end up with something like that: <code>scan: resilvered 1.51T in 5h2m with 0 errors</code>.
+My resilvering took a bit more than 5 hours. After that my pool was back in shape. Thanks zfs !</p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

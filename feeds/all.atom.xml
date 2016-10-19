@@ -1,5 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-10-02T00:00:00+02:00</updated><entry><title>Monitor pfsense firewall with ELK</title><link href="https://deadc0de.re/articles/pfsense-elk.html" rel="alternate"></link><updated>2016-10-02T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-10-02:articles/pfsense-elk.html</id><summary type="html">&lt;p&gt;This is a post on how to monitor your &lt;a href="https://pfsense.org/"&gt;Pfsense&lt;/a&gt; firewall with
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-10-19T00:00:00+02:00</updated><entry><title>Replacing a disk on a ZFS pool</title><link href="https://deadc0de.re/articles/zfs-disk-replace.html" rel="alternate"></link><updated>2016-10-19T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-10-19:articles/zfs-disk-replace.html</id><summary type="html">&lt;p&gt;This is what happened to me the other day on my RAIDZ-1:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo zpool status apool -x
+  pool: apool
+ state: DEGRADED
+status: One or more devices are faulted in response to persistent errors.
+  Sufficient replicas exist &lt;span class="k"&gt;for&lt;/span&gt; the pool to &lt;span class="k"&gt;continue&lt;/span&gt; functioning in a
+  degraded state.
+action: Replace the faulted device, or use &lt;span class="s1"&gt;&amp;#39;zpool clear&amp;#39;&lt;/span&gt; to mark the device
+  repaired.
+  scan: scrub repaired &lt;span class="m"&gt;0&lt;/span&gt; in 3h53m with &lt;span class="m"&gt;0&lt;/span&gt; errors
+config:
+
+  NAME        STATE     READ WRITE CKSUM
+  apool       DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+    raidz1-0  DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+      b       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+      c       FAULTED      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;140&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  too many errors
+      d       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;    11
+
+errors: No known data errors
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It is as bad as it looks like. I had a ZFS pool with 3 disks and one decided to fail.
+I had seen some smart warning but never gave it the attention needed
+... my bad ... now it needs to be taken care of.&lt;/p&gt;
+&lt;h1&gt;Identifying the device&lt;/h1&gt;
+&lt;p&gt;The first step is to identify the device. A first method is to get each device's serial
+number using &lt;a href="https://www.smartmontools.org/"&gt;smartctl&lt;/a&gt;. Obviously if your disk is unreachable
+by &lt;code&gt;smartctl&lt;/code&gt;, you'll have to get the healthy ones's serials and go by deduction from there.&lt;/p&gt;
+&lt;p&gt;Here's the &lt;code&gt;smartctl&lt;/code&gt; command to get a device's serial:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo smartctl -i /dev/sdXXX &lt;span class="p"&gt;|&lt;/span&gt; grep -i &lt;span class="s1"&gt;&amp;#39;Serial Number&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Another way is to use &lt;code&gt;ledctl&lt;/code&gt; from the &lt;a href="https://sourceforge.net/projects/ledmon/"&gt;ledmon&lt;/a&gt;
+tool. A little software which will allow you to control storage leds and thus identify physically
+your device.&lt;/p&gt;
+&lt;p&gt;Here's how the pool looks like once the failing disk has been removed:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo zpool status
+  pool: apool
+ state: DEGRADED
+status: One or more devices could not be used because the label is missing or
+  invalid.  Sufficient replicas exist &lt;span class="k"&gt;for&lt;/span&gt; the pool to &lt;span class="k"&gt;continue&lt;/span&gt;
+  functioning in a degraded state.
+action: Replace the device using &lt;span class="s1"&gt;&amp;#39;zpool replace&amp;#39;&lt;/span&gt;.
+   see: http://zfsonlinux.org/msg/ZFS-8000-4J
+  scan: scrub repaired &lt;span class="m"&gt;0&lt;/span&gt; in 4h5m with &lt;span class="m"&gt;0&lt;/span&gt; errors
+config:
+
+  NAME                      STATE     READ WRITE CKSUM
+  apool                     DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+    raidz1-0                DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+      b                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+      &lt;span class="m"&gt;11743263287665849900&lt;/span&gt;  FAULTED      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  was /dev/mapper/c
+      c                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+
+errors: No known data errors
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It is still working but in a &lt;em&gt;degraded&lt;/em&gt; state, what means that hopefully no other disk
+goes sick !&lt;/p&gt;
+&lt;h1&gt;Replacing the disk in the pool&lt;/h1&gt;
+&lt;p&gt;Once you get your new device, here's the process to replace it in the zfs pool.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo zpool status
+  pool: apool
+ state: DEGRADED
+status: One or more devices could not be used because the label is missing or
+        invalid.  Sufficient replicas exist &lt;span class="k"&gt;for&lt;/span&gt; the pool to &lt;span class="k"&gt;continue&lt;/span&gt;
+        functioning in a degraded state.
+action: Replace the device using &lt;span class="s1"&gt;&amp;#39;zpool replace&amp;#39;&lt;/span&gt;.
+   see: http://zfsonlinux.org/msg/ZFS-8000-4J
+  scan: scrub repaired &lt;span class="m"&gt;0&lt;/span&gt; in 3h55m with &lt;span class="m"&gt;0&lt;/span&gt; errors
+config:
+
+        NAME                      STATE     READ WRITE CKSUM
+        apool                     DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+          raidz1-0                DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+            b                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+            &lt;span class="m"&gt;11743263287665849900&lt;/span&gt;  UNAVAIL      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  was /dev/mapper/c
+            d                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+
+errors: No known data errors
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;First put the old device offline:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo zpool offline apool 11743263287665849900
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And finally replace with the new mounted disk:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo zpool replace apool /dev/mapper/c
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now the pool is rebuilding using the new disk (&lt;em&gt;resilvering&lt;/em&gt; in the zfs world):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo zpool status
+  pool: apool
+ state: DEGRADED
+status: One or more devices is currently being resilvered.  The pool will
+        &lt;span class="k"&gt;continue&lt;/span&gt; to &lt;span class="k"&gt;function&lt;/span&gt;, possibly in a degraded state.
+action: Wait &lt;span class="k"&gt;for&lt;/span&gt; the resilver to complete.
+  scan: resilver in progress
+    116G scanned out of 4.53T at 264M/s, 4h52m to go
+    38.5G resilvered, 2.49% &lt;span class="k"&gt;done&lt;/span&gt;
+config:
+
+        NAME                        STATE     READ WRITE CKSUM
+        apool                       DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+          raidz1-0                  DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+            b                       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+            replacing-1             OFFLINE      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+              &lt;span class="m"&gt;11743263287665849900&lt;/span&gt;  OFFLINE      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  was /dev/mapper/c/old
+              c                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="o"&gt;(&lt;/span&gt;resilvering&lt;span class="o"&gt;)&lt;/span&gt;
+            d                       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+
+errors: No known data errors
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;With the above command, you can see the progress &lt;code&gt;...resilvered, 2.49% done...&lt;/code&gt; and the
+expected duration: &lt;code&gt;4h52m to go&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Hopefully, you will end up with something like that: &lt;code&gt;scan: resilvered 1.51T in 5h2m with 0 errors&lt;/code&gt;.
+My resilvering took a bit more than 5 hours. After that my pool was back in shape. Thanks zfs !&lt;/p&gt;</summary><category term="zfs"></category><category term="disk"></category><category term="failure"></category></entry><entry><title>Monitor pfsense firewall with ELK</title><link href="https://deadc0de.re/articles/pfsense-elk.html" rel="alternate"></link><updated>2016-10-02T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-10-02:articles/pfsense-elk.html</id><summary type="html">&lt;p&gt;This is a post on how to monitor your &lt;a href="https://pfsense.org/"&gt;Pfsense&lt;/a&gt; firewall with
 an ELK stack (&lt;a href="https://www.elastic.co/"&gt;Elasticsearch&lt;/a&gt;, &lt;a href="https://www.elastic.co/products/logstash"&gt;Logstash&lt;/a&gt;
 and &lt;a href="https://www.elastic.co/products/kibana"&gt;Kibana&lt;/a&gt;)
 running on &lt;a href="https://www.docker.com"&gt;docker&lt;/a&gt;.&lt;/p&gt;
