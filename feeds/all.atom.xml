@@ -1,5 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-10-19T00:00:00+02:00</updated><entry><title>Replacing a disk on a ZFS pool</title><link href="https://deadc0de.re/articles/zfs-disk-replace.html" rel="alternate"></link><updated>2016-10-19T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-10-19:articles/zfs-disk-replace.html</id><summary type="html">&lt;p&gt;This is what happened to me the other day on my RAIDZ-1:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2016-11-16T00:00:00+01:00</updated><entry><title>Tor relay on a rpi2</title><link href="https://deadc0de.re/articles/rpi2-tor-relay.html" rel="alternate"></link><updated>2016-11-16T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-11-16:articles/rpi2-tor-relay.html</id><summary type="html">&lt;p&gt;This is a little walkthrough on using ansible to setup a tor relay (not an exit node)
+on a &lt;a href="https://www.raspberrypi.org/"&gt;Raspberry Pi&lt;/a&gt;. It might be overhead to
+use ansible for this purpose but the initial goal was to experiment with ansible.&lt;/p&gt;
+&lt;p&gt;First go to &lt;a href="https://www.raspberrypi.org/downloads/raspbian/"&gt;Raspberry Pi download&lt;/a&gt;
+and download the raspbian iso. Then flash it to your SD card and start your Raspberry Pi.
+A comprehensive guide is available &lt;a href="https://www.raspberrypi.org/documentation/installation/installing-images/linux.md"&gt;here&lt;/a&gt;.
+You might also want to follow the config setup doc &lt;a href="https://www.raspberrypi.org/documentation/configuration/raspi-config.md"&gt;here&lt;/a&gt;
+which explains the different options of the &lt;code&gt;raspi-config&lt;/code&gt; tool.&lt;/p&gt;
+&lt;p&gt;Once you have your Raspberry Pi up and running, let's setup &lt;a href="https://docs.ansible.com/"&gt;ansible&lt;/a&gt;
+to install and set up a tor relay.&lt;/p&gt;
+&lt;p&gt;To get the &lt;a href="https://docs.ansible.com/ansible/intro_installation.html#running-from-source"&gt;latest version of ansible&lt;/a&gt;,
+run the following on Debian/Ubuntu. For other distribution,
+follow the &lt;a href="https://docs.ansible.com/ansible/intro_installation.html#running-from-source"&gt;ansible &lt;em&gt;installation from source&lt;/em&gt; doc&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo apt-get update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; sudo apt-get install python-pip python-dev git -y
+&lt;span class="nv"&gt;$ &lt;/span&gt;sudo pip install PyYAML jinja2 paramiko
+&lt;span class="nv"&gt;$ &lt;/span&gt;git clone https://github.com/ansible/ansible.git --recursive /tmp/ansible
+&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; /tmp/ansible
+&lt;span class="nv"&gt;$ &lt;/span&gt;sudo make install
+&lt;span class="nv"&gt;$ &lt;/span&gt;sudo mkdir -p /etc/ansible
+&lt;span class="nv"&gt;$ &lt;/span&gt;sudo cp /tmp/ansible/examples/hosts /etc/ansible/.
+&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; -
+&lt;span class="nv"&gt;$ &lt;/span&gt;sudo rm -rf /tmp/ansible
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then make sure you're running the latest version with&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;ansible --version
+ansible 2.2.0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We will be using &lt;a href="https://docs.ansible.com/ansible/playbooks.html"&gt;ansible-playbook&lt;/a&gt; in order
+to run the different tasks on the Raspberry Pi.&lt;/p&gt;
+&lt;p&gt;Create a playbook in a file named &lt;code&gt;rpitor.yml&lt;/code&gt; and copy the following
+lines to it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;hosts&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;rpitor&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;vars&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;torport=TODO&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;dirport=TODO&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;nodename=TODO&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We will then need to complete this file with specific tasks that are to be executed from your host
+computer to your Raspberry Pi to setup the tor relay.&lt;/p&gt;
+&lt;p&gt;These are the options you need to fill in in the above file (the &lt;em&gt;TODO&lt;/em&gt;):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;torport&lt;/strong&gt;: this is the port on which tor will be listening
+    (it must be forwarded from your firewall/router)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.torproject.org/docs/faq#RelayWritesMoreThanItReads"&gt;&lt;strong&gt;dirport&lt;/strong&gt;&lt;/a&gt;:
+    this is the port to listen for directory requests (must as well be forwarded from
+    your firewall/router)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;nodename&lt;/strong&gt;: this is the name of your node (be creative)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Update the system and install the packages&lt;/h2&gt;
+&lt;p&gt;The following tasks will install the needed packages to
+run tor; add those lines to the playbook.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;rpi update&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;shell&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;rpi-update&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;become&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;true&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;update and upgrade&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;apt&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;update_cache=yes&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;upgrade=dist&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;install packages&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;apt&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name={{ item }}&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=installed&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;with_items&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;tor&lt;/span&gt;
+    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;tor-arm&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;stop tor&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;service&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=tor&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=stopped&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Tweak the system&lt;/h2&gt;
+&lt;p&gt;Some configs need to be set in order to run a tor relay. Feel
+free to adapt those to your likings.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;update limits&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;pam_limits&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;domain=*&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;limit_type=-&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;limit_item=nofile&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;value=120000&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set nic buffer size&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;shell&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;/sbin/ifconfig eth0 txqueuelen 20000&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;become&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;true&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set configs permanent&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;lineinfile&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;dest=/etc/rc.local&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;regexp=&amp;quot;^/sbin/ifconfig eth0 txqueuelen 20000$&amp;quot;&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;line=&amp;quot;/sbin/ifconfig eth0 txqueuelen 20000&amp;quot;&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;insertbefore=&amp;quot;^exit 0$&amp;quot;&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;become&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;true&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set sysctl settings 1/6&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;sysctl&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=vm.min_free_kbytes&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;value=16384&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=present&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set sysctl settings 2/6&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;sysctl&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=net.netfilter.nf_conntrack_max&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;value=1000000&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=present&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set sysctl settings 3/6&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;sysctl&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=net.core.rmem_max&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;value=26214400&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=present&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set sysctl settings 4/6&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;sysctl&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=net.core.wmem_max&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;value=26214400&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=present&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set sysctl settings 5/6&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;sysctl&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=net.core.rmem_default&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;value=26214400&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=present&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set sysctl settings 6/6&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;sysctl&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=net.core.wmem_default&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;value=26214400&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=present&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Setup tor&lt;/h2&gt;
+&lt;p&gt;Finally create the tasks that will setup tor and
+start it.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;set rights&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;file&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;dest=/var/lib/tor owner=debian-tor recurse=yes&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;stat logrotate for tor&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;stat&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;path=/etc/logrotate.d/tor&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;register&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;logrotate_stat&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;disable logrotate for tor&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;command&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;mv /etc/logrotate.d/tor /etc/logrotate.d/tor.disabled&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;when&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;logrotate_stat.stat.exists&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;become&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;true&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;setup torrc&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;template&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;src=/tmp/torrc.j2&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;dest=/etc/tor/torrc&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;become&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;true&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;enable tor&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;service&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=tor&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;enabled=yes&lt;/span&gt;
+
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;start tor&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;service&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;name=tor&lt;/span&gt;
+    &lt;span class="l-Scalar-Plain"&gt;state=restarted&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The jinja &lt;a href="https://docs.ansible.com/ansible/template_module.html"&gt;template&lt;/a&gt; used for the &lt;code&gt;torrc&lt;/code&gt;
+file is the following and has to be
+saved in a file named &lt;code&gt;/tmp/torrc.j2&lt;/code&gt; (it is referenced in the above &lt;em&gt;setup torrc&lt;/em&gt; task):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="x"&gt;Log notice file /var/log/tor/notices.log&lt;/span&gt;
+&lt;span class="x"&gt;RunAsDaemon 1&lt;/span&gt;
+&lt;span class="x"&gt;ControlPort 9051&lt;/span&gt;
+&lt;span class="x"&gt;ORPort &lt;/span&gt;&lt;span class="cp"&gt;{{&lt;/span&gt; &lt;span class="nv"&gt;torport&lt;/span&gt; &lt;span class="cp"&gt;}}&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;DirPort &lt;/span&gt;&lt;span class="cp"&gt;{{&lt;/span&gt; &lt;span class="nv"&gt;dirport&lt;/span&gt; &lt;span class="cp"&gt;}}&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;Nickname &lt;/span&gt;&lt;span class="cp"&gt;{{&lt;/span&gt; &lt;span class="nv"&gt;nodename&lt;/span&gt; &lt;span class="cp"&gt;}}&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;ExitPolicy reject *:* # no exits allowed&lt;/span&gt;
+&lt;span class="x"&gt;User debian-tor&lt;/span&gt;
+&lt;span class="x"&gt;DisableDebuggerAttachment 0&lt;/span&gt;
+&lt;span class="x"&gt;AvoidDiskWrites 1&lt;/span&gt;
+&lt;span class="x"&gt;SocksPort 0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For more information on the different options used on your tor relay,
+see the &lt;a href="https://www.torproject.org/docs/tor-manual.html.en"&gt;official doc&lt;/a&gt;
+and the &lt;a href="https://www.torproject.org/docs/faq"&gt;FAQ&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Running the playbook&lt;/h2&gt;
+&lt;p&gt;Now it's time to actually execute this playbook so that all the above defined
+tasks will be applied on the Raspberry Pi.&lt;/p&gt;
+&lt;p&gt;Copy your public ssh key to your Raspberry Pi:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;ssh-copy-id pi@&amp;lt;rpi-IP&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And make sure you're able to ssh to your Raspberry Pi with your key.&lt;/p&gt;
+&lt;p&gt;create the inventory file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;[rpitor]&amp;#39;&lt;/span&gt; &amp;gt; /tmp/torpi.hosts
+&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;rpi-IP&amp;gt;&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; /tmp/torpi.hosts
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and then run the playbook:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;ansible-playbook -u pi -i /tmp/torpi.hosts rpitor.yml
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can of course run the same playbook multiple times since ansible provides
+idempotency (running multiple times will end up with the same result).&lt;/p&gt;
+&lt;h2&gt;Final steps&lt;/h2&gt;
+&lt;p&gt;Now you can reboot your Raspberry Pi to make sure you're running the latest kernel.&lt;/p&gt;
+&lt;p&gt;Also make sure you opened the needed ports on your firewall, &lt;code&gt;torport&lt;/code&gt; and
+&lt;code&gt;dirport&lt;/code&gt; set in the &lt;code&gt;rpitor.yml&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;In order to monitor your tor relay, you can use the arm tool: &lt;code&gt;sudo -u debian-tor arm&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Once your relay is running, you can get information about your relay on &lt;a href="https://atlas.torproject.org/"&gt;atlas&lt;/a&gt;.&lt;/p&gt;</summary><category term="tor"></category><category term="privacy"></category><category term="raspberrypi"></category><category term="ansible"></category></entry><entry><title>Replacing a disk on a ZFS pool</title><link href="https://deadc0de.re/articles/zfs-disk-replace.html" rel="alternate"></link><updated>2016-10-19T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-10-19:articles/zfs-disk-replace.html</id><summary type="html">&lt;p&gt;This is what happened to me the other day on my RAIDZ-1:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;sudo zpool status apool -x
   pool: apool
  state: DEGRADED

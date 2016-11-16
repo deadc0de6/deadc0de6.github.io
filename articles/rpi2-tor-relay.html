@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Tor relay on a rpi2 // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Tor relay on a rpi2</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/tor.html">tor</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/privacy.html">privacy</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/raspberrypi.html">raspberrypi</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/ansible.html">ansible</a>
+                            <br/>
+                            // Wed 16 November 2016
+                        </p>
+                </header>
+            </section>
+            <p>This is a little walkthrough on using ansible to setup a tor relay (not an exit node)
+on a <a href="https://www.raspberrypi.org/">Raspberry Pi</a>. It might be overhead to
+use ansible for this purpose but the initial goal was to experiment with ansible.</p>
+<p>First go to <a href="https://www.raspberrypi.org/downloads/raspbian/">Raspberry Pi download</a>
+and download the raspbian iso. Then flash it to your SD card and start your Raspberry Pi.
+A comprehensive guide is available <a href="https://www.raspberrypi.org/documentation/installation/installing-images/linux.md">here</a>.
+You might also want to follow the config setup doc <a href="https://www.raspberrypi.org/documentation/configuration/raspi-config.md">here</a>
+which explains the different options of the <code>raspi-config</code> tool.</p>
+<p>Once you have your Raspberry Pi up and running, let's setup <a href="https://docs.ansible.com/">ansible</a>
+to install and set up a tor relay.</p>
+<p>To get the <a href="https://docs.ansible.com/ansible/intro_installation.html#running-from-source">latest version of ansible</a>,
+run the following on Debian/Ubuntu. For other distribution,
+follow the <a href="https://docs.ansible.com/ansible/intro_installation.html#running-from-source">ansible <em>installation from source</em> doc</a>:</p>
+<div class="highlight"><pre><span class="nv">$ </span>sudo apt-get update <span class="o">&amp;&amp;</span> sudo apt-get install python-pip python-dev git -y
+<span class="nv">$ </span>sudo pip install PyYAML jinja2 paramiko
+<span class="nv">$ </span>git clone https://github.com/ansible/ansible.git --recursive /tmp/ansible
+<span class="nv">$ </span><span class="nb">cd</span> /tmp/ansible
+<span class="nv">$ </span>sudo make install
+<span class="nv">$ </span>sudo mkdir -p /etc/ansible
+<span class="nv">$ </span>sudo cp /tmp/ansible/examples/hosts /etc/ansible/.
+<span class="nv">$ </span><span class="nb">cd</span> -
+<span class="nv">$ </span>sudo rm -rf /tmp/ansible
+</pre></div>
+
+
+<p>Then make sure you're running the latest version with</p>
+<div class="highlight"><pre><span class="nv">$ </span>ansible --version
+ansible 2.2.0
+</pre></div>
+
+
+<p>We will be using <a href="https://docs.ansible.com/ansible/playbooks.html">ansible-playbook</a> in order
+to run the different tasks on the Raspberry Pi.</p>
+<p>Create a playbook in a file named <code>rpitor.yml</code> and copy the following
+lines to it:</p>
+<div class="highlight"><pre><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">hosts</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">rpitor</span>
+  <span class="l-Scalar-Plain">vars</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">torport=TODO</span>
+    <span class="l-Scalar-Plain">dirport=TODO</span>
+    <span class="l-Scalar-Plain">nodename=TODO</span>
+</pre></div>
+
+
+<p>We will then need to complete this file with specific tasks that are to be executed from your host
+computer to your Raspberry Pi to setup the tor relay.</p>
+<p>These are the options you need to fill in in the above file (the <em>TODO</em>):</p>
+<ul>
+<li><strong>torport</strong>: this is the port on which tor will be listening
+    (it must be forwarded from your firewall/router)</li>
+<li><a href="https://www.torproject.org/docs/faq#RelayWritesMoreThanItReads"><strong>dirport</strong></a>:
+    this is the port to listen for directory requests (must as well be forwarded from
+    your firewall/router)</li>
+<li><strong>nodename</strong>: this is the name of your node (be creative)</li>
+</ul>
+<h2>Update the system and install the packages</h2>
+<p>The following tasks will install the needed packages to
+run tor; add those lines to the playbook.</p>
+<div class="highlight"><pre><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">rpi update</span>
+  <span class="l-Scalar-Plain">shell</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">rpi-update</span>
+  <span class="l-Scalar-Plain">become</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">update and upgrade</span>
+  <span class="l-Scalar-Plain">apt</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">update_cache=yes</span>
+    <span class="l-Scalar-Plain">upgrade=dist</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">install packages</span>
+  <span class="l-Scalar-Plain">apt</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name={{ item }}</span>
+    <span class="l-Scalar-Plain">state=installed</span>
+  <span class="l-Scalar-Plain">with_items</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">tor</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">tor-arm</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">stop tor</span>
+  <span class="l-Scalar-Plain">service</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=tor</span>
+    <span class="l-Scalar-Plain">state=stopped</span>
+</pre></div>
+
+
+<h2>Tweak the system</h2>
+<p>Some configs need to be set in order to run a tor relay. Feel
+free to adapt those to your likings.</p>
+<div class="highlight"><pre><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">update limits</span>
+  <span class="l-Scalar-Plain">pam_limits</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">domain=*</span>
+    <span class="l-Scalar-Plain">limit_type=-</span>
+    <span class="l-Scalar-Plain">limit_item=nofile</span>
+    <span class="l-Scalar-Plain">value=120000</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set nic buffer size</span>
+  <span class="l-Scalar-Plain">shell</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/sbin/ifconfig eth0 txqueuelen 20000</span>
+  <span class="l-Scalar-Plain">become</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set configs permanent</span>
+  <span class="l-Scalar-Plain">lineinfile</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">dest=/etc/rc.local</span>
+    <span class="l-Scalar-Plain">regexp=&quot;^/sbin/ifconfig eth0 txqueuelen 20000$&quot;</span>
+    <span class="l-Scalar-Plain">line=&quot;/sbin/ifconfig eth0 txqueuelen 20000&quot;</span>
+    <span class="l-Scalar-Plain">insertbefore=&quot;^exit 0$&quot;</span>
+  <span class="l-Scalar-Plain">become</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set sysctl settings 1/6</span>
+  <span class="l-Scalar-Plain">sysctl</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=vm.min_free_kbytes</span>
+    <span class="l-Scalar-Plain">value=16384</span>
+    <span class="l-Scalar-Plain">state=present</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set sysctl settings 2/6</span>
+  <span class="l-Scalar-Plain">sysctl</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=net.netfilter.nf_conntrack_max</span>
+    <span class="l-Scalar-Plain">value=1000000</span>
+    <span class="l-Scalar-Plain">state=present</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set sysctl settings 3/6</span>
+  <span class="l-Scalar-Plain">sysctl</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=net.core.rmem_max</span>
+    <span class="l-Scalar-Plain">value=26214400</span>
+    <span class="l-Scalar-Plain">state=present</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set sysctl settings 4/6</span>
+  <span class="l-Scalar-Plain">sysctl</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=net.core.wmem_max</span>
+    <span class="l-Scalar-Plain">value=26214400</span>
+    <span class="l-Scalar-Plain">state=present</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set sysctl settings 5/6</span>
+  <span class="l-Scalar-Plain">sysctl</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=net.core.rmem_default</span>
+    <span class="l-Scalar-Plain">value=26214400</span>
+    <span class="l-Scalar-Plain">state=present</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set sysctl settings 6/6</span>
+  <span class="l-Scalar-Plain">sysctl</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=net.core.wmem_default</span>
+    <span class="l-Scalar-Plain">value=26214400</span>
+    <span class="l-Scalar-Plain">state=present</span>
+</pre></div>
+
+
+<h2>Setup tor</h2>
+<p>Finally create the tasks that will setup tor and
+start it.</p>
+<div class="highlight"><pre><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">set rights</span>
+  <span class="l-Scalar-Plain">file</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">dest=/var/lib/tor owner=debian-tor recurse=yes</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">stat logrotate for tor</span>
+  <span class="l-Scalar-Plain">stat</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">path=/etc/logrotate.d/tor</span>
+  <span class="l-Scalar-Plain">register</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">logrotate_stat</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">disable logrotate for tor</span>
+  <span class="l-Scalar-Plain">command</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">mv /etc/logrotate.d/tor /etc/logrotate.d/tor.disabled</span>
+  <span class="l-Scalar-Plain">when</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">logrotate_stat.stat.exists</span>
+  <span class="l-Scalar-Plain">become</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">setup torrc</span>
+  <span class="l-Scalar-Plain">template</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">src=/tmp/torrc.j2</span>
+    <span class="l-Scalar-Plain">dest=/etc/tor/torrc</span>
+  <span class="l-Scalar-Plain">become</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">enable tor</span>
+  <span class="l-Scalar-Plain">service</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=tor</span>
+    <span class="l-Scalar-Plain">enabled=yes</span>
+
+<span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">start tor</span>
+  <span class="l-Scalar-Plain">service</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">name=tor</span>
+    <span class="l-Scalar-Plain">state=restarted</span>
+</pre></div>
+
+
+<p>The jinja <a href="https://docs.ansible.com/ansible/template_module.html">template</a> used for the <code>torrc</code>
+file is the following and has to be
+saved in a file named <code>/tmp/torrc.j2</code> (it is referenced in the above <em>setup torrc</em> task):</p>
+<div class="highlight"><pre><span class="x">Log notice file /var/log/tor/notices.log</span>
+<span class="x">RunAsDaemon 1</span>
+<span class="x">ControlPort 9051</span>
+<span class="x">ORPort </span><span class="cp">{{</span> <span class="nv">torport</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">DirPort </span><span class="cp">{{</span> <span class="nv">dirport</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">Nickname </span><span class="cp">{{</span> <span class="nv">nodename</span> <span class="cp">}}</span><span class="x"></span>
+<span class="x">ExitPolicy reject *:* # no exits allowed</span>
+<span class="x">User debian-tor</span>
+<span class="x">DisableDebuggerAttachment 0</span>
+<span class="x">AvoidDiskWrites 1</span>
+<span class="x">SocksPort 0</span>
+</pre></div>
+
+
+<p>For more information on the different options used on your tor relay,
+see the <a href="https://www.torproject.org/docs/tor-manual.html.en">official doc</a>
+and the <a href="https://www.torproject.org/docs/faq">FAQ</a>.</p>
+<h2>Running the playbook</h2>
+<p>Now it's time to actually execute this playbook so that all the above defined
+tasks will be applied on the Raspberry Pi.</p>
+<p>Copy your public ssh key to your Raspberry Pi:</p>
+<div class="highlight"><pre><span class="nv">$ </span>ssh-copy-id pi@&lt;rpi-IP&gt;
+</pre></div>
+
+
+<p>And make sure you're able to ssh to your Raspberry Pi with your key.</p>
+<p>create the inventory file:</p>
+<div class="highlight"><pre><span class="nv">$ </span><span class="nb">echo</span> <span class="s1">&#39;[rpitor]&#39;</span> &gt; /tmp/torpi.hosts
+<span class="nv">$ </span><span class="nb">echo</span> <span class="s1">&#39;&lt;rpi-IP&gt;&#39;</span> &gt;&gt; /tmp/torpi.hosts
+</pre></div>
+
+
+<p>and then run the playbook:</p>
+<div class="highlight"><pre><span class="nv">$ </span>ansible-playbook -u pi -i /tmp/torpi.hosts rpitor.yml
+</pre></div>
+
+
+<p>You can of course run the same playbook multiple times since ansible provides
+idempotency (running multiple times will end up with the same result).</p>
+<h2>Final steps</h2>
+<p>Now you can reboot your Raspberry Pi to make sure you're running the latest kernel.</p>
+<p>Also make sure you opened the needed ports on your firewall, <code>torport</code> and
+<code>dirport</code> set in the <code>rpitor.yml</code> file.</p>
+<p>In order to monitor your tor relay, you can use the arm tool: <code>sudo -u debian-tor arm</code>.</p>
+<p>Once your relay is running, you can get information about your relay on <a href="https://atlas.torproject.org/">atlas</a>.</p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
