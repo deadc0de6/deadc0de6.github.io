@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>33c3 works for me // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>33c3 works for me</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/ccc.html">CCC</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/conf.html">conf</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/33c3.html">33c3</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/security.html">security</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/hacking.html">hacking</a>
+                            <br/>
+                            // Sun 08 January 2017
+                        </p>
+                </header>
+            </section>
+            <p>Here's a summary of some of the talks I've seen at the <a href="https://events.ccc.de/congress/2016/wiki/Main_Page">33C3</a>.</p>
+<p>I haven't had time to see all the talks (obviously), therefore for
+a complete list of the talks see the <em>Additional links</em>'s section below.
+By the way this list is in no particular order but the starred (*) talks are the ones I
+appreciated the most.</p>
+<p><em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8044.html">What could possibly go wrong with &lt;insert x86 instruction here</a></em>*
+by Clémentine Maurice and Moritz Lipp was very interesting. They presented their work on cache-attacks starting
+with a general explanation on cache attacks followed with specific examples:</p>
+<ul>
+<li>Covert channel attacks and SSH connection over the cache</li>
+<li>Crypto side-channel attacks (AES T-tables attack and kernel ASLR bypass)</li>
+<li>Keylogger by monitoring cache line access</li>
+</ul>
+<p>The video is available <a href="https://media.ccc.de/v/33c3-8044-what_could_possibly_go_wrong_with_insert_x86_instruction_here">here</a>.</p>
+<p><em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8127.html">How do I crack satellite and cable pay tv</a></em>
+by Chris Gerlinsky
+gives an overview of his extended work on hacking into set-up boxes and reverse engineering the
+different protocols and cryptographic techniques used in pay-tv software/hardware.
+A must see for those into the field. For the recording, go <a href="https://media.ccc.de/v/33c3-8127-how_do_i_crack_satellite_and_cable_pay_tv">here</a>.</p>
+<p>Joseph Cox gave in his talk
+<em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8018.html">Law enforcement are hacking the planet</a></em>
+an overview of the different attacks performed by the NSA worldwide and how they were trespassing
+their rights (operation <em>Pacifier</em>, operation <em>Torpedo</em>, ...).
+The video is available <a href="https://media.ccc.de/v/33c3-8018-law_enforcement_are_hacking_the_planet">here</a>.</p>
+<p>If you're using (or planning to use) N26 app by FinTech, you might want to have a look at the
+talk by Vincent Haupert
+<em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/7969.html">Shut up and take my money</a></em>*.
+He identified several flaws and security vulnerabilities which made N26 very vulnerable. For the record it seems they
+have since fixed the disclosed issues. The video is available
+<a href="https://media.ccc.de/v/33c3-7969-shut_up_and_take_my_money">here</a>.</p>
+<p><em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8061.html">You can -j REJECT but you can not hide: Global scanning of the IPv6 Internet</a></em> is a talk by Tobias Fiebig
+on using DNS queries to discover
+IPv6 hosts. This talk, despite its name, does mostly focus on discovering
+IPv6 hosts than actually scanning them.
+You can find the video under
+<a href="https://media.ccc.de/v/33c3-8061-you_can_-j_reject_but_you_can_not_hide_global_scanning_of_the_ipv6_internet">this link</a>.</p>
+<p>Rich Jones in his talk
+<em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/7865.html">Gone in 60 Milliseconds</a></em>
+walks us to the hacking of AWS event-driven micro-services (AWS lambda, s3 buckets, ...) through exploitation
+and ex-filtration techniques. The recording is available
+<a href="https://media.ccc.de/v/33c3-7865-gone_in_60_milliseconds">here</a>.</p>
+<p>If you ever wondered how bank transactions work and why international payments take usually a lot
+of time, have a look at the talk by Mark van Cuijk
+<em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8315.html">A world without blockchain</a></em>.
+The recording is available <a href="https://media.ccc.de/v/33c3-8315-a_world_without_blockchain">here</a>.</p>
+<p>The <em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8095.html">Radare demystified</a></em>* talk
+by pancake is a must see for anyone interested by r2 or using it. This talk gives a great
+overview of the different features available. A must see ! Video available under
+<a href="https://media.ccc.de/v/33c3-8095-radare_demystified">this link</a>.</p>
+<p>Anna and Andre Meister in their talk
+<em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8117.html">3 Years After Snowden: Is Germany fighting State Surveillance?</a></em>
+show us what has happened since the Snowden's revelations in Germany.
+How the BND collaborates with the NSA to spy on its own citizen but also helping the US
+to perform their mass surveillance.
+Video is available
+<a href="https://media.ccc.de/v/33c3-8117-3_years_after_snowden_is_germany_fighting_state_surveillance">here</a>.</p>
+<p>The talk <em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8034.html">Build your own NSA</a></em>*
+by Andreas Dewes and sveckert gives a very interesting work on de-anonymization
+or how are we actually identifiable through our browsing history. As a hint, do not trust WoT
+(Web of Trust). A must see.
+The video is available under <a href="https://media.ccc.de/v/33c3-8034-build_your_own_nsa">this link</a>.</p>
+<p>Ever wondered what it would take to build an elevator to the moon ? The talk
+<em><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/events/8407.html">An Elevator to the Moon (and back)</a></em>
+by Markus Landgraf will give you an overview of the different challenges to face.
+Find the video <a href="https://media.ccc.de/v/33c3-8407-an_elevator_to_the_moon_and_back">here</a>.</p>
+<p>Have fun watching those talks !</p>
+<h1>Additional links</h1>
+<ul>
+<li>The videos: <a href="http://streaming.media.ccc.de/33c3">http://streaming.media.ccc.de/33c3</a></li>
+<li>The wiki: <a href="https://events.ccc.de/congress/2016/wiki/Main_Page">https://events.ccc.de/congress/2016/wiki/Main_Page</a></li>
+<li>The weblog: <a href="https://events.ccc.de/">https://events.ccc.de/</a></li>
+<li>The youtube playlist: <a href="https://www.youtube.com/user/mediacccde">https://www.youtube.com/user/mediacccde</a></li>
+<li>The Fahrplan: <a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/">https://fahrplan.events.ccc.de/congress/2016/Fahrplan/</a><ul>
+<li><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/schedule/0.html">Day 1</a></li>
+<li><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/schedule/1.html">Day 2</a></li>
+<li><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/schedule/2.html">Day 3</a></li>
+<li><a href="https://fahrplan.events.ccc.de/congress/2016/Fahrplan/schedule/3.html">Day 4</a></li>
+</ul>
+</li>
+</ul>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

@@ -70,7 +70,7 @@ that are coding in Erlang are actually coding in Erlang/OTP).</li>
 <p>So why would you use Erlang ? Well there’s many use cases one can think of, <a href="http://www.erlang.org/faq/introduction.html">here</a>‘s
 a list of nice use cases where Erlang is suitable (and some where it is not). But as stated on that page,
 Erlang is mainly suitable for</p>
-<div class="highlight"><pre>“Distributed, reliable, soft real-time concurrent systems”.
+<div class="highlight"><pre><span></span>“Distributed, reliable, soft real-time concurrent systems”.
 </pre></div>
 
 
@@ -101,15 +101,15 @@ features (scalability, concurrency, fault-tolerent).</p>
 <p>One very elegant feature of Erlang is its pattern matching (as other functional languages).
 It is very nice when one get down to, for example, parsing packets.</p>
 <p>This is an example of a function which takes as input an Ethernet frame (in binary) and prints its content:</p>
-<div class="highlight"><pre><span class="n">parse_ethernet</span><span class="p">(</span><span class="o">&lt;&lt;</span>
+<div class="highlight"><pre><span></span><span class="n">parse_ethernet</span><span class="p">(</span><span class="o">&lt;&lt;</span>
   <span class="n">Src</span><span class="p">:</span><span class="mi">48</span><span class="p">,</span>
   <span class="n">Dst</span><span class="p">:</span><span class="mi">48</span><span class="p">,</span>
   <span class="mi">2048</span><span class="p">:</span><span class="mi">16</span><span class="p">,</span>
   <span class="n">Rest</span><span class="o">/</span><span class="n">binary</span><span class="o">&gt;&gt;</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;~p -&gt; ~p (~p)~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">integer_to_list</span><span class="p">(</span><span class="n">Src</span><span class="p">),</span> <span class="n">integer_to_list</span><span class="p">(</span><span class="n">Dst</span><span class="p">),</span> <span class="n">Rest</span><span class="p">]),</span>
+  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s2">&quot;~p -&gt; ~p (~p)~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">integer_to_list</span><span class="p">(</span><span class="n">Src</span><span class="p">),</span> <span class="n">integer_to_list</span><span class="p">(</span><span class="n">Dst</span><span class="p">),</span> <span class="n">Rest</span><span class="p">]),</span>
   <span class="n">parse_ip</span><span class="p">(</span><span class="n">Rest</span><span class="p">);</span>
 <span class="n">parse_ethernet</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;FAILED TO DECODE Ethernet~n&quot;</span><span class="p">)</span><span class="o">.</span>
+  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s2">&quot;FAILED TO DECODE Ethernet~n&quot;</span><span class="p">)</span><span class="o">.</span>
 </pre></div>
 
 
@@ -129,16 +129,16 @@ to the second declaration which will simply output an error message.</p>
 <p>The next example shows you how you can spin a lot of Erlang processes.
 An Erlang process is very small (309 words as stated <a href="http://www.erlang.org/doc/efficiency_guide/processes.html">here</a>).</p>
 <p>You can easily spawn a process in Erlang using the function spawn.</p>
-<div class="highlight"><pre><span class="n">spawn</span><span class="p">(</span><span class="n">Module</span><span class="p">,</span> <span class="n">Function</span><span class="p">,</span> <span class="n">Args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pid</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><span class="n">spawn</span><span class="p">(</span><span class="n">Module</span><span class="p">,</span> <span class="n">Function</span><span class="p">,</span> <span class="n">Args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pid</span><span class="p">()</span>
 </pre></div>
 
 
 <p>Then you would make the created process wait for a message (using Erlang’s message passing) before quitting:</p>
-<div class="highlight"><pre><span class="n">procc</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;[~p] Process started~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Id</span><span class="p">]),</span>
+<div class="highlight"><pre><span></span><span class="n">procc</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s2">&quot;[~p] Process started~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Id</span><span class="p">]),</span>
   <span class="n">receive</span>
     <span class="p">{</span><span class="n">stop</span><span class="p">}</span> <span class="o">-&gt;</span>
-      <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;[~p] Process stopped~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Id</span><span class="p">])</span>
+      <span class="n">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s2">&quot;[~p] Process stopped~n&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Id</span><span class="p">])</span>
   <span class="n">end</span><span class="o">.</span>
 </pre></div>
 

@@ -52,7 +52,7 @@
             </section>
             <p>Let's say you have multiple two-fields csv files that you want to join on their
 first field. For example:</p>
-<div class="highlight"><pre>a.csv     b.csv
+<div class="highlight"><pre><span></span>a.csv     b.csv
 -----     -----
 a,1       b,10
 b,2       c,20
@@ -76,7 +76,7 @@ c,0,20
 <p>For a more complete explanation of those options, see join's man page.</p>
 <p>That is all what is needed to join two files (the sort command
 is added for reference although the files are already sorted):</p>
-<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, &lt;<span class="o">(</span>sort -t, -k1 a.csv<span class="o">)</span> &lt;<span class="o">(</span>sort -t, -k1 b.csv<span class="o">)</span>
+<div class="highlight"><pre><span></span>$ join -a1 -a2 -j1 -t, &lt;<span class="o">(</span>sort -t, -k1 a.csv<span class="o">)</span> &lt;<span class="o">(</span>sort -t, -k1 b.csv<span class="o">)</span>
 a,1
 b,2,10
 c,20
@@ -91,7 +91,7 @@ joined field and additional <em>FILENUM.FIELD</em> which field of which file (<e
 is to be added to the output. There's however a nice simplification using the keyword <em>auto</em> that automagically
 determines how many fields from each file to output based on their first line.</p>
 <p>Using <strong>-o 'auto'</strong> the output becomes:</p>
-<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> a.csv b.csv
+<div class="highlight"><pre><span></span>$ join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> a.csv b.csv
 a,1,
 b,2,10
 c,,20
@@ -101,7 +101,7 @@ c,,20
 <p>Now it's clear that <em>a</em> belongs to <em>a.csv</em> and <em>c</em> to <em>b.csv</em>.
 It is however nice to complete the command with <strong>-e0</strong>
 to replace missing fields with a <em>0</em>.</p>
-<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 a.csv b.csv
+<div class="highlight"><pre><span></span>$ join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 a.csv b.csv
 a,1,0
 b,2,10
 c,0,20
@@ -109,7 +109,7 @@ c,0,20
 
 
 <p>Perfect. Now we can add a new file:</p>
-<div class="highlight"><pre><span class="gh">d.csv</span>
+<div class="highlight"><pre><span></span><span class="gh">d.csv</span>
 <span class="gh">-----</span>
 a,100
 x,200
@@ -117,7 +117,7 @@ x,200
 
 
 <p>and join them all:</p>
-<div class="highlight"><pre><span class="nv">$ </span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 &lt;<span class="o">(</span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 a.csv b.csv<span class="o">)</span> d.csv
+<div class="highlight"><pre><span></span>$ join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 &lt;<span class="o">(</span>join -a1 -a2 -j1 -t, -o <span class="s1">&#39;auto&#39;</span> -e0 a.csv b.csv<span class="o">)</span> d.csv
 a,1,0,100
 b,2,10,0
 c,0,20,0

@@ -67,13 +67,13 @@ able to draw a map of who's scanning you from which country.</p>
 <li>play with the data on Kibana</li>
 </ul>
 <p>Once done, that's the kind of dashboard you could have to monitor your firewall:
-<a href="https://deadc0de.re/images/kibana.png"><img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px" /></a></p>
+<a href="https://deadc0de.re/images/kibana.png"><img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px"></a></p>
 <h2>Install docker</h2>
 <p>Follow the instructions for your distribution on
 the <a href="https://docs.docker.com/engine/installation/linux/">docker's installation doc</a>.</p>
 <p>Once docker's installed, retrieve the <a href="https://hub.docker.com/r/sebp/elk/">docker image</a>
 on which we will base our stack:</p>
-<div class="highlight"><pre>docker pull sebp/elk
+<div class="highlight"><pre><span></span>docker pull sebp/elk
 </pre></div>
 
 
@@ -86,7 +86,7 @@ viable structure for Elasticsearch.</p>
 be correctly parsed by Elasticsearch/kibana.</p>
 <p>This file is originally from
 <a href="https://gist.github.com/bradvido/4e6501222b8f7dbe3ba8">this gist</a>, save it into <code>docker-elk/pfsense.2.2.grok</code>.</p>
-<div class="highlight"><pre># GROK match pattern for logstash.conf filter: %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
+<div class="highlight"><pre><span></span># GROK match pattern for logstash.conf filter: %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
 
 # GROK Custom Patterns (add to patterns directory and reference in GROK filter for pfSense events):
 
@@ -145,7 +145,7 @@ ICMP_TSTAMP_REPLY (%{INT:icmp_tstamp_reply_id}),(%{INT:icmp_tstamp_reply_sequenc
 <li>outputs to Elasticsearch</li>
 </ul>
 <p>Save the following into <code>docker-elk/pfsense.conf</code></p>
-<div class="highlight"><pre>input {
+<div class="highlight"><pre><span></span>input {
   udp {
     port =&gt; 5000
     type =&gt; &quot;syslog&quot;
@@ -180,7 +180,7 @@ output {
 
 <p>Pfsense usually uses <em>re{0-9}</em> as interface names. You could rename those fields
 directly in logstash by adding an entry like this in the above config under the <em>filter</em> element:</p>
-<div class="highlight"><pre>if [iface] == &quot;re0&quot; {
+<div class="highlight"><pre><span></span>if [iface] == &quot;re0&quot; {
   mutate {
     replace =&gt; [ &quot;iface&quot;, &quot;WAN&quot; ]
   }
@@ -190,7 +190,7 @@ directly in logstash by adding an entry like this in the above config under the 
 
 <h2>Run the stack</h2>
 <p>Now that we have the configs, let's create the dockerfile as <em>docker-elk/dockerfile</em>:</p>
-<div class="highlight"><pre>FROM sebp/elk
+<div class="highlight"><pre><span></span>FROM sebp/elk
 
 # remove logstash config files
 RUN rm /etc/logstash/conf.d/01-lumberjack-input.conf
@@ -212,12 +212,12 @@ ADD ./pfsense.2.2.grok /etc/logstash/patterns/pfsense.2.2.grok
 <li>add our specific config files (defined above)</li>
 </ul>
 <p>Having all the above files in the same folder, build the docker image with:</p>
-<div class="highlight"><pre>cd docker-elk/ &amp;&amp; docker build -t elk-pfsense .
+<div class="highlight"><pre><span></span>cd docker-elk/ &amp;&amp; docker build -t elk-pfsense .
 </pre></div>
 
 
 <p>And finally run that container with:</p>
-<div class="highlight"><pre>docker run -p 5601:5601 -p 9200:9200 -p 5000:5000/udp -v elk-data:/var/lib/elasticsearch -it --name elk elk-pfsense
+<div class="highlight"><pre><span></span>docker run -p 5601:5601 -p 9200:9200 -p 5000:5000/udp -v elk-data:/var/lib/elasticsearch -it --name elk elk-pfsense
 </pre></div>
 
 
@@ -233,13 +233,13 @@ ADD ./pfsense.2.2.grok /etc/logstash/patterns/pfsense.2.2.grok
 Elasticsearch.</p>
 <p>Since we're running a single ES node, the number of replicas must be set to 0. This
 is done with following command:</p>
-<div class="highlight"><pre>curl -XPUT http://localhost:9200/_settings -d <span class="s1">&#39;{ &quot;number_of_replicas&quot; :0 }&#39;</span>
+<div class="highlight"><pre><span></span>curl -XPUT http://localhost:9200/_settings -d <span class="s1">&#39;{ &quot;number_of_replicas&quot; :0 }&#39;</span>
 </pre></div>
 
 
 <p>You might also want to increase the queue to avoid timeouts on kibana when
 querying large quantity of data:</p>
-<div class="highlight"><pre>curl -XPUT localhost:9200/_cluster/settings -d <span class="s1">&#39;{&quot;transient&quot; : {&quot;threadpool.search.queue_size&quot; : 2000}}&#39;</span>
+<div class="highlight"><pre><span></span>curl -XPUT localhost:9200/_cluster/settings -d <span class="s1">&#39;{&quot;transient&quot; : {&quot;threadpool.search.queue_size&quot; : 2000}}&#39;</span>
 </pre></div>
 
 
@@ -255,7 +255,7 @@ Also tick the <strong>Firewall Events</strong> and untick all the others.</p>
 <p>Connect to Kibana (http://[host-ip]:5601) and create a new time-based index based off this pattern: <em>logstash-</em>*</p>
 <p>Then, after a while you should see points coming in kibana on the <em>Discover</em> tab.</p>
 <p>Finally create a dashboard with these information:</p>
-<p><a href="https://deadc0de.re/images/kibana.png"><img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px" /></a></p>
+<p><a href="https://deadc0de.re/images/kibana.png"><img alt="kibana dashboard" src="https://deadc0de.re/images/kibana.png" width="800px"></a></p>
 <footer class="footer">
     <p>
     &copy; 2015 deadc0de

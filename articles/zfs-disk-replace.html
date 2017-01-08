@@ -50,7 +50,7 @@
                 </header>
             </section>
             <p>This is what happened to me the other day on my RAIDZ-1:</p>
-<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status apool -x
+<div class="highlight"><pre><span></span>$ sudo zpool status apool -x
   pool: apool
  state: DEGRADED
 status: One or more devices are faulted in response to persistent errors.
@@ -80,7 +80,7 @@ I had seen some smart warning but never gave it the attention needed
 number using <a href="https://www.smartmontools.org/">smartctl</a>. Obviously if your disk is unreachable
 by <code>smartctl</code>, you'll have to get the healthy ones's serials and go by deduction from there.</p>
 <p>Here's the <code>smartctl</code> command to get a device's serial:</p>
-<div class="highlight"><pre><span class="nv">$ </span>sudo smartctl -i /dev/sdXXX <span class="p">|</span> grep -i <span class="s1">&#39;Serial Number&#39;</span>
+<div class="highlight"><pre><span></span>$ sudo smartctl -i /dev/sdXXX <span class="p">|</span> grep -i <span class="s1">&#39;Serial Number&#39;</span>
 </pre></div>
 
 
@@ -88,7 +88,7 @@ by <code>smartctl</code>, you'll have to get the healthy ones's serials and go b
 tool. A little software which will allow you to control storage leds and thus identify physically
 your device.</p>
 <p>Here's how the pool looks like once the failing disk has been removed:</p>
-<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status
+<div class="highlight"><pre><span></span>$ sudo zpool status
   pool: apool
  state: DEGRADED
 status: One or more devices could not be used because the label is missing or
@@ -114,7 +114,7 @@ errors: No known data errors
 goes sick !</p>
 <h1>Replacing the disk in the pool</h1>
 <p>Once you get your new device, here's the process to replace it in the zfs pool.</p>
-<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status
+<div class="highlight"><pre><span></span>$ sudo zpool status
   pool: apool
  state: DEGRADED
 status: One or more devices could not be used because the label is missing or
@@ -137,17 +137,17 @@ errors: No known data errors
 
 
 <p>First put the old device offline:</p>
-<div class="highlight"><pre>sudo zpool offline apool 11743263287665849900
+<div class="highlight"><pre><span></span>sudo zpool offline apool 11743263287665849900
 </pre></div>
 
 
 <p>And finally replace with the new mounted disk:</p>
-<div class="highlight"><pre>sudo zpool replace apool /dev/mapper/c
+<div class="highlight"><pre><span></span>sudo zpool replace apool /dev/mapper/c
 </pre></div>
 
 
 <p>Now the pool is rebuilding using the new disk (<em>resilvering</em> in the zfs world):</p>
-<div class="highlight"><pre><span class="nv">$ </span>sudo zpool status
+<div class="highlight"><pre><span></span>$ sudo zpool status
   pool: apool
  state: DEGRADED
 status: One or more devices is currently being resilvered.  The pool will

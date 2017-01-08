@@ -53,7 +53,7 @@ Vim's macros allow you to repeat a <em>recording</em> of
 a sequence of command.</p>
 <p>For the following examples, I will use this content,
 the goal is to remove the spaces and the trailing commas.</p>
-<div class="highlight"><pre>a, 2,
+<div class="highlight"><pre><span></span>a, 2,
 b, 3,
 c, 4,
 d, 5,
@@ -69,14 +69,14 @@ applying a command to the entire column.</p>
 <ul>
 <li>
 <p>Select the spaces and delete them</p>
-<div class="highlight"><pre>f&lt;space&gt;&lt;CTRL&gt;v99jx
+<div class="highlight"><pre><span></span>f&lt;space&gt;&lt;CTRL&gt;v99jx
 </pre></div>
 
 
 </li>
 <li>
 <p>Go to the end of the line, select the commas and delete them</p>
-<div class="highlight"><pre>$&lt;CTRL&gt;v99jx
+<div class="highlight"><pre><span></span>$&lt;CTRL&gt;v99jx
 </pre></div>
 
 
@@ -92,7 +92,7 @@ applying a command to the entire column.</p>
 <li>...</li>
 </ul>
 <p>This is a little screencast of this execution:</p>
-<p><img alt="vim visual column" src="https://deadc0de.re/gifs/vim-col.gif" /></p>
+<p><img alt="vim visual column" src="https://deadc0de.re/gifs/vim-col.gif"></p>
 <h2>Using a macro I</h2>
 <p>With a macro, you can record a single execution on the first line and then
 execute it on all the subsequent lines.
@@ -114,7 +114,7 @@ And then apply that to the rest of the lines:</p>
 <li>and execute the macro: <code>:norm @a</code></li>
 </ul>
 <p>That's it !</p>
-<p><img alt="vim macro example 1" src="https://deadc0de.re/gifs/vim-macro-1.gif" /></p>
+<p><img alt="vim macro example 1" src="https://deadc0de.re/gifs/vim-macro-1.gif"></p>
 <p>The <code>normal</code> command (here I used the shortcut <code>norm</code>) is used to execute a set of
 vim commands as if you were in <em>normal</em> mode (see <code>:help normal</code> for more info).</p>
 <h2>Using macro II</h2>
@@ -136,7 +136,7 @@ the command with a count as for example <code>99@m</code>.</p>
 <h2>Using macro III</h2>
 <p>This is another nice example of the power of vim's macro.</p>
 <p>Our example file:</p>
-<div class="highlight"><pre>a,&quot;this is a&quot;
+<div class="highlight"><pre><span></span>a,&quot;this is a&quot;
 b,&quot;this is b&quot;
 c,&quot;this is c&quot;
 </pre></div>
@@ -165,7 +165,7 @@ that to all subsequent lines.</p>
 <li>apply the macro to these lines: <code>:norm @q</code></li>
 </ul>
 <p>Here's a little screencast that demonstrates this execution.</p>
-<p><img alt="vim macro example 2" src="https://deadc0de.re/gifs/vim-macro-2.gif" /></p>
+<p><img alt="vim macro example 2" src="https://deadc0de.re/gifs/vim-macro-2.gif"></p>
 <p>One more thing: you can append more command to a macro by restarting the macro with the capital
 letter of the register where you saved your commands. For example <code>qA ... q</code>
 for register <em>a</em>.</p>

@@ -54,7 +54,7 @@ body <a href="https://tools.ietf.org/html/rfc2616">using two CRLFs</a> (<code>\r
 Some freestylers (obviously not following the RFC) use two <code>\n</code>. I however won't
 deal with that in here.</p>
 <p>First get a HTTP response:</p>
-<div class="highlight"><pre><span class="nv">$ </span><span class="nb">echo</span> -e <span class="s1">&#39;GET / HTTP/1.1\r\n\r\n&#39;</span> <span class="p">|</span> nc google.com <span class="m">80</span> <span class="p">|</span> tee /tmp/response
+<div class="highlight"><pre><span></span>$ <span class="nb">echo</span> -e <span class="s1">&#39;GET / HTTP/1.1\r\n\r\n&#39;</span> <span class="p">|</span> nc google.com <span class="m">80</span> <span class="p">|</span> tee /tmp/response
 HTTP/1.1 <span class="m">302</span> Found
 Cache-Control: private
 Content-Type: text/html<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>UTF-8
@@ -93,14 +93,14 @@ based on a separator lead me to these solutions:</p>
 <p><a href="http://erlang.org/doc/man/string.html#tokens-2">string:tokens/2</a> allows
 to split a string into a list of tokens.</p>
 <p>For example:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="s">&quot;this is a test&quot;</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="s">&quot;this is a test&quot;</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">).</span>
 <span class="p">[</span><span class="s">&quot;this&quot;</span><span class="p">,</span><span class="s">&quot;is&quot;</span><span class="p">,</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">]</span>
 </pre></div>
 
 
 <p>A disadvantage (or advantage) from this method is that adjacent separators are
 treated as one as shown here:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="s">&quot;I want to separate successive c in here&quot;</span><span class="p">,</span> <span class="s">&quot;cc&quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="nf">tokens</span><span class="p">(</span><span class="s">&quot;I want to separate successive c in here&quot;</span><span class="p">,</span> <span class="s">&quot;cc&quot;</span><span class="p">).</span>
 <span class="p">[</span><span class="s">&quot;I want to separate su&quot;</span><span class="p">,</span><span class="s">&quot;essive &quot;</span><span class="p">,</span><span class="s">&quot; in here&quot;</span><span class="p">]</span>
 </pre></div>
 
@@ -110,7 +110,7 @@ treated as one as shown here:</p>
 header from the body using the separator <code>\r\n\r\n</code>. As shown this won't work
 with <code>tokens</code> since <code>\r\n\r\n</code> will be treated as <code>\r\n</code> and thus result in
 the following:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
 <span class="p">...</span>
 <span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
 <span class="p">...</span>
@@ -135,7 +135,7 @@ the offset of a specific sequence in a string while
 <a href="http://erlang.org/doc/man/string.html#substr-2">string:substr</a> helps you extract
 a sub-string based on its starting offset and its length.</p>
 <p>One way of doing it would then be:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
 <span class="p">...</span>
 <span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
 <span class="p">...</span>
@@ -158,7 +158,7 @@ able to split a string in more than two fields.</p>
 <p><a href="http://erlang.org/doc/man/lists.html#split-2">lists:split/2</a> will split the
 list provided in argument in two lists with the first one containing the N first
 char(s):</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
 <span class="p">...</span>
 <span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
 <span class="p">...</span>
@@ -183,7 +183,7 @@ solutions this:</p>
 <li>[bonus] allows to split in more than two fields</li>
 </ul>
 <p>Without further introduction, here's how I did this:</p>
-<div class="highlight"><pre><span class="p">-</span><span class="ni">define</span><span class="p">(</span><span class="no">CRLF</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="p">-</span><span class="ni">define</span><span class="p">(</span><span class="no">CRLF</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">).</span>
 
 <span class="nf">parse_response</span><span class="p">(</span><span class="o">?</span><span class="nv">CRLF</span> <span class="o">++</span> <span class="o">?</span><span class="nv">CRLF</span> <span class="o">++</span> <span class="nv">Rest</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
   <span class="p">[</span><span class="nn">lists</span><span class="p">:</span><span class="nf">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">)</span><span class="o">++?</span><span class="nv">CRLF</span><span class="p">,</span> <span class="nv">Rest</span><span class="p">];</span>
@@ -196,7 +196,7 @@ solutions this:</p>
 
 <p>This allows, using list comprehension and pattern matching, to nicely
 separate the header of the body:</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="nf">read_file</span><span class="p">(</span><span class="s">&quot;/tmp/response&quot;</span><span class="p">).</span>
 <span class="p">...</span>
 <span class="mi">2</span><span class="o">&gt;</span> <span class="nv">Content</span> <span class="o">=</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Bin</span><span class="p">).</span>
 <span class="p">...</span>
@@ -215,7 +215,7 @@ If no <code>\r\n\r\n</code> is found, a list of two empty lists is returned.</p>
 <p>This function can then be improved to handle the splitting of several fields,
 as for example in a csv line where fields are separated by a comma. We wouldn't
 be able to use <code>string:tokens</code> since we want to be able to see empty fields:</p>
-<div class="highlight"><pre><span class="p">-</span><span class="ni">define</span><span class="p">(</span><span class="no">SEP</span><span class="p">,</span> <span class="s">&quot;,&quot;</span><span class="p">).</span>
+<div class="highlight"><pre><span></span><span class="p">-</span><span class="ni">define</span><span class="p">(</span><span class="no">SEP</span><span class="p">,</span> <span class="s">&quot;,&quot;</span><span class="p">).</span>
 
 <span class="nf">parse_line</span><span class="p">(</span><span class="o">?</span><span class="nv">SEP</span> <span class="o">++</span> <span class="nv">Rest</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
   <span class="p">[</span><span class="nn">string</span><span class="p">:</span><span class="nf">strip</span><span class="p">(</span><span class="nn">lists</span><span class="p">:</span><span class="nf">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">))|</span><span class="n">parse_line</span><span class="p">(</span><span class="nv">Rest</span><span class="p">,</span> <span class="p">[])];</span>
@@ -227,7 +227,7 @@ be able to use <code>string:tokens</code> since we want to be able to see empty 
 
 
 <p>resulting in (you can see the difference with <code>string:tokens</code>):</p>
-<div class="highlight"><pre><span class="mi">1</span><span class="o">&gt;</span> <span class="nv">Line</span> <span class="o">=</span> <span class="s">&quot;field1,ofjeofje    ,field3, foefjoejfe,    field5,,&quot;</span><span class="p">.</span>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">&gt;</span> <span class="nv">Line</span> <span class="o">=</span> <span class="s">&quot;field1,ofjeofje    ,field3, foefjoejfe,    field5,,&quot;</span><span class="p">.</span>
 <span class="s">&quot;field1,ofjeofje    ,field3, foefjoejfe,    field5,,&quot;</span>
 <span class="mi">2</span><span class="o">&gt;</span> <span class="nn">tmp</span><span class="p">:</span><span class="nf">parse_line</span><span class="p">(</span><span class="nv">Line</span><span class="p">,</span> <span class="p">[]).</span>
 <span class="p">[</span><span class="s">&quot;field1&quot;</span><span class="p">,</span><span class="s">&quot;ofjeofje&quot;</span><span class="p">,</span><span class="s">&quot;field3&quot;</span><span class="p">,</span><span class="s">&quot;foefjoejfe&quot;</span><span class="p">,</span><span class="s">&quot;field5&quot;</span><span class="p">,[],[]]</span>
