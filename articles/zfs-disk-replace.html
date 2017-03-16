@@ -62,11 +62,11 @@ action: Replace the faulted device, or use <span class="s1">&#39;zpool clear&#39
 config:
 
   NAME        STATE     READ WRITE CKSUM
-  apool       DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-    raidz1-0  DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-      b       ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+  apool       DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+    raidz1-0  DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+      b       ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
       c       FAULTED      <span class="m">0</span>   <span class="m">140</span>     <span class="m">0</span>  too many errors
-      d       ONLINE       <span class="m">0</span>     <span class="m">0</span>    11
+      d       ONLINE       <span class="m">0</span>     <span class="m">0</span>    <span class="m">11</span>
 
 errors: No known data errors
 </pre></div>
@@ -100,11 +100,11 @@ action: Replace the device using <span class="s1">&#39;zpool replace&#39;</span>
 config:
 
   NAME                      STATE     READ WRITE CKSUM
-  apool                     DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-    raidz1-0                DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-      b                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+  apool                     DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+    raidz1-0                DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+      b                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
       <span class="m">11743263287665849900</span>  FAULTED      <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  was /dev/mapper/c
-      c                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+      c                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
 
 errors: No known data errors
 </pre></div>
@@ -126,18 +126,18 @@ action: Replace the device using <span class="s1">&#39;zpool replace&#39;</span>
 config:
 
         NAME                      STATE     READ WRITE CKSUM
-        apool                     DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-          raidz1-0                DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-            b                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+        apool                     DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+          raidz1-0                DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+            b                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
             <span class="m">11743263287665849900</span>  UNAVAIL      <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  was /dev/mapper/c
-            d                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+            d                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
 
 errors: No known data errors
 </pre></div>
 
 
 <p>First put the old device offline:</p>
-<div class="highlight"><pre><span></span>sudo zpool offline apool 11743263287665849900
+<div class="highlight"><pre><span></span>sudo zpool offline apool <span class="m">11743263287665849900</span>
 </pre></div>
 
 
@@ -154,18 +154,18 @@ status: One or more devices is currently being resilvered.  The pool will
         <span class="k">continue</span> to <span class="k">function</span>, possibly in a degraded state.
 action: Wait <span class="k">for</span> the resilver to complete.
   scan: resilver in progress
-    116G scanned out of 4.53T at 264M/s, 4h52m to go
-    38.5G resilvered, 2.49% <span class="k">done</span>
+    116G scanned out of <span class="m">4</span>.53T at 264M/s, 4h52m to go
+    <span class="m">38</span>.5G resilvered, <span class="m">2</span>.49% <span class="k">done</span>
 config:
 
         NAME                        STATE     READ WRITE CKSUM
-        apool                       DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-          raidz1-0                  DEGRADED     <span class="m">0</span>     <span class="m">0</span>     0
-            b                       ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
-            replacing-1             OFFLINE      <span class="m">0</span>     <span class="m">0</span>     0
+        apool                       DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+          raidz1-0                  DEGRADED     <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+            b                       ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
+            replacing-1             OFFLINE      <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
               <span class="m">11743263287665849900</span>  OFFLINE      <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  was /dev/mapper/c/old
               c                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>  <span class="o">(</span>resilvering<span class="o">)</span>
-            d                       ONLINE       <span class="m">0</span>     <span class="m">0</span>     0
+            d                       ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
 
 errors: No known data errors
 </pre></div>
