@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Dotfiles management with dotdrop // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Dotfiles management with dotdrop</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/dotfiles.html">dotfiles</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/linux.html">linux</a>
+                            <br/>
+                            // Mon 13 March 2017
+                        </p>
+                </header>
+            </section>
+            <p>Managing dotfiles is a pain, especially when working on multiple
+hosts (your host at home, your host in the office, your cloud VMs,
+etc), I was therefore looking for a solution that would
+allow me to save my dotfiles and manage them easily.</p>
+<p>If you don't know what this is about, dotfiles are
+all those configuration files you keep in your $HOME usually in a hidden
+file (starting with a dot, therefore <em>dotfile</em>).</p>
+<p>There exist several smart solutions on how to save your dotfiles, here
+are some solutions I almost adopted:</p>
+<ul>
+<li><a href="https://github.com/anishathalye/dotbot">https://github.com/anishathalye/dotbot</a></li>
+<li><a href="https://github.com/EvanPurkhiser/dots">https://github.com/EvanPurkhiser/dots</a></li>
+<li><a href="https://github.com/jaagr/dots">https://github.com/jaagr/dots</a></li>
+</ul>
+<p>Check the page <a href="https://dotfiles.github.io/">Github does dotfiles</a> for
+more tools on dotfiles.</p>
+<p>Those solutions are awesome but didn't exactly match what I needed.
+Here are some of the requirements I had:</p>
+<ul>
+<li>I want my dotfiles to be versioned (preferably with git).</li>
+<li>I want to store each dotfile only once (no multiple repositories,
+    no duplicate, ...).</li>
+<li>I want to be able to easily compare my local version with
+    the stored one.</li>
+<li>I want my management tool to handle multiple profiles (for different
+    hosts: home, desktop, VM, ...).</li>
+<li>I want different versions of same dotfile to be generated
+    depending on where I want it deployed.</li>
+</ul>
+<p>Most of the tools out there are designed for people using either a single
+host or the same set of dotfiles on all their hosts.
+One exception is <a href="https://github.com/tomjnixon/Dotfiles">ConMan</a> which is a nice
+tools that uses <a href="http://www.gnu.org/software/m4/m4.html">M4 macro processor</a> to
+generate the dotfiles. I found the idea really interesting but was missing the
+possibility to compare the local dotfiles with the ones stored.
+Moreover I wanted to code something ;-)</p>
+<p>I thus decided to implement my own tool to manage my dotfiles. I went for
+Python3 and needed a templating engine to parse and generate different versions
+of the same files based on macros. This led me to <a href="http://jinja.pocoo.org/">jinja2</a>,
+a well recognized templating engine for python.</p>
+<p>The resulting tool is <strong><a href="https://github.com/deadc0de6/dotdrop">dotdrop</a></strong> !
+Dotdrop's goal is to help you manage your dotfiles by storing them once and deploying
+them on different hosts the way you want them to be.</p>
+<p>Dotdrop keeps all its configs in a config file (<code>config.yaml</code>) where all
+the different dotfiles are listed as well as the profiles where they should
+be deployed. It thus gives the ability to have different sets
+of dotfiles on different hosts. For example you would install all your dotfiles
+on your home laptop but would have only a subset for your vserver (a stripped down
+version of vimrc for example along with some other basic dotfiles: tmux, etc).
+Also it leverages the power of <a href="http://jinja.pocoo.org/">jinja2</a> by allowing to
+template your dotfiles such that the same stored dotfile could be generated differently
+depending on where it is to be installed.</p>
+<p>It has nice features like the ability to import your dotfiles automatically and
+to compare the dotfiles you have currently on your host with the ones stored
+on dotdrop; such that if you change your dotfiles from your desktop, you are
+able to see what has changed and how you need to update it on dotdrop
+to reflect what you want.</p>
+<p>Let's take an example: you want to manage the following two files using dotdrop:</p>
+<ul>
+<li><em>$HOME/.xinitrc</em>: it is to be deployed on both your home and your office host but
+  with two different versions of the file.</li>
+<li><em>$HOME/.vimrc</em>: it only needs to be deployed on your home host.</li>
+</ul>
+<p>A template for jinja2 needs to be set up for <em>.xinitrc</em> such that different versions of
+that file are installed using dotdrop (no worry it's straight forward and doesn't
+need much to be efficient):</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="c1"># load Xresources</span>
+<span class="nv">userresources</span><span class="o">=</span><span class="nv">$HOME</span>/.Xresources
+<span class="k">if</span> <span class="o">[</span> -f <span class="s2">&quot;</span><span class="nv">$userresources</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+      xrdb -merge <span class="s2">&quot;</span><span class="nv">$userresources</span><span class="s2">&quot;</span> <span class="p">&amp;</span>
+<span class="k">fi</span>
+
+<span class="c1"># launch the wm</span>
+<span class="o">{</span>%@@ <span class="k">if</span> <span class="nv">profile</span> <span class="o">==</span> <span class="s2">&quot;home&quot;</span> @@%<span class="o">}</span>
+<span class="nb">exec</span> awesome
+<span class="o">{</span>%@@ <span class="k">elif</span> <span class="nv">profile</span> <span class="o">==</span> <span class="s2">&quot;office&quot;</span> @@%<span class="o">}</span>
+<span class="nb">exec</span> bspwm
+<span class="o">{</span>%@@ endif @@%<span class="o">}</span>
+</pre></div>
+
+
+<p>When the above dotfile is deployed it will result in two different file depending
+if you are running it from the <em>home</em> profile or the <em>office</em> one
+(see the <strong>if branch</strong> above). Jinja2 templating
+engine will choose the right branch and drop the rest such that the resulting file
+is a clean dotfile.</p>
+<p>Moreover using the config file you are able to specify what needs to be installed
+with which profile:</p>
+<div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">config</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">backup</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="l l-Scalar l-Scalar-Plain">create</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="l l-Scalar l-Scalar-Plain">dotpath</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">dotfiles</span>
+<span class="l l-Scalar l-Scalar-Plain">dotfiles</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">f_xinitrc</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">dst</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.xinitrc</span>
+    <span class="l l-Scalar l-Scalar-Plain">src</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">xinitrc</span>
+  <span class="l l-Scalar l-Scalar-Plain">f_vimrc</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">dst</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.vimrc</span>
+    <span class="l l-Scalar l-Scalar-Plain">src</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">vimrc</span>
+<span class="l l-Scalar l-Scalar-Plain">profiles</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">home</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_xinitrc</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_vimrc</span>
+  <span class="l l-Scalar l-Scalar-Plain">office</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_xinitrc</span>
+</pre></div>
+
+
+<p>Hope this tool will be useful to some. If you have issues using it or want to contribute,
+feel free to do a PR or create an issue on <a href="https://github.com/deadc0de6/dotdrop">dotdrop's page on github</a>.</p>
+<p>Link to the project on github: <strong><a href="https://github.com/deadc0de6/dotdrop">dotdrop</a></strong></p>
+<p>Happy ricing !</p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
