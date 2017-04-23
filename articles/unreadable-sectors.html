@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Fixing unreadable sectors // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Fixing unreadable sectors</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/smart.html">smart</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/zfs.html">zfs</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/disk.html">disk</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/failure.html">failure</a>
+                            <br/>
+                            // Sun 23 April 2017
+                        </p>
+                </header>
+            </section>
+            <p>Quick reminder for myself on how to fix unreadable sectors on a disk. Doing this live is
+possible on a zfs pool for example (or probably other RAID setups that have redundancy)
+but otherwise it is safer to unmount the disk/partition first.</p>
+<p>Here are the errors reported by SMART:</p>
+<div class="highlight"><pre><span></span>Device: /dev/sdb <span class="o">[</span>SAT<span class="o">]</span>, <span class="m">8</span> Currently unreadable <span class="o">(</span>pending<span class="o">)</span> sectors
+Device: /dev/sdb <span class="o">[</span>SAT<span class="o">]</span>, <span class="m">8</span> Offline uncorrectable sectors
+</pre></div>
+
+
+<p>First run a full <code>Extended offline</code> test:</p>
+<div class="highlight"><pre><span></span>$ smartctl -t long /dev/sdb
+</pre></div>
+
+
+<p>Once the test is done, check the results:</p>
+<div class="highlight"><pre><span></span>$ smartctl -a /dev/sdb
+...
+Sector Sizes:     <span class="m">512</span> bytes logical, <span class="m">4096</span> bytes physical
+...
+<span class="c1"># 9  Extended offline    Completed: read failure       30%     19394         2776811256</span>
+....
+</pre></div>
+
+
+<p>The bad sector then need to be zeroed out (adapt the <code>bs</code> argument with the sector sizes
+and the <code>seek</code> with the first bad sector offset reported from the above command):</p>
+<div class="highlight"><pre><span></span>$ dd <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">of</span><span class="o">=</span>/dev/sdb <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span><span class="m">1</span> <span class="nv">seek</span><span class="o">=</span><span class="m">2776811256</span> <span class="nv">conv</span><span class="o">=</span>noerror,sync
+$ sync
+</pre></div>
+
+
+<p>Repeat the above procedure until all bad sectors have been fixed.
+At the end, make sure no more bad sectors are detected with:</p>
+<div class="highlight"><pre><span></span>$ smartctl -A /dev/sdb <span class="p">|</span> grep Offline_Uncorrectable
+<span class="m">198</span> Offline_Uncorrectable   0x0010   <span class="m">100</span>   <span class="m">100</span>   <span class="m">000</span>    Old_age   Offline      -       <span class="m">0</span>
+</pre></div>
+
+
+<p>References:</p>
+<ul>
+<li><a href="http://bytesandbolts.com/fixing-freenas-error-currently-unreadable-pending-sectors/">http://bytesandbolts.com/fixing-freenas-error-currently-unreadable-pending-sectors/</a></li>
+<li><a href="http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/">http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/</a></li>
+<li><a href="https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/">https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/</a></li>
+</ul>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

@@ -1,5 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2017-03-13T00:00:00+01:00</updated><entry><title>Dotfiles management with dotdrop</title><link href="https://deadc0de.re/articles/dotfiles.html" rel="alternate"></link><published>2017-03-13T00:00:00+01:00</published><updated>2017-03-13T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-03-13:/articles/dotfiles.html</id><summary type="html">&lt;p&gt;Management of dotfiles made easy with &lt;a href="https://github.com/deadc0de6/dotdrop"&gt;dotdrop&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Managing dotfiles is a pain, especially when working on multiple
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2017-04-23T00:00:00+02:00</updated><entry><title>Fixing unreadable sectors</title><link href="https://deadc0de.re/articles/unreadable-sectors.html" rel="alternate"></link><published>2017-04-23T00:00:00+02:00</published><updated>2017-04-23T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-04-23:/articles/unreadable-sectors.html</id><summary type="html">&lt;p&gt;Fixing unreadable sectors on disk&lt;/p&gt;</summary><content type="html">&lt;p&gt;Quick reminder for myself on how to fix unreadable sectors on a disk. Doing this live is
+possible on a zfs pool for example (or probably other RAID setups that have redundancy)
+but otherwise it is safer to unmount the disk/partition first.&lt;/p&gt;
+&lt;p&gt;Here are the errors reported by SMART:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Device: /dev/sdb &lt;span class="o"&gt;[&lt;/span&gt;SAT&lt;span class="o"&gt;]&lt;/span&gt;, &lt;span class="m"&gt;8&lt;/span&gt; Currently unreadable &lt;span class="o"&gt;(&lt;/span&gt;pending&lt;span class="o"&gt;)&lt;/span&gt; sectors
+Device: /dev/sdb &lt;span class="o"&gt;[&lt;/span&gt;SAT&lt;span class="o"&gt;]&lt;/span&gt;, &lt;span class="m"&gt;8&lt;/span&gt; Offline uncorrectable sectors
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;First run a full &lt;code&gt;Extended offline&lt;/code&gt; test:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ smartctl -t long /dev/sdb
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Once the test is done, check the results:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ smartctl -a /dev/sdb
+...
+Sector Sizes:     &lt;span class="m"&gt;512&lt;/span&gt; bytes logical, &lt;span class="m"&gt;4096&lt;/span&gt; bytes physical
+...
+&lt;span class="c1"&gt;# 9  Extended offline    Completed: read failure       30%     19394         2776811256&lt;/span&gt;
+....
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The bad sector then need to be zeroed out (adapt the &lt;code&gt;bs&lt;/code&gt; argument with the sector sizes
+and the &lt;code&gt;seek&lt;/code&gt; with the first bad sector offset reported from the above command):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/zero &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/sdb &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;512&lt;/span&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="nv"&gt;seek&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2776811256&lt;/span&gt; &lt;span class="nv"&gt;conv&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;noerror,sync
+$ sync
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Repeat the above procedure until all bad sectors have been fixed.
+At the end, make sure no more bad sectors are detected with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ smartctl -A /dev/sdb &lt;span class="p"&gt;|&lt;/span&gt; grep Offline_Uncorrectable
+&lt;span class="m"&gt;198&lt;/span&gt; Offline_Uncorrectable   0x0010   &lt;span class="m"&gt;100&lt;/span&gt;   &lt;span class="m"&gt;100&lt;/span&gt;   &lt;span class="m"&gt;000&lt;/span&gt;    Old_age   Offline      -       &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;References:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://bytesandbolts.com/fixing-freenas-error-currently-unreadable-pending-sectors/"&gt;http://bytesandbolts.com/fixing-freenas-error-currently-unreadable-pending-sectors/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/"&gt;http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/"&gt;https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="smart"></category><category term="zfs"></category><category term="disk"></category><category term="failure"></category></entry><entry><title>Dotfiles management with dotdrop</title><link href="https://deadc0de.re/articles/dotfiles.html" rel="alternate"></link><published>2017-03-13T00:00:00+01:00</published><updated>2017-03-13T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-03-13:/articles/dotfiles.html</id><summary type="html">&lt;p&gt;Management of dotfiles made easy with &lt;a href="https://github.com/deadc0de6/dotdrop"&gt;dotdrop&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Managing dotfiles is a pain, especially when working on multiple
 hosts (your host at home, your host in the office, your cloud VMs,
 etc), I was therefore looking for a solution that would
 allow me to save my dotfiles and manage them easily.&lt;/p&gt;
