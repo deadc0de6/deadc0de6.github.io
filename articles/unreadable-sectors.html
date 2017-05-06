@@ -94,6 +94,42 @@ At the end, make sure no more bad sectors are detected with:</p>
 <li><a href="http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/">http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/</a></li>
 <li><a href="https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/">https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/</a></li>
 </ul>
+<hr>
+<p><strong>EDIT</strong></p>
+<p>I experienced that sometimes <code>dd</code> is unable to write to a bad sector, resulting in a similar output</p>
+<div class="highlight"><pre><span></span>dd: error writing ‘/dev/sdb’: Input/output error
+</pre></div>
+
+
+<p>The workaround is to use <code>hdparm</code> in order to fix it</p>
+<div class="highlight"><pre><span></span><span class="c1"># read the bad sector to validate it is indeed bad</span>
+$ sudo hdparm --read-sector <span class="m">2757742944</span> /dev/sdb
+/dev/sdb:
+reading sector <span class="m">2757742944</span>: FAILED: Input/output error
+
+<span class="c1"># write to it</span>
+$ sudo hdparm --write-sector <span class="m">2757742944</span> --yes-i-know-what-i-am-doing /dev/sdb
+/dev/sdb:
+re-writing sector <span class="m">2757742944</span>: succeeded
+
+<span class="c1"># re-read to confirm it is fixed</span>
+$ sudo hdparm --read-sector <span class="m">2757742944</span> /dev/sdb
+/dev/sdb:
+reading sector <span class="m">2757742944</span>: succeeded
+...
+</pre></div>
+
+
+<p>Smartctl then shows that one sector was reallocated:</p>
+<div class="highlight"><pre><span></span>$ sudo smartctl -a /dev/sdb <span class="p">|</span> grep -i reallocated
+  <span class="m">5</span> Reallocated_Sector_Ct   0x0033   <span class="m">100</span>   <span class="m">100</span>   <span class="m">010</span>    Pre-fail  Always       -       <span class="m">1</span>
+</pre></div>
+
+
+<p>References:</p>
+<ul>
+<li><a href="http://www.sj-vs.net/forcing-a-hard-disk-to-reallocate-bad-sectors/">http://www.sj-vs.net/forcing-a-hard-disk-to-reallocate-bad-sectors/</a></li>
+</ul>
 <footer class="footer">
     <p>
     &copy; 2015 deadc0de

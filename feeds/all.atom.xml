@@ -42,6 +42,42 @@ At the end, make sure no more bad sectors are detected with:&lt;/p&gt;
 &lt;li&gt;&lt;a href="http://bytesandbolts.com/fixing-freenas-error-currently-unreadable-pending-sectors/"&gt;http://bytesandbolts.com/fixing-freenas-error-currently-unreadable-pending-sectors/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/"&gt;http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/"&gt;https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;EDIT&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I experienced that sometimes &lt;code&gt;dd&lt;/code&gt; is unable to write to a bad sector, resulting in a similar output&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;dd: error writing ‘/dev/sdb’: Input/output error
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The workaround is to use &lt;code&gt;hdparm&lt;/code&gt; in order to fix it&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# read the bad sector to validate it is indeed bad&lt;/span&gt;
+$ sudo hdparm --read-sector &lt;span class="m"&gt;2757742944&lt;/span&gt; /dev/sdb
+/dev/sdb:
+reading sector &lt;span class="m"&gt;2757742944&lt;/span&gt;: FAILED: Input/output error
+
+&lt;span class="c1"&gt;# write to it&lt;/span&gt;
+$ sudo hdparm --write-sector &lt;span class="m"&gt;2757742944&lt;/span&gt; --yes-i-know-what-i-am-doing /dev/sdb
+/dev/sdb:
+re-writing sector &lt;span class="m"&gt;2757742944&lt;/span&gt;: succeeded
+
+&lt;span class="c1"&gt;# re-read to confirm it is fixed&lt;/span&gt;
+$ sudo hdparm --read-sector &lt;span class="m"&gt;2757742944&lt;/span&gt; /dev/sdb
+/dev/sdb:
+reading sector &lt;span class="m"&gt;2757742944&lt;/span&gt;: succeeded
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Smartctl then shows that one sector was reallocated:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo smartctl -a /dev/sdb &lt;span class="p"&gt;|&lt;/span&gt; grep -i reallocated
+  &lt;span class="m"&gt;5&lt;/span&gt; Reallocated_Sector_Ct   0x0033   &lt;span class="m"&gt;100&lt;/span&gt;   &lt;span class="m"&gt;100&lt;/span&gt;   &lt;span class="m"&gt;010&lt;/span&gt;    Pre-fail  Always       -       &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;References:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.sj-vs.net/forcing-a-hard-disk-to-reallocate-bad-sectors/"&gt;http://www.sj-vs.net/forcing-a-hard-disk-to-reallocate-bad-sectors/&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><category term="smart"></category><category term="zfs"></category><category term="disk"></category><category term="failure"></category></entry><entry><title>Dotfiles management with dotdrop</title><link href="https://deadc0de.re/articles/dotfiles.html" rel="alternate"></link><published>2017-03-13T00:00:00+01:00</published><updated>2017-03-13T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-03-13:/articles/dotfiles.html</id><summary type="html">&lt;p&gt;Management of dotfiles made easy with &lt;a href="https://github.com/deadc0de6/dotdrop"&gt;dotdrop&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Managing dotfiles is a pain, especially when working on multiple
 hosts (your host at home, your host in the office, your cloud VMs,
 etc), I was therefore looking for a solution that would
