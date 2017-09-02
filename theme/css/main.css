@@ -220,7 +220,7 @@ pre {
 
 /* code blocks (inline) gets white on black */
 code {
-  font-size: 120%;
+  font-size: 100%;
   /*letter-spacing: 0.02em;*/
   background: #C4C4C4;
   color:  #000000;

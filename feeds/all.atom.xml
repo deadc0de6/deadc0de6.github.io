@@ -1,5 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2017-06-03T00:00:00+02:00</updated><entry><title>YubiKey</title><link href="https://deadc0de.re/articles/yubikey.html" rel="alternate"></link><published>2017-06-03T00:00:00+02:00</published><updated>2017-06-03T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-06-03:/articles/yubikey.html</id><summary type="html">&lt;p&gt;Yubikey FTW&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://www.yubico.com/products/yubikey-hardware/"&gt;YubiKey&lt;/a&gt; is a nice dongle that allows
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2017-09-02T00:00:00+02:00</updated><entry><title>Unix tricks 3</title><link href="https://deadc0de.re/articles/unix-tricks-3.html" rel="alternate"></link><published>2017-09-02T00:00:00+02:00</published><updated>2017-09-02T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-09-02:/articles/unix-tricks-3.html</id><summary type="html">&lt;p&gt;Unix tricks 3&lt;/p&gt;</summary><content type="html">&lt;p&gt;some more neat unix tricks&lt;/p&gt;
+&lt;h2&gt;scp when there are too many arguments&lt;/h2&gt;
+&lt;p&gt;Sometimes you want to retrieve a lot of files from a remote location but
+the expension of star (*) in bash returns the following error&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Argument list too long
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One way of fixing it is to leverage &lt;code&gt;find&lt;/code&gt; and its nice &lt;em&gt;-exec&lt;/em&gt; switch:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh &amp;lt;user&amp;gt;@&amp;lt;remote-host&amp;gt; &lt;span class="s1"&gt;&amp;#39;find &amp;lt;path-where-files-are&amp;gt; -type f -name &amp;quot;&amp;lt;some-regex&amp;gt;&amp;quot; | tar czvf - --files-from -&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; tar zxvf - -C &amp;lt;local-destination&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As a reminder, following command allows to retrieve the max number of arguments
+that can be passed to a command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ getconf ARG_MAX
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Reload groups without logging out&lt;/h2&gt;
+&lt;p&gt;Simple trick to avoid to log out to apply new groups&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ id
+$ su - &lt;span class="nv"&gt;$USER&lt;/span&gt;
+$ id
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Find file newer or older than a specific date&lt;/h2&gt;
+&lt;p&gt;Create a file with the to-be-tested timestamp
+(format: YYYYMMDDHHMM, see also the manpage)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ touch -t &lt;span class="m"&gt;201501010000&lt;/span&gt; /tmp/timestamp
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then query with find&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find &amp;lt;some-path&amp;gt; -newer /tmp/timestamp
+$ find &amp;lt;some-path&amp;gt; -not -newer /tmp/timestamp
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Chown symlink&lt;/h2&gt;
+&lt;p&gt;How to chown a symlink&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ chown -h &amp;lt;user&amp;gt;:&amp;lt;group&amp;gt; &amp;lt;symlink&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Gateway routing&lt;/h2&gt;
+&lt;p&gt;Check which gateway would be used for routing a specific
+IP:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ip route get &amp;lt;IP&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Randomize-lines replacement&lt;/h2&gt;
+&lt;p&gt;The package &lt;code&gt;Randomize-lines&lt;/code&gt; that provides the quite useful &lt;code&gt;rl&lt;/code&gt; for
+randomizing lines has been removed in latest Ubuntu version
+(Xenial and newer).&lt;/p&gt;
+&lt;p&gt;A replacement for this is the &lt;code&gt;shuf&lt;/code&gt; tool.&lt;/p&gt;
+&lt;p&gt;For example to retrieve a random line from a file&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ shuf -n &lt;span class="m"&gt;1&lt;/span&gt; &amp;lt;some-file&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;script duration&lt;/h2&gt;
+&lt;p&gt;Ever wanted to know the duration of a specific bash script ? The
+following oneliner allows to do that easily:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;date -u -d @&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;SECONDS&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; +%T
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;ps tree-style&lt;/h2&gt;
+&lt;p&gt;Display &lt;code&gt;ps&lt;/code&gt; output with the processes hierarchy:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ps aux --forest
+&lt;/pre&gt;&lt;/div&gt;</content><category term="unix"></category><category term="cli"></category><category term="shell"></category></entry><entry><title>YubiKey</title><link href="https://deadc0de.re/articles/yubikey.html" rel="alternate"></link><published>2017-06-03T00:00:00+02:00</published><updated>2017-06-03T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-06-03:/articles/yubikey.html</id><summary type="html">&lt;p&gt;Yubikey FTW&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://www.yubico.com/products/yubikey-hardware/"&gt;YubiKey&lt;/a&gt; is a nice dongle that allows
 to hold several PGP subkeys to handle authentication (like SSH for example) and PGP encryption/signature.&lt;/p&gt;
 &lt;p&gt;Using it allows to considerably increase your daily workflow with U2F for online authentication,
 as well as password management with &lt;a href="https://www.passwordstore.org/"&gt;pass&lt;/a&gt; or
