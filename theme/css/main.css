@@ -6,13 +6,13 @@
 
 a {
     text-decoration: none;
+    /*color: #2ba6cb;*/
     color: rgb(142, 142, 214);
 }
 a:hover,
 a:focus {
     text-decoration: underline;
 }
-
 
 .banner {
     background-position: center;
@@ -23,8 +23,6 @@ a:focus {
 
 pre {
     padding: 15px 15px 15px 15px;
-    /*font-size: 90%;*/
-    box-shadow: 2px 2px 2px #888;
     overflow: auto;
 }
 
@@ -209,24 +207,26 @@ pre {
 }
 
 .highlight pre {
-    font-size: 120%;
+    font-size: 100%;
 }
 
-/* LAYOUT CSS */
+.highlight {
+    border-radius: 1em;
+    box-shadow: 6px 6px 10px #888;
+}
+
 #layout {
-    padding-left: 25%; /* "left col (nav + list)" width */
+    padding-left: 25%;
     position: relative;
 }
 
-/* code blocks (inline) gets white on black */
 code {
-  font-size: 100%;
-  /*letter-spacing: 0.02em;*/
-  background: #C4C4C4;
-  color:  #000000;
-  border: 3px solid #C4C4C4;
-  border-radius: 2px;
-  font-style: italic bold;
+    font-size: 100%;
+    color: #FDCE93;
+    background-color: #3F3F3F;
+    border: 5px solid #3F3F3F;
+    border-radius: 5px;
+    font-style: italic bold;
 }
 
 @media (max-width: 1024px) {
@@ -271,7 +271,7 @@ ul.tagcloud {
 }
 
 ul.tagcloud a {
-  color: #000000;
+  color: #FDCE93;
 }
 
 ul.tagcloud li {
@@ -281,19 +281,19 @@ ul.tagcloud li {
   padding: 5px 5px 5px 5px;
   margin: 2px 2px 2px 2px;
   display: inline-block;
-  color: #000000;
-  background:  #E8EAEB;
+  color: #FDCE93;
+  background-color: #3F3F3F;
 }
 
 li.tag-1 {
-  font-size: 150%;
+  font-size: 170%;
 }
 li.tag-2 {
-  font-size: 130%;
+  font-size: 140%;
 }
 li.tag-3 {
-  font-size: 120%;
+  font-size: 110%;
 }
 li.tag-4 {
-  font-size: 110%;
+  font-size: 90%;
 }
