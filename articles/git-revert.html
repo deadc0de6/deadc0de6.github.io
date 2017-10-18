@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Reverting the revert // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Reverting the revert</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/git.html">git</a>
+                            <br/>
+                            // Wed 18 October 2017
+                        </p>
+                </header>
+            </section>
+            <p>As a reminder to myself and maybe to help others too, <strong>try to avoid
+reverting a merge if you plan on merging it in some later times !</strong></p>
+<p>Let's consider an example in order to understand why this could be a problem.
+First create a repository:</p>
+<div class="highlight"><pre><span></span>mkdir repo<span class="p">;</span> <span class="nb">cd</span> repo<span class="p">;</span> git init
+<span class="nb">echo</span> <span class="s1">&#39;master-file-1&#39;</span> &gt; master-file-1
+git add *
+git commit -a -m <span class="s1">&#39;master-file-1&#39;</span>
+
+<span class="c1"># master --o--H</span>
+</pre></div>
+
+
+<p>Now a new branch <em>branch</em> is created and two files are added to it</p>
+<div class="highlight"><pre><span></span>git checkout -b branch
+<span class="nb">echo</span> <span class="s1">&#39;branch-file-1&#39;</span> &gt; branch-file-1
+<span class="nb">echo</span> <span class="s1">&#39;branch-file-2&#39;</span> &gt; branch-file-2
+git add *
+git commit -a -m <span class="s1">&#39;branch-file-*&#39;</span>
+
+<span class="c1"># master --o--H</span>
+<span class="c1">#           \</span>
+<span class="c1"># branch     o--H</span>
+</pre></div>
+
+
+<p>At this time the <em>branch</em> branch is ready to be merged with master and
+this is what is done</p>
+<div class="highlight"><pre><span></span><span class="c1"># now comes the merge (M)</span>
+git checkout master
+git merge branch
+
+<span class="c1"># master --o------M--H</span>
+<span class="c1">#           \    /</span>
+<span class="c1"># branch     o--o</span>
+</pre></div>
+
+
+<p>However for some reason the merge needs to be reverted (issue with master, unstable, not the right
+time, etc)</p>
+<div class="highlight"><pre><span></span><span class="c1"># now comes the revert (W)</span>
+git revert &lt;commit&gt;
+
+<span class="c1"># master --o------M--W--H</span>
+<span class="c1">#           \    /</span>
+<span class="c1"># branch     o--o</span>
+</pre></div>
+
+
+<p>This is not directly an error, but it will bring quite some issues if you don't realize
+what was exactly done here. A revert will actually create a new commit that is the opposite
+of what was done by the merge, i.e. removing the two files that were committed in the
+<em>branch</em> branch.
+Therefore the master branch history now contains a commit that says that the two files
+<em>branch-file-1</em> and <em>branch-file-2</em>
+have been removed. This commit is more recent that the one that actually added the files in
+the first place. Thus if those file are not changed, they will never be added in a future
+merge.</p>
+<p>Let's see that with an example. One of the two file is updated in the <em>branch</em> branch</p>
+<div class="highlight"><pre><span></span><span class="c1"># update branch (C)</span>
+git checkout branch
+<span class="nb">echo</span> <span class="s1">&#39;some change&#39;</span> &gt; branch-file-2
+git commit -a -m <span class="s1">&#39;update&#39;</span>
+
+<span class="c1"># master --o------M--W--H</span>
+<span class="c1">#           \    /</span>
+<span class="c1"># branch     o--o-------C--H</span>
+</pre></div>
+
+
+<p>And then the new version of the branch is ok to be merged and there goes the merge</p>
+<div class="highlight"><pre><span></span><span class="c1"># and re-merge (Y)</span>
+git checkout master
+git merge branch
+
+<span class="c1"># master --o------M--W---Y--H</span>
+<span class="c1">#           \    /      /</span>
+<span class="c1"># branch     o--o------C--H</span>
+</pre></div>
+
+
+<p>Now two things are happening, first a conflicts arise between the two versions of the <em>branch-file-2</em>,
+the one in master that was deleted and the one from branch <em>branch</em>  that was modified. That is normal and this needs
+to be fixed. The second issue, that is more problematic, is that the file <em>branch-file-1</em> <strong>does not
+at all (re-)appear in the master branch</strong>. It makes sense since for the master branch it has been deleted
+in a commit that is more recent than the one that actually created it but it might not be directly expected
+without having understood exactly what the first revert did.</p>
+<p>How to fix this then and actually have <strong>all changes</strong> from branch <em>branch</em> being merged into master ?
+Well the revert (W) needs to be reverted first and then the whole branch <em>branch</em> re-merged in Master.</p>
+<div class="highlight"><pre><span></span><span class="c1"># revert the revert (X) and merge (N)</span>
+git checkout master
+git revert &lt;revert-commit&gt;
+git merge branch
+
+<span class="c1"># master --o------M--W--X---N--H</span>
+<span class="c1">#           \    /         /</span>
+<span class="c1"># branch     o--o---------C--H</span>
+</pre></div>
+
+
+<p>That's it, now all changes/files brought by branch <em>branch</em> are in master.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://www.kernel.org/pub/software/scm/git/docs/howto/revert-a-faulty-merge.txt">revert a faulty merge</a></li>
+</ul>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
