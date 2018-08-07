@@ -43,7 +43,39 @@ and the following blogposts:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://toroid.org/sudoers-syntax"&gt;http://toroid.org/sudoers-syntax&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://www.garron.me/en/linux/visudo-command-sudoers-file-sudo-default-editor.html"&gt;https://www.garron.me/en/linux/visudo-command-sudoers-file-sudo-default-editor.html&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><category term="unix"></category><category term="sudo"></category><category term="cli"></category></entry><entry><title>Reverting the revert</title><link href="https://deadc0de.re/articles/git-revert.html" rel="alternate"></link><published>2017-10-18T00:00:00+02:00</published><updated>2017-10-18T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-10-18:/articles/git-revert.html</id><summary type="html">&lt;p&gt;be careful when reverting a merge&lt;/p&gt;</summary><content type="html">&lt;p&gt;As a reminder to myself and maybe to help others too, &lt;strong&gt;try to avoid
+&lt;/ul&gt;</content><category term="unix"></category><category term="sudo"></category><category term="cli"></category></entry><entry><title>YubiKey SSH key instead of local key</title><link href="https://deadc0de.re/articles/yubikey-ssh.html" rel="alternate"></link><published>2018-08-07T00:00:00+02:00</published><updated>2018-08-07T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2018-08-07:/articles/yubikey-ssh.html</id><summary type="html">&lt;p&gt;Using the SSH key in the YubiKey along with other SSH keys&lt;/p&gt;</summary><content type="html">&lt;p&gt;When using a &lt;a href="https://www.yubico.com/products/yubikey-hardware/"&gt;YubiKey&lt;/a&gt; for SSH, it is sometimes
+useful to be able to choose which key to use: a local SSH key (defaults to &lt;code&gt;~/.ssh/id_rsa&lt;/code&gt;)
+or the one on the YubiKey.&lt;/p&gt;
+&lt;p&gt;The common way of selecting a specific SSH key with &lt;code&gt;ssh&lt;/code&gt; is to specify it with the &lt;code&gt;-i&lt;/code&gt; switch:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ssh -i ~/.ssh/id_rsa user@somehost
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Or for example for cloning a repository:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;GIT_SSH_COMMAND&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ssh -i ~/.ssh/id_rsa&amp;#39;&lt;/span&gt; git clone git@&amp;lt;somehost&amp;gt;:&amp;lt;someuser&amp;gt;/&amp;lt;somerepo&amp;gt;.git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Another solution would be to insert this config in &lt;code&gt;~/.ssh/config&lt;/code&gt;, for example&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Host &amp;lt;somehost&amp;gt;
+   IdentityFile ~/.ssh/id_rsa
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;When you however want to force &lt;code&gt;ssh&lt;/code&gt; to use the SSH key from your YubiKey instead of a
+local key, you'd have to specify it in some way, here's how.&lt;/p&gt;
+&lt;p&gt;First extract the SSH public key from your YubiKey. Either using gpg2 with&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;gpg2 --export-ssh-key &amp;lt;keyid&amp;gt; &amp;gt; ~/.ssh/id_rsa_yubi.pub
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;or through ssh-agent&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ssh-add -L &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s2"&gt;&amp;quot;cardno&amp;quot;&lt;/span&gt; &amp;gt; ~/.ssh/id_rsa_yubi.pub
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That public key (&lt;code&gt;~/.ssh/id_rsa_yubi.pub&lt;/code&gt;) can then be used with the usual SSH switch &lt;code&gt;-i&lt;/code&gt; like
+the above to force &lt;code&gt;ssh&lt;/code&gt; to use the key from your YubiKey.&lt;/p&gt;</content><category term="unix"></category><category term="yubikey"></category><category term="ssh"></category></entry><entry><title>Reverting the revert</title><link href="https://deadc0de.re/articles/git-revert.html" rel="alternate"></link><published>2017-10-18T00:00:00+02:00</published><updated>2017-10-18T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-10-18:/articles/git-revert.html</id><summary type="html">&lt;p&gt;be careful when reverting a merge&lt;/p&gt;</summary><content type="html">&lt;p&gt;As a reminder to myself and maybe to help others too, &lt;strong&gt;try to avoid
 reverting a merge if you plan on merging it some later times !&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Let's consider an example in order to understand why this could be a problem.
 First create a repository:&lt;/p&gt;

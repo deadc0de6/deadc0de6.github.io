@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>YubiKey SSH key instead of local key // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>YubiKey SSH key instead of local key</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/unix.html">unix</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/yubikey.html">yubikey</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/ssh.html">ssh</a>
+                            <br/>
+                            // Tue 07 August 2018
+                        </p>
+                </header>
+            </section>
+            <p>When using a <a href="https://www.yubico.com/products/yubikey-hardware/">YubiKey</a> for SSH, it is sometimes
+useful to be able to choose which key to use: a local SSH key (defaults to <code>~/.ssh/id_rsa</code>)
+or the one on the YubiKey.</p>
+<p>The common way of selecting a specific SSH key with <code>ssh</code> is to specify it with the <code>-i</code> switch:</p>
+<div class="highlight"><pre><span></span>ssh -i ~/.ssh/id_rsa user@somehost
+</pre></div>
+
+
+<p>Or for example for cloning a repository:</p>
+<div class="highlight"><pre><span></span><span class="nv">GIT_SSH_COMMAND</span><span class="o">=</span><span class="s1">&#39;ssh -i ~/.ssh/id_rsa&#39;</span> git clone git@&lt;somehost&gt;:&lt;someuser&gt;/&lt;somerepo&gt;.git
+</pre></div>
+
+
+<p>Another solution would be to insert this config in <code>~/.ssh/config</code>, for example</p>
+<div class="highlight"><pre><span></span>Host &lt;somehost&gt;
+   IdentityFile ~/.ssh/id_rsa
+</pre></div>
+
+
+<p>When you however want to force <code>ssh</code> to use the SSH key from your YubiKey instead of a
+local key, you'd have to specify it in some way, here's how.</p>
+<p>First extract the SSH public key from your YubiKey. Either using gpg2 with</p>
+<div class="highlight"><pre><span></span>gpg2 --export-ssh-key &lt;keyid&gt; &gt; ~/.ssh/id_rsa_yubi.pub
+</pre></div>
+
+
+<p>or through ssh-agent</p>
+<div class="highlight"><pre><span></span>ssh-add -L <span class="p">|</span> grep <span class="s2">&quot;cardno&quot;</span> &gt; ~/.ssh/id_rsa_yubi.pub
+</pre></div>
+
+
+<p>That public key (<code>~/.ssh/id_rsa_yubi.pub</code>) can then be used with the usual SSH switch <code>-i</code> like
+the above to force <code>ssh</code> to use the key from your YubiKey.</p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>
