@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2017-10-18T00:00:00+02:00</updated><entry><title>Reverting the revert</title><link href="https://deadc0de.re/articles/git-revert.html" rel="alternate"></link><published>2017-10-18T00:00:00+02:00</published><updated>2017-10-18T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-10-18:/articles/git-revert.html</id><summary type="html">&lt;p&gt;be careful when reverting a merge&lt;/p&gt;</summary><content type="html">&lt;p&gt;As a reminder to myself and maybe to help others too, &lt;strong&gt;try to avoid
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2018-08-07T00:00:00+02:00</updated><entry><title>Allow non-admin to execute sudo commands</title><link href="https://deadc0de.re/articles/sudo-for-non-admin.html" rel="alternate"></link><published>2018-08-07T00:00:00+02:00</published><updated>2018-08-07T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2018-08-07:/articles/sudo-for-non-admin.html</id><summary type="html">&lt;p&gt;Allow non-admin users to execute sudo commands&lt;/p&gt;</summary><content type="html">&lt;p&gt;It is sometimes useful to allow non-admin users to
+execute commands that normally require the use of &lt;code&gt;sudo&lt;/code&gt; for example to reload nginx or to
+execute specific &lt;code&gt;systemctl&lt;/code&gt; command. It is especially useful for CI/CD.&lt;/p&gt;
+&lt;p&gt;This is easily doable with &lt;code&gt;visudo&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Start by adding a new sudoer file with&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo visudo -f /etc/sudoers.d/&amp;lt;some-meaningful-name&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that the filename cannot contain dots or tilds.&lt;/p&gt;
+&lt;p&gt;Adding your file under &lt;code&gt;/etc/sudoers.d/&lt;/code&gt; ensures no bad surprise will arise
+when your distribution will change the &lt;code&gt;/etc/sudoers&lt;/code&gt; file due to system upgrades.&lt;/p&gt;
+&lt;p&gt;All files in &lt;code&gt;/etc/sudoers.d/&lt;/code&gt; are loaded by the last line of &lt;code&gt;/etc/sudoers&lt;/code&gt;
+(which is not a comment btw):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#includedir /etc/sudoers.d
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Let's say you want the user &lt;em&gt;web&lt;/em&gt; to be able to reload nginx config&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Cmnd_Alias RELOADNGINX = /bin/systemctl reload nginx
+web ALL=(ALL) NOPASSWD: RELOADNGINX
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The same can be done for a group by prepending the group
+name with a &lt;code&gt;%&lt;/code&gt; for example&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;%webgroup&lt;/span&gt; &lt;span class="n"&gt;ALL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ALL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nl"&gt;NOPASSWD&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;RELOADNGINX&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Also multiple commands can be added by separating them with a comma,
+here user &lt;em&gt;web&lt;/em&gt; would be able to stop and start nginx.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Cmnd_Alias RESTART = /bin/systemctl stop nginx,/bin/systemctl start nginx
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To check what has been added is valid, run &lt;code&gt;sudo visudo --check&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Once saved and written, user &lt;em&gt;web&lt;/em&gt; will be able to execute
+the command &lt;code&gt;sudo systemctl restart nginx&lt;/code&gt; without any password.&lt;/p&gt;
+&lt;p&gt;For more on visudo, see &lt;a href="https://manpage.me/?q=visudo"&gt;man visudo&lt;/a&gt;
+and the following blogposts:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://toroid.org/sudoers-syntax"&gt;http://toroid.org/sudoers-syntax&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.garron.me/en/linux/visudo-command-sudoers-file-sudo-default-editor.html"&gt;https://www.garron.me/en/linux/visudo-command-sudoers-file-sudo-default-editor.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="unix"></category><category term="sudo"></category><category term="cli"></category></entry><entry><title>Reverting the revert</title><link href="https://deadc0de.re/articles/git-revert.html" rel="alternate"></link><published>2017-10-18T00:00:00+02:00</published><updated>2017-10-18T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2017-10-18:/articles/git-revert.html</id><summary type="html">&lt;p&gt;be careful when reverting a merge&lt;/p&gt;</summary><content type="html">&lt;p&gt;As a reminder to myself and maybe to help others too, &lt;strong&gt;try to avoid
 reverting a merge if you plan on merging it some later times !&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Let's consider an example in order to understand why this could be a problem.
 First create a repository:&lt;/p&gt;
