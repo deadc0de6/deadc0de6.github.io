@@ -1266,7 +1266,7 @@ host, they would resolve until cache is cleared.&lt;/p&gt;</content><category te
 &lt;li&gt;&lt;em&gt;microwave_61f50dba931bb10ab3089215b2e188f4&lt;/em&gt;&lt;/li&gt;
 &lt;li&gt;&lt;em&gt;libc.so.6&lt;/em&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Those are both available &lt;a href="https://github.com/deadc0de6/ctf/tree/master/2016-insomnihack"&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Those are both available &lt;a href="https://gitlab.com/deadc0de6/ctf/tree/master/2016-insomnihack"&gt;here&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;The program&lt;/h2&gt;
 &lt;p&gt;The program simulates a microwave able to connect to twitter
 and tweets your favorite food.&lt;/p&gt;
@@ -1698,7 +1698,7 @@ ssh. It's one way of doing it though, there are many other alternatives:&lt;/p&g
 &lt;/ul&gt;
 &lt;p&gt;I like fabric because it gives you a lot of power thanks to Python. I haven't
 yet tried &lt;em&gt;parallel-ssh&lt;/em&gt; which looks like a good alternative.&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://github.com/deadc0de6/scripts/blob/master/nodes-mgmt.py"&gt;Here&lt;/a&gt;'s a little
+&lt;p&gt;&lt;a href="https://gitlab.com/deadc0de6/scripts/blob/master/nodes-mgmt.py"&gt;Here&lt;/a&gt;'s a little
 template I tend to complete depending on the job I have to do. It's a nice starting
 point if one wants to try fabric&lt;/p&gt;
 &lt;p&gt;Simply complete the &lt;em&gt;TODO&lt;/em&gt; and get going.&lt;/p&gt;
@@ -1985,7 +1985,7 @@ and more specifically with gmail.&lt;/p&gt;
 &lt;p&gt;I modified it to be able to translate notmuch's tags into a maildir folder and
 thus get my emails structured on the IMAP server for access with webmail.
 My modified version is available
-&lt;a href="https://github.com/deadc0de6/scripts/blob/master/maildir-notmuch-sync"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;a href="https://gitlab.com/deadc0de6/scripts/blob/master/maildir-notmuch-sync"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The modified version will create a new folder (locally in maildir and remotely
 through offlineimap) when a new
 tag is used for the first time. Also emails will be copied around depending on
@@ -2750,8 +2750,8 @@ An Erlang process is very small (309 words as stated &lt;a href="http://www.erla
 
 
 &lt;p&gt;I’ve been able to spawn 100K processes in less than 30 seconds and 200K processes in about 2 minutes on a i5!&lt;/p&gt;
-&lt;p&gt;All the code above is available on github &lt;a href="https://github.com/deadc0de6/erlang-pcap/"&gt;here&lt;/a&gt; and
-&lt;a href="https://github.com/deadc0de6/erlang-tests"&gt;here&lt;/a&gt;. These were small projects I did to learn the language
+&lt;p&gt;All the code above is available on github &lt;a href="https://gitlab.com/deadc0de6/erlang-pcap"&gt;here&lt;/a&gt; and
+&lt;a href="https://gitlab.com/deadc0de6/erlang-tests"&gt;here&lt;/a&gt;. These were small projects I did to learn the language
 so they might have some design flaws and/or errors but it will give you an idea of the language.&lt;/p&gt;
 &lt;p&gt;That’s it, hope this little overview made you want to try Erlang!&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;This article was first published on &lt;a href="http://cybermashup.com/2015/12/01/getting-started-with-erlang/"&gt;cybersmashup&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;</content><category term="erlang"></category><category term="programming"></category></entry></feed>
