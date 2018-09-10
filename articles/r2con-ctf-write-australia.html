@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>r2con-ctf writeup: Australia // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>r2con-ctf writeup: Australia</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/write-up.html">write-up</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/ctf.html">ctf</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/radare2.html">radare2</a>
+                            <br/>
+                            // Mon 10 September 2018
+                        </p>
+                </header>
+            </section>
+            <p>This is a write-up for the <em>Australia</em> challenge of r2con 2018 CTF.</p>
+<div class="highlight"><pre><span></span>We developed this Perfectly Secure Vault (or PVS for short) for storing your secrets
+securely and safe from hackers. We even use a super-secure secret key to protect it.
+We are sure you won&#39;t be able to recover said key... will you?
+</pre></div>
+
+
+<p>binary: <a href="https://gitlab.com/deadc0de6/ctf/tree/master/2018-r2con/australia">psv_fc64b1cfd34704a72b2180982e418e9c</a></p>
+<div class="highlight"><pre><span></span>$ ./psv_fc64b1cfd34704a72b2180982e418e9c
+Welcome to PSV <span class="o">(</span>Perfectly Secure Vault<span class="o">)</span>!
+Enter your secret key to unlock:
+AAAAAAAAAAAAAAAAAAAAAA
+Sorry, try again.
+</pre></div>
+
+
+<p>Open the binary with <a href="https://github.com/radare/radare2">radare2</a> and list the functions</p>
+<div class="highlight"><pre><span></span>$ radare2 psv_fc64b1cfd34704a72b2180982e418e9c
+<span class="o">[</span>0x00400630<span class="o">]</span>&gt; aaa
+<span class="o">[</span>0x00400630<span class="o">]</span>&gt; e asm.pseudo <span class="o">=</span> <span class="m">1</span>
+<span class="o">[</span>0x00400630<span class="o">]</span>&gt; e asm.bytes <span class="o">=</span> <span class="m">0</span>
+<span class="o">[</span>0x00400630<span class="o">]</span>&gt; afl
+0x00400580    <span class="m">3</span> <span class="m">26</span>           sub.__gmon_start_580
+0x004005b0    <span class="m">1</span> <span class="m">6</span>            sym.imp.free
+0x004005c0    <span class="m">1</span> <span class="m">6</span>            sym.imp.puts
+0x004005d0    <span class="m">1</span> <span class="m">6</span>            sym.imp.__stack_chk_fail
+0x004005e0    <span class="m">1</span> <span class="m">6</span>            sym.imp.__libc_start_main
+0x004005f0    <span class="m">1</span> <span class="m">6</span>            sym.imp.fgets
+0x00400600    <span class="m">1</span> <span class="m">6</span>            sym.imp.malloc
+0x00400610    <span class="m">1</span> <span class="m">6</span>            sym.imp.fwrite
+0x00400620    <span class="m">1</span> <span class="m">6</span>            sub.__gmon_start_620
+0x00400630    <span class="m">1</span> <span class="m">41</span>           entry0
+0x00400660    <span class="m">4</span> <span class="m">50</span>   -&gt; <span class="m">41</span>   fcn.00400660
+0x004006e0    <span class="m">3</span> <span class="m">28</span>           entry2.fini
+0x00400700    <span class="m">8</span> <span class="m">38</span>   -&gt; <span class="m">90</span>   entry1.init
+0x00400726    <span class="m">1</span> <span class="m">27</span>           sub.Welcome_to_PSV__Perfectly_Secure_Vault_726
+0x00400741    <span class="m">9</span> <span class="m">317</span>          sub.__stack_chk_fail_741
+0x0040087e    <span class="m">9</span> <span class="m">252</span>          main
+<span class="o">[</span>0x00400630<span class="o">]</span>&gt; s main
+<span class="o">[</span>0x00400630<span class="o">]</span>&gt; pdf
+</pre></div>
+
+
+<p>Exploring the <em>main</em> quickly shows that the function at <code>0x400925</code> leads to either <code>str.Correct__You_got_the_flag</code>
+(the string <em>"Correct! You got the flag!"</em>) or <code>str.Sorry__try_again.</code> (the string
+<em>"Sorry, try again.\n"</em>).</p>
+<div class="highlight"><pre><span></span><span class="p">;</span> CODE XREF from main <span class="o">(</span>0x4008f2<span class="o">)</span>
+0x00400925      <span class="nv">eax</span> <span class="o">=</span> dword <span class="o">[</span>size<span class="o">]</span>
+0x00400928      <span class="nv">edx</span> <span class="o">=</span> <span class="o">[</span>rax - <span class="m">1</span><span class="o">]</span>
+0x0040092b      <span class="nv">rax</span> <span class="o">=</span> qword <span class="o">[</span>ptr<span class="o">]</span>
+0x0040092f      <span class="nv">esi</span> <span class="o">=</span> edx
+0x00400931      <span class="nv">rdi</span> <span class="o">=</span> rax
+0x00400934      sub.__stack_chk_fail_741 <span class="o">()</span>
+0x00400939      <span class="nv">var</span> <span class="o">=</span> eax <span class="p">&amp;</span> eax
+0x0040093b      <span class="k">if</span> <span class="o">(</span>!var<span class="o">)</span> goto 0x400949
+0x0040093d      <span class="nv">edi</span> <span class="o">=</span> str.Correct__You_got_the_flag <span class="p">;</span> 0x400ac5 <span class="p">;</span> <span class="s2">&quot;Correct! You got the flag!&quot;</span>
+</pre></div>
+
+
+<p>The function <code>sub.__stack_chk_fail_741</code> (which determines if we
+got the correct flag or not) starts by setting a few local variables
+and then applies a <em>xor</em> on the arg1 (the string
+provided at the command line) and the string pointed by <em>str.sorry_this_is_not_the_flag_u_are_looking_for</em>.</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>0x0040087e<span class="o">]</span>&gt; s sub.__stack_chk_fail_741
+<span class="o">[</span>0x00400741<span class="o">]</span>&gt; pdf
+…
+0x00400749      qword <span class="o">[</span>local_58h<span class="o">]</span> <span class="o">=</span> rdi                    <span class="p">;</span> arg1
+0x0040075f      qword <span class="o">[</span>local_48h<span class="o">]</span> <span class="o">=</span> str.sorry_this_is_not_the_flag_u_are_looking_for
+0x00400817      dword <span class="o">[</span>local_4ch<span class="o">]</span> <span class="o">=</span> <span class="m">0</span>  &lt;---- THIS IS THE COUNTER
+…
+<span class="p">;</span> CODE XREF from sub.__stack_chk_fail_741 <span class="o">(</span>0x400861<span class="o">)</span>
+0x00400820      <span class="nv">eax</span> <span class="o">=</span> dword <span class="o">[</span>local_4ch<span class="o">]</span>
+0x00400823      <span class="nv">rdx</span> <span class="o">=</span> eax
+0x00400826      <span class="nv">rax</span> <span class="o">=</span> qword <span class="o">[</span>local_48h<span class="o">]</span>
+0x0040082a      <span class="nv">rax</span> <span class="o">+=</span> rdx
+0x0040082d      <span class="nv">edx</span> <span class="o">=</span> byte <span class="o">[</span>rax<span class="o">]</span>                  &lt;----- <span class="nv">edx</span> <span class="o">=</span> local_48h<span class="o">[</span>local_4ch<span class="o">]</span>
+0x00400830      <span class="nv">eax</span> <span class="o">=</span> dword <span class="o">[</span>local_4ch<span class="o">]</span>
+0x00400833      <span class="nv">rcx</span> <span class="o">=</span> eax
+0x00400836      <span class="nv">rax</span> <span class="o">=</span> qword <span class="o">[</span>local_58h<span class="o">]</span>
+0x0040083a      <span class="nv">rax</span> <span class="o">+=</span> rcx
+0x0040083d      <span class="nv">ecx</span> <span class="o">=</span> byte <span class="o">[</span>rax<span class="o">]</span>                &lt;------- <span class="nv">ecx</span> <span class="o">=</span> local_58h<span class="o">[</span>local_4ch<span class="o">]</span>
+0x00400840      <span class="nv">eax</span> <span class="o">=</span> dword <span class="o">[</span>local_4ch<span class="o">]</span>
+0x00400843      cdqe
+0x00400845      <span class="nv">eax</span> <span class="o">=</span> byte <span class="o">[</span>rbp + rax - 0x40<span class="o">]</span>   &lt;----- <span class="nv">eax</span> <span class="o">=</span> one of the <span class="nb">local</span> var on the stack
+0x0040084a      eax ^<span class="o">=</span> ecx                            &lt;----- XOR
+0x0040084c      <span class="nv">var</span> <span class="o">=</span> dl - al
+0x0040084e      <span class="k">if</span> <span class="o">(</span>!var<span class="o">)</span> goto 0x400857
+0x00400850      <span class="nv">eax</span> <span class="o">=</span> <span class="m">0</span>
+0x00400855      goto 0x400868
+…
+</pre></div>
+
+
+<p>What it does is taking one byte from the string <em>"sorry_this_is_not_the_flag_u_are_looking_for"</em>
+at index <em>local_4ch</em>, one byte from the entered password at index <em>local_4ch</em> and one of the local variables
+on the stack assigned at the beginning of the function. It then xors the last two and
+compares the result with the first string.</p>
+<p>In other words:</p>
+<div class="highlight"><pre><span></span><span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;sorry_this_is_not_the_flag_u_are_looking_for&quot;</span>
+<span class="n">somebytes</span> <span class="o">=</span> <span class="s2">&quot;&lt;some-bytes&gt;&quot;</span>
+<span class="n">cliarg</span> <span class="o">=</span> <span class="s2">&quot;AAAAAAAAAAAAAAAAAAAAAA&quot;</span>
+
+<span class="k">for</span> <span class="n">loop</span> <span class="n">on</span> <span class="nb">all</span> <span class="n">chars</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">cliarg</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">^</span> <span class="n">somebytes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">tmp</span> <span class="o">!=</span> <span class="n">string</span><span class="p">[</span><span class="n">index</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+<span class="k">return</span> <span class="bp">True</span>
+</pre></div>
+
+
+<p>The password can thus be retrieved by
+<em>simply</em> doing <code>somebytes ^ string</code>, where <em>somebytes</em> are all
+the variables set at the beginning of the function that stands on the stack.</p>
+<p>Let's do this with radare2.
+Start the debugger</p>
+<div class="highlight"><pre><span></span>$ radare2 -d psv_fc64b1cfd34704a72b2180982e418e9c
+</pre></div>
+
+
+<p>Add a breakpoint on the xor line</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>0x7f6c279f0000<span class="o">]</span>&gt; db 0x40084a
+</pre></div>
+
+
+<p>Then execute the program and enter a fake password:</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>0x7f6c279f0000<span class="o">]</span>&gt; dc
+Welcome to PSV <span class="o">(</span>Perfectly Secure Vault<span class="o">)</span>!
+Enter your secret key to unlock:
+AAAAAAAAAAAAAAAAAAAA
+hit breakpoint at: 40084a
+</pre></div>
+
+
+<p>Now we need to xor some bytes on the stack (the local variables) with the string pointed
+by <em>str.sorry_this_is_not_the_flag_u_are_looking_for</em>. The local variables are located at
+<code>rbp + rax - 0x40</code> (rax is 0).</p>
+<p>In radare2, it goes like this: seek to the string <em>str.sorry_this_is_not_the_flag_u_are_looking_for</em></p>
+<div class="highlight"><pre><span></span><span class="o">[</span>0x0040084a<span class="o">]</span>&gt; s str.sorry_this_is_not_the_flag_u_are_looking_for
+<span class="o">[</span>0x00400a60<span class="o">]</span>&gt; ps
+sorry_this_is_not_the_flag_u_are_looking_for
+</pre></div>
+
+
+<p>retrieve the length of the string</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>0x00400a60<span class="o">]</span>&gt; iz ~sorry
+<span class="m">002</span> 0x00000a60 0x00400a60  <span class="m">44</span>  <span class="m">45</span> <span class="o">(</span>.rodata<span class="o">)</span> ascii sorry_this_is_not_the_flag_u_are_looking_for
+</pre></div>
+
+
+<p>xor the string with 45 bytes at rbp-0x40
+and store the result here</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>0x00400a60<span class="o">]</span>&gt; wox <span class="sb">`</span>p8 <span class="m">45</span> @ rbp-0x40<span class="sb">`</span>
+<span class="o">[</span>0x00400a60<span class="o">]</span>&gt; ps
+r2con<span class="o">{</span>x0r_1s_Sup3r_K00l_<span class="p">&amp;</span>_s3cur3_4lg0r1thm!<span class="o">}</span>lB2dqs<span class="se">\x</span>04b7o<span class="se">\x</span>0c<span class="se">\x</span>0fv@cx~3H<span class="se">\x</span>0bN0<span class="se">\x</span>02eA&gt;<span class="se">\x</span><span class="m">16</span><span class="p">&amp;</span>F<span class="se">\x</span>7f<span class="o">{</span>u:dxmg/<span class="p">;</span>-vVonz<span class="se">\x</span>1fd/1tyTy,5<span class="p">&amp;</span>nYC~iz<span class="nv">$Y</span>
+<span class="se">\x</span><span class="m">03</span><span class="se">\x</span>0c
+</pre></div>
+
+
+<p>Now score with <em>r2con{x0r_1s_Sup3r_K00l_&amp;_s3cur3_4lg0r1thm!}</em></p>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

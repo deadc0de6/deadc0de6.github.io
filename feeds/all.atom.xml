@@ -1,5 +1,449 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2018-08-07T00:00:00+02:00</updated><entry><title>Allow non-admin to execute sudo commands</title><link href="https://deadc0de.re/articles/sudo-for-non-admin.html" rel="alternate"></link><published>2018-08-07T00:00:00+02:00</published><updated>2018-08-07T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2018-08-07:/articles/sudo-for-non-admin.html</id><summary type="html">&lt;p&gt;Allow non-admin users to execute sudo commands&lt;/p&gt;</summary><content type="html">&lt;p&gt;It is sometimes useful to allow non-admin users to
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2018-09-10T00:00:00+02:00</updated><entry><title>r2con-ctf writeup: Australia</title><link href="https://deadc0de.re/articles/r2con-ctf-write-australia.html" rel="alternate"></link><published>2018-09-10T00:00:00+02:00</published><updated>2018-09-10T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2018-09-10:/articles/r2con-ctf-write-australia.html</id><summary type="html">&lt;p&gt;Write-up to r2con 2018 ctf "Autralia"&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is a write-up for the &lt;em&gt;Australia&lt;/em&gt; challenge of r2con 2018 CTF.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;We developed this Perfectly Secure Vault (or PVS for short) for storing your secrets
+securely and safe from hackers. We even use a super-secure secret key to protect it.
+We are sure you won&amp;#39;t be able to recover said key... will you?
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;binary: &lt;a href="https://gitlab.com/deadc0de6/ctf/tree/master/2018-r2con/australia"&gt;psv_fc64b1cfd34704a72b2180982e418e9c&lt;/a&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./psv_fc64b1cfd34704a72b2180982e418e9c
+Welcome to PSV &lt;span class="o"&gt;(&lt;/span&gt;Perfectly Secure Vault&lt;span class="o"&gt;)&lt;/span&gt;!
+Enter your secret key to unlock:
+AAAAAAAAAAAAAAAAAAAAAA
+Sorry, try again.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Open the binary with &lt;a href="https://github.com/radare/radare2"&gt;radare2&lt;/a&gt; and list the functions&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ radare2 psv_fc64b1cfd34704a72b2180982e418e9c
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400630&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; aaa
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400630&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; e asm.pseudo &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400630&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; e asm.bytes &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400630&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; afl
+0x00400580    &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;26&lt;/span&gt;           sub.__gmon_start_580
+0x004005b0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.free
+0x004005c0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.puts
+0x004005d0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.__stack_chk_fail
+0x004005e0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.__libc_start_main
+0x004005f0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.fgets
+0x00400600    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.malloc
+0x00400610    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.fwrite
+0x00400620    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sub.__gmon_start_620
+0x00400630    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;41&lt;/span&gt;           entry0
+0x00400660    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;41&lt;/span&gt;   fcn.00400660
+0x004006e0    &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;28&lt;/span&gt;           entry2.fini
+0x00400700    &lt;span class="m"&gt;8&lt;/span&gt; &lt;span class="m"&gt;38&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;90&lt;/span&gt;   entry1.init
+0x00400726    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;27&lt;/span&gt;           sub.Welcome_to_PSV__Perfectly_Secure_Vault_726
+0x00400741    &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;317&lt;/span&gt;          sub.__stack_chk_fail_741
+0x0040087e    &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;252&lt;/span&gt;          main
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400630&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; s main
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400630&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; pdf
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Exploring the &lt;em&gt;main&lt;/em&gt; quickly shows that the function at &lt;code&gt;0x400925&lt;/code&gt; leads to either &lt;code&gt;str.Correct__You_got_the_flag&lt;/code&gt;
+(the string &lt;em&gt;"Correct! You got the flag!"&lt;/em&gt;) or &lt;code&gt;str.Sorry__try_again.&lt;/code&gt; (the string
+&lt;em&gt;"Sorry, try again.\n"&lt;/em&gt;).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; CODE XREF from main &lt;span class="o"&gt;(&lt;/span&gt;0x4008f2&lt;span class="o"&gt;)&lt;/span&gt;
+0x00400925      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; dword &lt;span class="o"&gt;[&lt;/span&gt;size&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400928      &lt;span class="nv"&gt;edx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;rax - &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040092b      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; qword &lt;span class="o"&gt;[&lt;/span&gt;ptr&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040092f      &lt;span class="nv"&gt;esi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; edx
+0x00400931      &lt;span class="nv"&gt;rdi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; rax
+0x00400934      sub.__stack_chk_fail_741 &lt;span class="o"&gt;()&lt;/span&gt;
+0x00400939      &lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; eax &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; eax
+0x0040093b      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;!var&lt;span class="o"&gt;)&lt;/span&gt; goto 0x400949
+0x0040093d      &lt;span class="nv"&gt;edi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; str.Correct__You_got_the_flag &lt;span class="p"&gt;;&lt;/span&gt; 0x400ac5 &lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Correct! You got the flag!&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The function &lt;code&gt;sub.__stack_chk_fail_741&lt;/code&gt; (which determines if we
+got the correct flag or not) starts by setting a few local variables
+and then applies a &lt;em&gt;xor&lt;/em&gt; on the arg1 (the string
+provided at the command line) and the string pointed by &lt;em&gt;str.sorry_this_is_not_the_flag_u_are_looking_for&lt;/em&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;0x0040087e&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; s sub.__stack_chk_fail_741
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400741&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; pdf
+…
+0x00400749      qword &lt;span class="o"&gt;[&lt;/span&gt;local_58h&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; rdi                    &lt;span class="p"&gt;;&lt;/span&gt; arg1
+0x0040075f      qword &lt;span class="o"&gt;[&lt;/span&gt;local_48h&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; str.sorry_this_is_not_the_flag_u_are_looking_for
+0x00400817      dword &lt;span class="o"&gt;[&lt;/span&gt;local_4ch&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;  &amp;lt;---- THIS IS THE COUNTER
+…
+&lt;span class="p"&gt;;&lt;/span&gt; CODE XREF from sub.__stack_chk_fail_741 &lt;span class="o"&gt;(&lt;/span&gt;0x400861&lt;span class="o"&gt;)&lt;/span&gt;
+0x00400820      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; dword &lt;span class="o"&gt;[&lt;/span&gt;local_4ch&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400823      &lt;span class="nv"&gt;rdx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; eax
+0x00400826      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; qword &lt;span class="o"&gt;[&lt;/span&gt;local_48h&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040082a      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; rdx
+0x0040082d      &lt;span class="nv"&gt;edx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; byte &lt;span class="o"&gt;[&lt;/span&gt;rax&lt;span class="o"&gt;]&lt;/span&gt;                  &amp;lt;----- &lt;span class="nv"&gt;edx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; local_48h&lt;span class="o"&gt;[&lt;/span&gt;local_4ch&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400830      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; dword &lt;span class="o"&gt;[&lt;/span&gt;local_4ch&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400833      &lt;span class="nv"&gt;rcx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; eax
+0x00400836      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; qword &lt;span class="o"&gt;[&lt;/span&gt;local_58h&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040083a      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; rcx
+0x0040083d      &lt;span class="nv"&gt;ecx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; byte &lt;span class="o"&gt;[&lt;/span&gt;rax&lt;span class="o"&gt;]&lt;/span&gt;                &amp;lt;------- &lt;span class="nv"&gt;ecx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; local_58h&lt;span class="o"&gt;[&lt;/span&gt;local_4ch&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400840      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; dword &lt;span class="o"&gt;[&lt;/span&gt;local_4ch&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400843      cdqe
+0x00400845      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; byte &lt;span class="o"&gt;[&lt;/span&gt;rbp + rax - 0x40&lt;span class="o"&gt;]&lt;/span&gt;   &amp;lt;----- &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; one of the &lt;span class="nb"&gt;local&lt;/span&gt; var on the stack
+0x0040084a      eax ^&lt;span class="o"&gt;=&lt;/span&gt; ecx                            &amp;lt;----- XOR
+0x0040084c      &lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; dl - al
+0x0040084e      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;!var&lt;span class="o"&gt;)&lt;/span&gt; goto 0x400857
+0x00400850      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+0x00400855      goto 0x400868
+…
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What it does is taking one byte from the string &lt;em&gt;"sorry_this_is_not_the_flag_u_are_looking_for"&lt;/em&gt;
+at index &lt;em&gt;local_4ch&lt;/em&gt;, one byte from the entered password at index &lt;em&gt;local_4ch&lt;/em&gt; and one of the local variables
+on the stack assigned at the beginning of the function. It then xors the last two and
+compares the result with the first string.&lt;/p&gt;
+&lt;p&gt;In other words:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;sorry_this_is_not_the_flag_u_are_looking_for&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;somebytes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;lt;some-bytes&amp;gt;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;cliarg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;AAAAAAAAAAAAAAAAAAAAAA&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;loop&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt; &lt;span class="nb"&gt;all&lt;/span&gt; &lt;span class="n"&gt;chars&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cliarg&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;^&lt;/span&gt; &lt;span class="n"&gt;somebytes&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;False&lt;/span&gt;
+&lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The password can thus be retrieved by
+&lt;em&gt;simply&lt;/em&gt; doing &lt;code&gt;somebytes ^ string&lt;/code&gt;, where &lt;em&gt;somebytes&lt;/em&gt; are all
+the variables set at the beginning of the function that stands on the stack.&lt;/p&gt;
+&lt;p&gt;Let's do this with radare2.
+Start the debugger&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ radare2 -d psv_fc64b1cfd34704a72b2180982e418e9c
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Add a breakpoint on the xor line&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;0x7f6c279f0000&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; db 0x40084a
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then execute the program and enter a fake password:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;0x7f6c279f0000&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; dc
+Welcome to PSV &lt;span class="o"&gt;(&lt;/span&gt;Perfectly Secure Vault&lt;span class="o"&gt;)&lt;/span&gt;!
+Enter your secret key to unlock:
+AAAAAAAAAAAAAAAAAAAA
+hit breakpoint at: 40084a
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we need to xor some bytes on the stack (the local variables) with the string pointed
+by &lt;em&gt;str.sorry_this_is_not_the_flag_u_are_looking_for&lt;/em&gt;. The local variables are located at
+&lt;code&gt;rbp + rax - 0x40&lt;/code&gt; (rax is 0).&lt;/p&gt;
+&lt;p&gt;In radare2, it goes like this: seek to the string &lt;em&gt;str.sorry_this_is_not_the_flag_u_are_looking_for&lt;/em&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;0x0040084a&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; s str.sorry_this_is_not_the_flag_u_are_looking_for
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400a60&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; ps
+sorry_this_is_not_the_flag_u_are_looking_for
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;retrieve the length of the string&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;0x00400a60&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; iz ~sorry
+&lt;span class="m"&gt;002&lt;/span&gt; 0x00000a60 0x00400a60  &lt;span class="m"&gt;44&lt;/span&gt;  &lt;span class="m"&gt;45&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;.rodata&lt;span class="o"&gt;)&lt;/span&gt; ascii sorry_this_is_not_the_flag_u_are_looking_for
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;xor the string with 45 bytes at rbp-0x40
+and store the result here&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;0x00400a60&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; wox &lt;span class="sb"&gt;`&lt;/span&gt;p8 &lt;span class="m"&gt;45&lt;/span&gt; @ rbp-0x40&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400a60&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; ps
+r2con&lt;span class="o"&gt;{&lt;/span&gt;x0r_1s_Sup3r_K00l_&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;_s3cur3_4lg0r1thm!&lt;span class="o"&gt;}&lt;/span&gt;lB2dqs&lt;span class="se"&gt;\x&lt;/span&gt;04b7o&lt;span class="se"&gt;\x&lt;/span&gt;0c&lt;span class="se"&gt;\x&lt;/span&gt;0fv@cx~3H&lt;span class="se"&gt;\x&lt;/span&gt;0bN0&lt;span class="se"&gt;\x&lt;/span&gt;02eA&amp;gt;&lt;span class="se"&gt;\x&lt;/span&gt;&lt;span class="m"&gt;16&lt;/span&gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;F&lt;span class="se"&gt;\x&lt;/span&gt;7f&lt;span class="o"&gt;{&lt;/span&gt;u:dxmg/&lt;span class="p"&gt;;&lt;/span&gt;-vVonz&lt;span class="se"&gt;\x&lt;/span&gt;1fd/1tyTy,5&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;nYC~iz&lt;span class="nv"&gt;$Y&lt;/span&gt;
+&lt;span class="se"&gt;\x&lt;/span&gt;&lt;span class="m"&gt;03&lt;/span&gt;&lt;span class="se"&gt;\x&lt;/span&gt;0c
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now score with &lt;em&gt;r2con{x0r_1s_Sup3r_K00l_&amp;amp;_s3cur3_4lg0r1thm!}&lt;/em&gt;&lt;/p&gt;</content><category term="write-up"></category><category term="ctf"></category><category term="radare2"></category></entry><entry><title>r2con-ctf writeup: Egypt</title><link href="https://deadc0de.re/articles/r2con-ctf-write-egypt.html" rel="alternate"></link><published>2018-09-10T00:00:00+02:00</published><updated>2018-09-10T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2018-09-10:/articles/r2con-ctf-write-egypt.html</id><summary type="html">&lt;p&gt;Write-up to r2con 2018 ctf "Egypt"&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is a write-up for the &lt;em&gt;Egypt&lt;/em&gt; challenge of r2con 2018 CTF.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Are you a master in lockpicking?
+Try to open this lock bruteforcing the combination!
+Put the flag inside r2con{flag} and check if you got the right flag.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;binary: &lt;a href="https://gitlab.com/deadc0de6/ctf/tree/master/2018-r2con/egypt"&gt;forceme_9f132ba529bfd562380d448f4904c76f&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Open the binary with &lt;a href="https://github.com/radare/radare2"&gt;radare2&lt;/a&gt; and list the functions&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ radare2 forceme_9f132ba529bfd562380d448f4904c76f
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; aaa
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; e asm.pseudo &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; e asm.bytes &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; afl
+0x00400047    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;170&lt;/span&gt;          fcn.00400047
+0x00400438    &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;26&lt;/span&gt;           sym._init
+0x00400470    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.putchar
+0x00400480    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.puts
+0x00400490    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.strlen
+0x004004a0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.__libc_start_main
+0x004004b0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sub.__gmon_start_4b0
+0x004004c0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;41&lt;/span&gt;           entry0
+0x004004f0    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;41&lt;/span&gt;   sym.deregister_tm_clones
+0x00400530    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;58&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;55&lt;/span&gt;   sym.register_tm_clones
+0x00400570    &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;28&lt;/span&gt;           sym.__do_global_dtors_aux
+0x00400590    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;38&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;35&lt;/span&gt;   entry1.init
+0x004005b6    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;53&lt;/span&gt;           sym.code
+0x004005eb    &lt;span class="m"&gt;8&lt;/span&gt; &lt;span class="m"&gt;62&lt;/span&gt;           sym.check
+0x00400629    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;117&lt;/span&gt;          sym.banner
+0x0040069e    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;117&lt;/span&gt;          sym.goodboy
+0x00400713    &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;543&lt;/span&gt;          main
+0x00400940    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;101&lt;/span&gt;          sym.__libc_csu_init
+0x004009b0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;            sym.__libc_csu_fini
+0x004009b4    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;9&lt;/span&gt;            sym._fini
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We quickly see that we want to end up in &lt;code&gt;sym.goodboy&lt;/code&gt;
+which is called from the main function and prints some ascii art.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; axt sym.goodboy
+main 0x40091a &lt;span class="o"&gt;[&lt;/span&gt;CALL&lt;span class="o"&gt;]&lt;/span&gt; call sym.goodboy
+&lt;span class="o"&gt;[&lt;/span&gt;0x0040069e&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; s main
+&lt;span class="o"&gt;[&lt;/span&gt;0x00400713&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; pdf
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Looking at the &lt;em&gt;main&lt;/em&gt; function we see that the password need to be at least of length 9&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0x00400762      &lt;span class="nv"&gt;rdi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; rax                                  &lt;span class="p"&gt;;&lt;/span&gt; const char *s
+0x00400765      sym.imp.strlen &lt;span class="o"&gt;()&lt;/span&gt;                          &lt;span class="p"&gt;;&lt;/span&gt; size_t strlen&lt;span class="o"&gt;(&lt;/span&gt;const char *s&lt;span class="o"&gt;)&lt;/span&gt;
+0x0040076a      &lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; rax - &lt;span class="m"&gt;9&lt;/span&gt;                              &lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="m"&gt;9&lt;/span&gt;
+0x0040076e      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;var&lt;span class="o"&gt;)&lt;/span&gt; goto 0x40092b
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And that there are two end paths&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0x00400909      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;!var&lt;span class="o"&gt;)&lt;/span&gt; goto 0x400921
+0x0040090b      &lt;span class="nv"&gt;edi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; str.Success__You_Got_it              &lt;span class="p"&gt;;&lt;/span&gt; 0x400b05 &lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Success! You Got it!&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;;&lt;/span&gt; const char *s
+0x00400910      sym.imp.puts &lt;span class="o"&gt;()&lt;/span&gt;                            &lt;span class="p"&gt;;&lt;/span&gt; int puts&lt;span class="o"&gt;(&lt;/span&gt;const char *s&lt;span class="o"&gt;)&lt;/span&gt;
+0x00400915      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+0x0040091a      sym.goodboy &lt;span class="o"&gt;()&lt;/span&gt;
+0x0040091f      goto 0x40092b
+0x00400921      &lt;span class="nv"&gt;edi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; str.Try_harder                       &lt;span class="p"&gt;;&lt;/span&gt; 0x400b1a &lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Try harder&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;;&lt;/span&gt; const char *s
+0x00400926      sym.imp.puts &lt;span class="o"&gt;()&lt;/span&gt;                            &lt;span class="p"&gt;;&lt;/span&gt; int puts&lt;span class="o"&gt;(&lt;/span&gt;const char *s&lt;span class="o"&gt;)&lt;/span&gt;
+0x0040092b      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+0x00400930
+0x00400931      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Address &lt;code&gt;0x0040091a&lt;/code&gt; brings us to a success through the function &lt;code&gt;sym.goodboy&lt;/code&gt;
+while address &lt;code&gt;0x00400921&lt;/code&gt; (or any below) brings us to failure with a
+&lt;em&gt;"Try harder"&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;This is a typical job for &lt;a href="https://github.com/angr/angr"&gt;angr&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We know:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the password needs to be at least 9 bytes long&lt;/li&gt;
+&lt;li&gt;a success path is reachable at &lt;code&gt;0x0040091a&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;a failure path is reachable at &lt;code&gt;0x00400921&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Finding the password took less than 5s to angr&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;time&lt;/span&gt; ./forceme-angr.py
+&amp;lt;SimulationManager with &lt;span class="m"&gt;1&lt;/span&gt; found, &lt;span class="m"&gt;19&lt;/span&gt; deadended, &lt;span class="m"&gt;1&lt;/span&gt; avoid&amp;gt;
+esilrulez
+./forceme-angr.py  &lt;span class="m"&gt;3&lt;/span&gt;.61s user &lt;span class="m"&gt;0&lt;/span&gt;.12s system &lt;span class="m"&gt;99&lt;/span&gt;% cpu &lt;span class="m"&gt;3&lt;/span&gt;.742 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Below the angr script used&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;!&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;bin&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;env&lt;/span&gt; &lt;span class="n"&gt;python2&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Egypt - lockpicking - 100 pts&lt;/span&gt;
+&lt;span class="c1"&gt;# type: flag&lt;/span&gt;
+&lt;span class="c1"&gt;# category: easy&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;angr&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;claripy&lt;/span&gt;
+
+&lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;./forceme_9f132ba529bfd562380d448f4904c76f&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;angr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Project&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;load_options&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;auto_load_libs&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;factory&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;entry_state&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="c1"&gt;# construct the argument&lt;/span&gt;
+&lt;span class="n"&gt;argv&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;9&lt;/span&gt; &lt;span class="c1"&gt;# password size&lt;/span&gt;
+&lt;span class="n"&gt;pwd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;claripy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;BVS&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sym_arg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pwd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;factory&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;entry_state&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;sm&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;factory&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;simulation_manager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;sm&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;explore&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;find&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x0040091a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;avoid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00400921&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;sm&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sm&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;found&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="c1"&gt;# we have a valid path to success&lt;/span&gt;
+    &lt;span class="n"&gt;found&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sm&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;found&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;found&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;solver&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;eval&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;cast_to&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="write-up"></category><category term="ctf"></category><category term="angr"></category><category term="radare2"></category></entry><entry><title>r2con-ctf writeup: Madagascar</title><link href="https://deadc0de.re/articles/r2con-ctf-write-madagascar.html" rel="alternate"></link><published>2018-09-10T00:00:00+02:00</published><updated>2018-09-10T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2018-09-10:/articles/r2con-ctf-write-madagascar.html</id><summary type="html">&lt;p&gt;Write-up to r2con 2018 ctf "Madagascar"&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is a write-up for the &lt;em&gt;Madagascar&lt;/em&gt; challenge of r2con 2018 CTF.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Are you sure what you see?
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;binary: &lt;a href="https://gitlab.com/deadc0de6/ctf/tree/master/2018-r2con/madagascar"&gt;scrabble_ad92a0e308d220dc89c4bc133e0ce64c&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The string &lt;em&gt;"Wk2p2pm3wg7eo7d"&lt;/em&gt; is quickly found using &lt;code&gt;strings&lt;/code&gt; and naively inserted
+as a valid flag, obviously without success ;-)&lt;/p&gt;
+&lt;p&gt;Open the binary with &lt;a href="https://github.com/radare/radare2"&gt;radare2&lt;/a&gt; and explore the functions and the &lt;em&gt;main&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ radare2 scrabble_ad92a0e308d220dc89c4bc133e0ce64c
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; aaa
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; e asm.pseudo &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; e asm.bytes &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; afl
+0x00400460    &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;26&lt;/span&gt;           sym._init
+0x00400490    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.puts
+0x004004a0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.__stack_chk_fail
+0x004004b0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.printf
+0x004004c0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sym.imp.__libc_start_main
+0x004004d0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;            sub.__gmon_start_4d0
+0x004004e0    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;41&lt;/span&gt;           entry0
+0x00400510    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;41&lt;/span&gt;   sym.deregister_tm_clones
+0x00400550    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;58&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;55&lt;/span&gt;   sym.register_tm_clones
+0x00400590    &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;28&lt;/span&gt;           sym.__do_global_dtors_aux
+0x004005b0    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;38&lt;/span&gt;   -&amp;gt; &lt;span class="m"&gt;35&lt;/span&gt;   entry1.init
+0x004005d6   &lt;span class="m"&gt;11&lt;/span&gt; &lt;span class="m"&gt;234&lt;/span&gt;          main
+0x004006c0    &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;101&lt;/span&gt;          sym.__libc_csu_init
+0x00400730    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;            sym.__libc_csu_fini
+0x00400734    &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;9&lt;/span&gt;            sym._fini
+&lt;span class="o"&gt;[&lt;/span&gt;0x004004c0&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; s main
+&lt;span class="o"&gt;[&lt;/span&gt;0x004005d6&lt;span class="o"&gt;]&lt;/span&gt;&amp;gt; pdf
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Looking at the &lt;em&gt;main&lt;/em&gt; function shows interesting information.&lt;/p&gt;
+&lt;p&gt;First &lt;code&gt;local_10h&lt;/code&gt; is initialized with a pointer to the string &lt;em&gt;"Wk2p2pm3wg7eo7d"&lt;/em&gt;,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0x0040060e      qword &lt;span class="o"&gt;[&lt;/span&gt;local_10h&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; str.Wk2p2pm3wg7eo7d
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and below block loops through all chars until &lt;code&gt;\0&lt;/code&gt; is hit.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0x00400666      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; qword &lt;span class="o"&gt;[&lt;/span&gt;local_10h&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040066a      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; byte &lt;span class="o"&gt;[&lt;/span&gt;rax&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040066d      &lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; al &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; al
+0x0040066f      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;var&lt;span class="o"&gt;)&lt;/span&gt; goto 0x400626
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The block at address &lt;code&gt;0x00400626&lt;/code&gt; called for each valid char in the string is
+decomposed below.&lt;/p&gt;
+&lt;p&gt;Note that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;local_10h&lt;/code&gt; is a pointer to the string (&lt;em&gt;"Wk2p2pm3wg7eo7d"&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;local_30h&lt;/code&gt; is a pointer to argv&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;local_18h&lt;/code&gt; is an int initialized to 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0x00400626      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; qword &lt;span class="o"&gt;[&lt;/span&gt;local_10h&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040062a      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; byte &lt;span class="o"&gt;[&lt;/span&gt;rax&lt;span class="o"&gt;]&lt;/span&gt;
+Load char pointed by local_10h
+
+0x0040062d      eax ^&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;
+0x00400630      byte &lt;span class="o"&gt;[&lt;/span&gt;local_19h&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; al
+0x00400633      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;local_19h&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400637      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; byte &lt;span class="o"&gt;[&lt;/span&gt;rax&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040063a      &lt;span class="nv"&gt;edx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; al
+&lt;span class="k"&gt;do&lt;/span&gt; some operations and store in edx:
+&lt;span class="nv"&gt;rdx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;((&lt;/span&gt;*local_10h&lt;span class="o"&gt;)&lt;/span&gt; ^ &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; 0xf
+
+0x0040063d      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; qword &lt;span class="o"&gt;[&lt;/span&gt;local_30h&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400641      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="m"&gt;8&lt;/span&gt;
+rax points now to the input string
+
+0x00400645      &lt;span class="nv"&gt;rcx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; qword &lt;span class="o"&gt;[&lt;/span&gt;rax&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400648      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; dword &lt;span class="o"&gt;[&lt;/span&gt;local_18h&lt;span class="o"&gt;]&lt;/span&gt;
+0x0040064b      cdqe
+0x0040064d      &lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; rcx
+0x00400650      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; byte &lt;span class="o"&gt;[&lt;/span&gt;rax&lt;span class="o"&gt;]&lt;/span&gt;
+0x00400653      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; al
+rax points now to one char in our input
+&lt;span class="nv"&gt;rax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; input&lt;span class="o"&gt;[&lt;/span&gt;local_18h&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; 0xf
+
+0x00400656      edx -&lt;span class="o"&gt;=&lt;/span&gt; eax
+0x00400658      &lt;span class="nv"&gt;eax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; edx
+rax gets the value of rdx - rax
+
+0x0040065a      dword &lt;span class="o"&gt;[&lt;/span&gt;local_14h&lt;span class="o"&gt;]&lt;/span&gt; +&lt;span class="o"&gt;=&lt;/span&gt; eax
+add rax to local_14h
+
+0x0040065d      qword &lt;span class="o"&gt;[&lt;/span&gt;local_10h&lt;span class="o"&gt;]&lt;/span&gt; +&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+0x00400662      dword &lt;span class="o"&gt;[&lt;/span&gt;local_18h&lt;span class="o"&gt;]&lt;/span&gt; +&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+increment the pointer/counter
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In other words:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;input&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;AAAAA&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Wk2p2pm3wg7eo7d&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;index&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+  &lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;^&lt;/span&gt; &lt;span class="mh"&gt;0x3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="mh"&gt;0xf&lt;/span&gt;
+  &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="mh"&gt;0xf&lt;/span&gt;
+  &lt;span class="n"&gt;res&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="n"&gt;index&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Finally the test that defines if we found the correct flag is done
+in block at &lt;code&gt;0x00400671&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0x00400671      &lt;span class="nv"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; dword &lt;span class="o"&gt;[&lt;/span&gt;local_14h&lt;span class="o"&gt;]&lt;/span&gt; - &lt;span class="m"&gt;0&lt;/span&gt;
+0x00400675      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;!var&lt;span class="o"&gt;)&lt;/span&gt; goto 0x400688
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;where &lt;code&gt;local_14h&lt;/code&gt; should be 0 in order to win.&lt;/p&gt;
+&lt;p&gt;That means that each input char must be equal to each respective char
+of the internal string xored with 0x03.&lt;/p&gt;
+&lt;p&gt;Here's a small python one-liner to find the flag:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ python
+&amp;gt;&amp;gt;&amp;gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;.join&lt;span class="o"&gt;([&lt;/span&gt;chr&lt;span class="o"&gt;(&lt;/span&gt;ord&lt;span class="o"&gt;(&lt;/span&gt;x&lt;span class="o"&gt;)&lt;/span&gt;^0x3&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; x in &lt;span class="s2"&gt;&amp;quot;Wk2p2pm3wg7eo7d&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;])&lt;/span&gt;
+&lt;span class="s1"&gt;&amp;#39;Th1s1sn0td4fl4g&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Enter the flag and win!&lt;/p&gt;
+&lt;p&gt;I then tried to solve this with &lt;a href="https://github.com/angr/angr"&gt;angr&lt;/a&gt; as an exercise.
+It didn't work not because angr wasn't able
+to find a solution but because it was finding too many solutions.&lt;/p&gt;
+&lt;p&gt;The reason is that &lt;code&gt;local_14&lt;/code&gt; needs to be 0 for the flag
+to be valid (as shown above) however it doesn't say that some characters comparisons cannot
+be different to zero as long as those are being compensented and that the
+final value of &lt;code&gt;local_14&lt;/code&gt; is 0. What means that there isn't a single solution to it but
+multiple.
+Still only one flag was valid for scoring that challenge. If that was purposely
+used to avoid the use of angr, it worked ;-)&lt;/p&gt;
+&lt;p&gt;Below my angr script as a reference&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/env python2&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;angr&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;claripy&lt;/span&gt;
+
+&lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;./scrabble_ad92a0e308d220dc89c4bc133e0ce64c&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;angr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Project&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;load_options&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;auto_load_libs&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;factory&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;entry_state&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="c1"&gt;# construct the argument&lt;/span&gt;
+&lt;span class="n"&gt;argv&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt; &lt;span class="c1"&gt;# password size&lt;/span&gt;
+&lt;span class="n"&gt;pwd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;claripy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;BVS&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sym_arg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pwd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;factory&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;entry_state&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;current_byte&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pwd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_byte&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_constraints&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;claripy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Or&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+            &lt;span class="n"&gt;claripy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;And&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;current_byte&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;current_byte&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;z&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+            &lt;span class="n"&gt;claripy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;And&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;current_byte&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;A&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;current_byte&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Z&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+            &lt;span class="n"&gt;claripy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;And&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;current_byte&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;current_byte&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;9&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;sm&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;factory&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;simulation_manager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;sm&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;explore&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;find&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x400688&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;avoid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00400677&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mh"&gt;0x4005fa&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sm&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;found&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="c1"&gt;# we have a valid path to success&lt;/span&gt;
+    &lt;span class="n"&gt;found&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sm&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;found&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;found&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;solver&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;eval_upto&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cast_to&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="write-up"></category><category term="ctf"></category><category term="radare2"></category><category term="angr"></category></entry><entry><title>Allow non-admin to execute sudo commands</title><link href="https://deadc0de.re/articles/sudo-for-non-admin.html" rel="alternate"></link><published>2018-08-07T00:00:00+02:00</published><updated>2018-08-07T00:00:00+02:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2018-08-07:/articles/sudo-for-non-admin.html</id><summary type="html">&lt;p&gt;Allow non-admin users to execute sudo commands&lt;/p&gt;</summary><content type="html">&lt;p&gt;It is sometimes useful to allow non-admin users to
 execute commands that normally require the use of &lt;code&gt;sudo&lt;/code&gt; for example to reload nginx or to
 execute specific &lt;code&gt;systemctl&lt;/code&gt; command. It is especially useful for CI/CD.&lt;/p&gt;
 &lt;p&gt;This is easily doable with &lt;code&gt;visudo&lt;/code&gt;.&lt;/p&gt;
