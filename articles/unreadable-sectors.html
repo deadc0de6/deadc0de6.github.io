@@ -83,8 +83,8 @@ $ sync
 
 <p>Repeat the above procedure until all bad sectors have been fixed.
 At the end, make sure no more bad sectors are detected with:</p>
-<div class="highlight"><pre><span></span>$ smartctl -A /dev/sdb <span class="p">|</span> grep Offline_Uncorrectable
-<span class="m">198</span> Offline_Uncorrectable   0x0010   <span class="m">100</span>   <span class="m">100</span>   <span class="m">000</span>    Old_age   Offline      -       <span class="m">0</span>
+<div class="highlight"><pre><span></span>$ smartctl -A /dev/sdb | grep Offline_Uncorrectable
+198 Offline_Uncorrectable   0x0010   100   100   000    Old_age   Offline      -       0
 </pre></div>
 
 
@@ -94,7 +94,7 @@ At the end, make sure no more bad sectors are detected with:</p>
 <li><a href="http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/">http://linoxide.com/linux-how-to/how-to-fix-repair-bad-blocks-in-linux/</a></li>
 <li><a href="https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/">https://dekoder.wordpress.com/2014/10/08/fixing-freenas-currently-unreadable-pending-sectors-error/</a></li>
 </ul>
-<hr>
+<hr />
 <p><strong>EDIT</strong></p>
 <p>I experienced that sometimes <code>dd</code> is unable to write to a bad sector, resulting in a similar output</p>
 <div class="highlight"><pre><span></span>dd: error writing ‘/dev/sdb’: Input/output error

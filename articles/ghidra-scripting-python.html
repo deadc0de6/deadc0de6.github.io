@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Scripting Ghidra with Python // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Scripting Ghidra with Python</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/python.html">python</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/ghidra.html">ghidra</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/hacking.html">hacking</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/reverse.html">reverse</a>
+                            <br/>
+                            // Tue 12 November 2019
+                        </p>
+                </header>
+            </section>
+            <p>This post shortly gives a few examples to get started with scripting <a href="https://ghidra-sre.org/">Ghidra</a>
+using Python.</p>
+<h1>Where to get help</h1>
+<ul>
+<li>look at the <a href="https://ghidra.re/ghidra_docs/api/ghidra/program/flatapi/FlatProgramAPI.html">online API</a></li>
+<li>use the Python interpreter directly available in Ghidra (<strong>Window -&gt; Python</strong>) and use <code>help(...)</code></li>
+<li>hit <code>F1</code> inside the Python interpreter</li>
+</ul>
+<h1>How to run a script</h1>
+<p>Open the script manager (<strong>Window -&gt; Script Manager</strong>) and create a new Python script.
+If developping your script outside of Ghidra, make sure to hit the <code>refresh</code> button before re-running the script in Ghidra.</p>
+<h1>How to code</h1>
+<p>Some available objects:</p>
+<ul>
+<li><code>currentProgram</code>: the current active program</li>
+<li><code>currentAddress</code>: the address where the cursor is</li>
+<li><code>monitor</code>: a task monitor to allow user to interact with the script</li>
+</ul>
+<p>Below are a few snippets that could be helpful for
+getting started in Ghidra scripting with Python.</p>
+<p>Find function's entry point from an address</p>
+<div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="mh">0x7ff7cf42b901</span>
+
+<span class="c1">## transform to a Ghidra Address object</span>
+<span class="n">addr</span> <span class="o">=</span> <span class="n">toAddr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="c1">## get the containing function</span>
+<span class="n">fn</span> <span class="o">=</span> <span class="n">getFunctionContaining</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+
+<span class="c1">## get the function&#39;s entry point</span>
+<span class="n">entry</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">getEntryPoint</span><span class="p">()</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">toString</span><span class="p">())</span>
+</pre></div>
+
+
+<p>Find callers and callees for function</p>
+<div class="highlight"><pre><span></span><span class="c1">## let fn be a function</span>
+<span class="n">callers</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">getCallingFunctions</span><span class="p">(</span><span class="n">monitor</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">callers</span><span class="p">)</span>
+
+<span class="n">callees</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">getCalledFunctions</span><span class="p">(</span><span class="n">monitor</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">callees</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Get decompiled C code from a function
+(see <a href="https://ghidra.re/ghidra_docs/api/ghidra/app/decompiler/DecompInterface.html#decompileFunction(ghidra.program.model.listing.Function,int,ghidra.util.task.TaskMonitor)">decompileFunction api</a>)</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ghidra.app.decompiler</span> <span class="kn">as</span> <span class="nn">decomp</span>
+
+<span class="c1">## let addr be a valid Address</span>
+<span class="n">fn</span> <span class="o">=</span> <span class="n">getFunctionContaining</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+
+<span class="c1">## get the decompiler interface</span>
+<span class="n">iface</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">DecompInterface</span><span class="p">()</span>
+
+<span class="c1">## decompile the function</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">openProgram</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">getProgram</span><span class="p">())</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">iface</span><span class="o">.</span><span class="n">decompileFunction</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">monitor</span><span class="p">)</span>
+
+<span class="c1">## get the C code as string</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">decompileCompleted</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">getErrorMessage</span><span class="p">())</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">getDecompiledFunction</span><span class="p">()</span>
+    <span class="n">ccode</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">getC</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ccode</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Add custom bookmarks
+(see <a href="https://ghidra.re/ghidra_docs/api/ghidra/program/flatapi/FlatProgramAPI.html#createBookmark(ghidra.program.model.address.Address,java.lang.String,java.lang.String)">createBookmark api</a>) - check the bookmarks in Ghidra in <strong>Window -&gt; Bookmarks</strong></p>
+<div class="highlight"><pre><span></span><span class="c1">## let fn be a function</span>
+<span class="n">pos1</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">getEntryPoint</span><span class="p">()</span>
+
+<span class="n">addr</span> <span class="o">=</span> <span class="mh">0x7ff7cf32b901</span>
+<span class="n">pos2</span> <span class="o">=</span> <span class="n">toAddr</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+
+<span class="c1">## add bookmarks</span>
+<span class="n">category</span> <span class="o">=</span> <span class="s1">&#39;my-bookmark&#39;</span>
+<span class="n">createBookmark</span><span class="p">(</span><span class="n">pos1</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="s1">&#39;addr-{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pos1</span><span class="o">.</span><span class="n">toString</span><span class="p">()))</span>
+<span class="n">createBookmark</span><span class="p">(</span><span class="n">pos2</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="s1">&#39;addr-{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pos2</span><span class="o">.</span><span class="n">toString</span><span class="p">()))</span>
+</pre></div>
+
+
+<p>References:</p>
+<ul>
+<li><a href="https://ghidra-sre.org/">https://ghidra-sre.org/</a></li>
+<li><a href="https://github.com/NationalSecurityAgency/ghidra">https://github.com/NationalSecurityAgency/ghidra</a></li>
+<li><a href="https://ghidra.re/courses/GhidraClass/Intermediate/Scripting_withNotes.html#Scripting.html">https://ghidra.re/courses/GhidraClass/Intermediate/Scripting_withNotes.html#Scripting.html</a> (for Python starting at page 45)</li>
+<li><a href="https://ghidra.re/ghidra_docs/api/ghidra/program/flatapi/FlatProgramAPI.html">https://ghidra.re/ghidra_docs/api/ghidra/program/flatapi/FlatProgramAPI.html</a></li>
+</ul>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

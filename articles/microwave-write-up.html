@@ -147,40 +147,40 @@ Twitter account
 twitter account. The username can be anything, however the function
 containing the <em>Checking</em> string shows where the password is checked
 (and what it is):</p>
-<div class="highlight"><pre><span></span><span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">iz</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">Checking</span>
-<span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">axt</span> <span class="mh">0x00002ac0</span>
-<span class="n">data</span> <span class="mh">0xf03</span> <span class="n">lea</span> <span class="n">rsi</span><span class="p">,</span> <span class="p">[</span><span class="n">rip</span> <span class="o">+</span> <span class="mh">0x1bb6</span><span class="p">]</span> <span class="k">in</span> <span class="n">sub</span><span class="p">.</span><span class="n">__printf_chk_f00</span>
-<span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">pd</span> <span class="mh">@0xf03</span>
+<div class="highlight"><pre><span></span>[0x00000ac0]&gt; iz | grep Checking
+[0x00000ac0]&gt; axt 0x00002ac0
+data 0xf03 lea rsi, [rip + 0x1bb6] in sub.__printf_chk_f00
+[0x00000ac0]&gt; pd @0xf03
 
-<span class="p">...</span> <span class="p">(</span><span class="n">snip</span><span class="p">)</span> <span class="p">...</span>
+... (snip) ...
 
-      <span class="mh">0x00000f98</span>      <span class="mi">488</span><span class="n">b1d713020</span><span class="p">.</span>  <span class="n">mov</span> <span class="n">rbx</span><span class="p">,</span> <span class="n">qword</span> <span class="p">[</span><span class="n">rip</span> <span class="o">+</span> <span class="mh">0x203071</span><span class="p">]</span> <span class="p">;</span> <span class="p">[</span><span class="mh">0x204010</span><span class="o">:</span><span class="mi">8</span><span class="p">]</span><span class="o">=</span><span class="mh">0x2b56</span> <span class="n">str</span><span class="p">.</span><span class="n">n07_7h3_fl46</span> <span class="p">;</span> <span class="s">&quot;V</span>
-      <span class="mh">0x00000f9f</span>      <span class="mi">4889</span><span class="n">df</span>         <span class="n">mov</span> <span class="n">rdi</span><span class="p">,</span> <span class="n">rbx</span>
-      <span class="mh">0x00000fa2</span>      <span class="n">e849faffff</span>     <span class="n">call</span> <span class="n">sym</span><span class="p">.</span><span class="n">imp</span><span class="p">.</span><span class="n">strlen</span>         <span class="p">;[</span><span class="mi">7</span><span class="p">]</span>
-      <span class="mh">0x00000fa7</span>      <span class="mi">31</span><span class="n">d2</span>           <span class="n">xor</span> <span class="n">edx</span><span class="p">,</span> <span class="n">edx</span>
-  <span class="p">,</span><span class="o">=&lt;</span> <span class="mh">0x00000fa9</span>      <span class="n">eb13</span>           <span class="n">jmp</span> <span class="mh">0xfbe</span>                   <span class="p">;[</span><span class="mi">9</span><span class="p">]</span>
-  <span class="o">|</span>   <span class="mh">0x00000fab</span>      <span class="mf">0f1f</span><span class="mi">440000</span>     <span class="n">nop</span> <span class="n">dword</span> <span class="p">[</span><span class="n">rax</span> <span class="o">+</span> <span class="n">rax</span><span class="p">]</span>
-  <span class="o">|</span>   <span class="p">;</span> <span class="n">JMP</span> <span class="n">XREF</span> <span class="n">from</span> <span class="mh">0x00000fc1</span> <span class="p">(</span><span class="n">sub</span><span class="p">.</span><span class="n">__printf_chk_f00</span><span class="p">)</span>
- <span class="p">.</span><span class="o">--&gt;</span> <span class="mh">0x00000fb0</span>      <span class="mf">0f</span><span class="n">b60c13</span>       <span class="n">movzx</span> <span class="n">ecx</span><span class="p">,</span> <span class="n">byte</span> <span class="p">[</span><span class="n">rbx</span> <span class="o">+</span> <span class="n">rdx</span><span class="p">]</span>    <span class="c1">// LOAD THE PASSWORD CHAR</span>
- <span class="o">||</span>   <span class="mh">0x00000fb4</span>      <span class="mi">384</span><span class="n">c1528</span>       <span class="n">cmp</span> <span class="n">byte</span> <span class="p">[</span><span class="n">rbp</span> <span class="o">+</span> <span class="n">rdx</span> <span class="o">+</span> <span class="mh">0x28</span><span class="p">],</span> <span class="n">cl</span> <span class="p">;</span> <span class="p">[</span><span class="mh">0xa</span><span class="o">:</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span> <span class="c1">// COMPARE PROVIDED PASSWORD CHAR</span>
-<span class="p">,</span><span class="o">===&lt;</span> <span class="mh">0x00000fb8</span>      <span class="mi">752</span><span class="n">e</span>           <span class="n">jne</span> <span class="mh">0xfe8</span>                   <span class="p">;[</span><span class="o">?</span><span class="p">]</span>
-<span class="o">|||</span>   <span class="mh">0x00000fba</span>      <span class="mi">4883</span><span class="n">c201</span>       <span class="n">add</span> <span class="n">rdx</span><span class="p">,</span> <span class="mi">1</span>                     <span class="c1">// NEXT CHAR</span>
-<span class="o">|||</span>   <span class="p">;</span> <span class="n">JMP</span> <span class="n">XREF</span> <span class="n">from</span> <span class="mh">0x00000fa9</span> <span class="p">(</span><span class="n">sub</span><span class="p">.</span><span class="n">__printf_chk_f00</span><span class="p">)</span>
-<span class="o">||</span><span class="err">`</span><span class="o">-&gt;</span> <span class="mh">0x00000fbe</span>      <span class="mi">4839</span><span class="n">c2</span>         <span class="n">cmp</span> <span class="n">rdx</span><span class="p">,</span> <span class="n">rax</span>                   <span class="c1">// CHECK REACH END OF STRING</span>
-<span class="o">|</span><span class="err">`</span><span class="o">==&lt;</span> <span class="mh">0x00000fc1</span>      <span class="mi">75</span><span class="n">ed</span>           <span class="n">jne</span> <span class="mh">0xfb0</span>                   <span class="p">;[</span><span class="o">?</span><span class="p">]</span> <span class="c1">// GO ON</span>
-<span class="o">|</span>     <span class="mh">0x00000fc3</span>      <span class="n">b801000000</span>     <span class="n">mov</span> <span class="n">eax</span><span class="p">,</span> <span class="mi">1</span>
-<span class="o">|</span>     <span class="mh">0x00000fc8</span>      <span class="mi">6689453</span><span class="n">c</span>       <span class="n">mov</span> <span class="n">word</span> <span class="p">[</span><span class="n">rbp</span><span class="o">+</span><span class="n">arg_3ch</span><span class="p">],</span> <span class="n">ax</span>  <span class="p">;</span> <span class="p">[</span><span class="mh">0x3c</span><span class="o">:</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="mi">27</span> <span class="p">;</span> <span class="sc">&#39;&lt;&#39;</span> <span class="c1">// RETURN VALUE 1</span>
-<span class="o">|</span>     <span class="p">;</span> <span class="n">JMP</span> <span class="n">XREF</span> <span class="n">from</span> <span class="mh">0x00000fee</span> <span class="p">(</span><span class="n">sub</span><span class="p">.</span><span class="n">__printf_chk_f00</span><span class="p">)</span>
-<span class="o">|</span> <span class="p">.</span><span class="o">-&gt;</span> <span class="mh">0x00000fcc</span>      <span class="mi">488</span><span class="n">b442408</span>     <span class="n">mov</span> <span class="n">rax</span><span class="p">,</span> <span class="n">qword</span> <span class="p">[</span><span class="n">rsp</span> <span class="o">+</span> <span class="mi">8</span><span class="p">]</span>    <span class="p">;</span> <span class="p">[</span><span class="mh">0x8</span><span class="o">:</span><span class="mi">8</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
-<span class="o">|</span> <span class="o">|</span>   <span class="mh">0x00000fd1</span>      <span class="mf">644833042528.</span>  <span class="n">xor</span> <span class="n">rax</span><span class="p">,</span> <span class="n">qword</span> <span class="nl">fs</span><span class="p">:[</span><span class="mh">0x28</span><span class="p">]</span>
-<span class="o">|</span><span class="p">,</span><span class="o">==&lt;</span> <span class="mh">0x00000fda</span>      <span class="mi">7514</span>           <span class="n">jne</span> <span class="mh">0xff0</span>                   <span class="p">;[</span><span class="o">?</span><span class="p">]</span>
-<span class="o">|||</span>   <span class="mh">0x00000fdc</span>      <span class="mi">4883</span><span class="n">c410</span>       <span class="n">add</span> <span class="n">rsp</span><span class="p">,</span> <span class="mh">0x10</span>                                                               <span class="s">&quot;</span>
+      0x00000f98      488b1d713020.  mov rbx, qword [rip + 0x203071] ; [0x204010:8]=0x2b56 str.n07_7h3_fl46 ; &quot;V
+      0x00000f9f      4889df         mov rdi, rbx
+      0x00000fa2      e849faffff     call sym.imp.strlen         ;[7]
+      0x00000fa7      31d2           xor edx, edx
+  ,=&lt; 0x00000fa9      eb13           jmp 0xfbe                   ;[9]
+  |   0x00000fab      0f1f440000     nop dword [rax + rax]
+  |   ; JMP XREF from 0x00000fc1 (sub.__printf_chk_f00)
+ .--&gt; 0x00000fb0      0fb60c13       movzx ecx, byte [rbx + rdx]    // LOAD THE PASSWORD CHAR
+ ||   0x00000fb4      384c1528       cmp byte [rbp + rdx + 0x28], cl ; [0xa:1]=0 // COMPARE PROVIDED PASSWORD CHAR
+,===&lt; 0x00000fb8      752e           jne 0xfe8                   ;[?]
+|||   0x00000fba      4883c201       add rdx, 1                     // NEXT CHAR
+|||   ; JMP XREF from 0x00000fa9 (sub.__printf_chk_f00)
+||`-&gt; 0x00000fbe      4839c2         cmp rdx, rax                   // CHECK REACH END OF STRING
+|`==&lt; 0x00000fc1      75ed           jne 0xfb0                   ;[?] // GO ON
+|     0x00000fc3      b801000000     mov eax, 1
+|     0x00000fc8      6689453c       mov word [rbp+arg_3ch], ax  ; [0x3c:2]=27 ; &#39;&lt;&#39; // RETURN VALUE 1
+|     ; JMP XREF from 0x00000fee (sub.__printf_chk_f00)
+| .-&gt; 0x00000fcc      488b442408     mov rax, qword [rsp + 8]    ; [0x8:8]=0
+| |   0x00000fd1      644833042528.  xor rax, qword fs:[0x28]
+|,==&lt; 0x00000fda      7514           jne 0xff0                   ;[?]
+|||   0x00000fdc      4883c410       add rsp, 0x10                                                               &quot;
 
-<span class="p">...</span> <span class="p">(</span><span class="n">snip</span><span class="p">)</span> <span class="p">...</span>
+... (snip) ...
 
-<span class="err">`</span><span class="o">---&gt;</span> <span class="mh">0x00000fe8</span>      <span class="mi">31</span><span class="n">d2</span>           <span class="n">xor</span> <span class="n">edx</span><span class="p">,</span> <span class="n">edx</span>
- <span class="o">||</span>   <span class="mh">0x00000fea</span>      <span class="mi">6689553</span><span class="n">c</span>       <span class="n">mov</span> <span class="n">word</span> <span class="p">[</span><span class="n">rbp</span><span class="o">+</span><span class="n">arg_3ch</span><span class="p">],</span> <span class="n">dx</span>  <span class="p">;</span> <span class="p">[</span><span class="mh">0x3c</span><span class="o">:</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="mi">27</span> <span class="p">;</span> <span class="sc">&#39;&lt;&#39;</span> <span class="c1">// RETURN VALUE 0</span>
- <span class="o">|</span><span class="err">`</span><span class="o">=&lt;</span> <span class="mh">0x00000fee</span>      <span class="n">ebdc</span>           <span class="n">jmp</span> <span class="mh">0xfcc</span>
+`---&gt; 0x00000fe8      31d2           xor edx, edx
+ ||   0x00000fea      6689553c       mov word [rbp+arg_3ch], dx  ; [0x3c:2]=27 ; &#39;&lt;&#39; // RETURN VALUE 0
+ |`=&lt; 0x00000fee      ebdc           jmp 0xfcc
 </pre></div>
 
 
@@ -224,18 +224,18 @@ and will be used later:</p>
 <h3>Vuln2: stack overflow</h3>
 <p>The second vulnerability is triggered when reading the content to tweet.
 It reads from stdin (0) and store the result on the stack</p>
-<div class="highlight"><pre><span></span><span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">iz</span> <span class="o">|</span> <span class="n">grep</span> <span class="err">&#39;#</span><span class="o">&gt;</span><span class="err">&#39;</span>
-<span class="n">vaddr</span><span class="o">=</span><span class="mh">0x00002adb</span> <span class="n">paddr</span><span class="o">=</span><span class="mh">0x00002adb</span> <span class="n">ordinal</span><span class="o">=</span><span class="mo">01</span><span class="mi">9</span> <span class="n">sz</span><span class="o">=</span><span class="mi">16</span> <span class="n">len</span><span class="o">=</span><span class="mi">15</span> <span class="n">section</span><span class="o">=</span><span class="p">.</span><span class="n">rodata</span> <span class="n">type</span><span class="o">=</span><span class="n">ascii</span> <span class="n">string</span><span class="o">=</span><span class="err">\</span><span class="n">n</span>           <span class="err">#</span><span class="o">&gt;</span>
-<span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">axt</span> <span class="mh">0x00002adb</span>
-<span class="n">data</span> <span class="mh">0x1007</span> <span class="n">lea</span> <span class="n">rsi</span><span class="p">,</span> <span class="p">[</span><span class="n">rip</span> <span class="o">+</span> <span class="mh">0x1acd</span><span class="p">]</span> <span class="k">in</span> <span class="n">sub</span><span class="p">.</span><span class="n">__printf_chk_0</span>
-<span class="p">[</span><span class="mh">0x00000ac0</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">pd</span> <span class="mh">@0x1007</span>
-<span class="p">...</span>
-<span class="mh">0x00001032</span>      <span class="mf">31ff</span>           <span class="n">xor</span> <span class="n">edi</span><span class="p">,</span> <span class="n">edi</span> <span class="c1">// 0 == STDIN</span>
-<span class="mh">0x00001034</span>      <span class="mf">4889e6</span>         <span class="n">mov</span> <span class="n">rsi</span><span class="p">,</span> <span class="n">rsp</span> <span class="c1">// buffer on the stack</span>
-<span class="mh">0x00001037</span>      <span class="n">ba00080000</span>     <span class="n">mov</span> <span class="n">edx</span><span class="p">,</span> <span class="n">section</span><span class="p">..</span><span class="n">rela</span><span class="p">.</span><span class="n">plt</span>  <span class="p">;</span> <span class="s">&quot;@? &quot;</span> <span class="p">@</span> <span class="mh">0x800</span>
-<span class="mh">0x0000103c</span>      <span class="mi">31</span><span class="n">c0</span>           <span class="n">xor</span> <span class="n">eax</span><span class="p">,</span> <span class="n">eax</span>
-<span class="mh">0x0000103e</span>      <span class="n">e8ddf9ffff</span>     <span class="n">call</span> <span class="n">sym</span><span class="p">.</span><span class="n">imp</span><span class="p">.</span><span class="n">read</span>
-<span class="p">...</span>
+<div class="highlight"><pre><span></span>[0x00000ac0]&gt; iz | grep &#39;#&gt;&#39;
+vaddr=0x00002adb paddr=0x00002adb ordinal=019 sz=16 len=15 section=.rodata type=ascii string=\n           #&gt;
+[0x00000ac0]&gt; axt 0x00002adb
+data 0x1007 lea rsi, [rip + 0x1acd] in sub.__printf_chk_0
+[0x00000ac0]&gt; pd @0x1007
+...
+0x00001032      31ff           xor edi, edi // 0 == STDIN
+0x00001034      4889e6         mov rsi, rsp // buffer on the stack
+0x00001037      ba00080000     mov edx, section..rela.plt  ; &quot;@? &quot; @ 0x800
+0x0000103c      31c0           xor eax, eax
+0x0000103e      e8ddf9ffff     call sym.imp.read
+...
 </pre></div>
 
 
@@ -275,13 +275,13 @@ jne 0x106a ;[e]
 <p>Due to the protections, one needs to exploit the binary using ROP.
 However looking into the provided libc shows that the <em>magic</em> ROP chain
 is present.</p>
-<div class="highlight"><pre><span></span><span class="nl">.text:</span><span class="err">000000000004652</span><span class="nf">C</span> <span class="no">mov</span>     <span class="no">rax</span><span class="p">,</span> <span class="no">cs</span><span class="p">:</span><span class="no">environ_ptr_0</span>
-<span class="nl">.text:</span><span class="err">0000000000046533</span> <span class="nf">lea</span>     <span class="no">rdi</span><span class="p">,</span> <span class="no">aBinSh</span>     <span class="c">; &quot;/bin/sh&quot;</span>
-<span class="no">.text</span><span class="p">:</span><span class="mi">000000000004653</span><span class="no">A</span> <span class="no">lea</span>     <span class="no">rsi</span><span class="p">,</span> <span class="p">[</span><span class="no">rsp</span><span class="err">+</span><span class="mi">180</span><span class="no">h</span><span class="err">+</span><span class="no">var_150</span><span class="p">]</span>
-<span class="nl">.text:</span><span class="err">000000000004653</span><span class="nf">F</span> <span class="no">mov</span>     <span class="no">cs</span><span class="p">:</span><span class="no">dword_3C06C0</span><span class="p">,</span> <span class="mi">0</span>
-<span class="nl">.text:</span><span class="err">0000000000046549</span> <span class="nf">mov</span>     <span class="no">cs</span><span class="p">:</span><span class="no">dword_3C06D0</span><span class="p">,</span> <span class="mi">0</span>
-<span class="nl">.text:</span><span class="err">0000000000046553</span> <span class="nf">mov</span>     <span class="no">rdx</span><span class="p">,</span> <span class="p">[</span><span class="no">rax</span><span class="p">]</span>
-<span class="nl">.text:</span><span class="err">0000000000046556</span> <span class="nf">call</span>    <span class="no">execve</span>
+<div class="highlight"><pre><span></span>.text:000000000004652C mov     rax, cs:environ_ptr_0
+.text:0000000000046533 lea     rdi, aBinSh     ; &quot;/bin/sh&quot;
+.text:000000000004653A lea     rsi, [rsp+180h+var_150]
+.text:000000000004653F mov     cs:dword_3C06C0, 0
+.text:0000000000046549 mov     cs:dword_3C06D0, 0
+.text:0000000000046553 mov     rdx, [rax]
+.text:0000000000046556 call    execve
 </pre></div>
 
 

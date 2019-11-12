@@ -85,8 +85,8 @@ ansible <span class="m">2</span>.2.0
 to run the different tasks on the Raspberry Pi.</p>
 <p>Create a playbook in a file named <code>rpitor.yml</code> and copy the following
 lines to it:</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">hosts</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">rpitor</span>
-  <span class="l l-Scalar l-Scalar-Plain">vars</span><span class="p p-Indicator">:</span>
+<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpitor</span>
+  <span class="nt">vars</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">torport=TODO</span>
     <span class="l l-Scalar l-Scalar-Plain">dirport=TODO</span>
     <span class="l l-Scalar l-Scalar-Plain">nodename=TODO</span>
@@ -107,25 +107,25 @@ computer to your Raspberry Pi to setup the tor relay.</p>
 <h2>Update the system and install the packages</h2>
 <p>The following tasks will install the needed packages to
 run tor; add those lines to the playbook.</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">rpi update</span>
-  <span class="l l-Scalar l-Scalar-Plain">shell</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">rpi-update</span>
-  <span class="l l-Scalar l-Scalar-Plain">become</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpi update</span>
+  <span class="nt">shell</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpi-update</span>
+  <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">update and upgrade</span>
-  <span class="l l-Scalar l-Scalar-Plain">apt</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update and upgrade</span>
+  <span class="nt">apt</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">update_cache=yes</span>
     <span class="l l-Scalar l-Scalar-Plain">upgrade=dist</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">install packages</span>
-  <span class="l l-Scalar l-Scalar-Plain">apt</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">install packages</span>
+  <span class="nt">apt</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name={{ item }}</span>
     <span class="l l-Scalar l-Scalar-Plain">state=installed</span>
-  <span class="l l-Scalar l-Scalar-Plain">with_items</span><span class="p p-Indicator">:</span>
+  <span class="nt">with_items</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">tor</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">tor-arm</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">stop tor</span>
-  <span class="l l-Scalar l-Scalar-Plain">service</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">stop tor</span>
+  <span class="nt">service</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=tor</span>
     <span class="l l-Scalar l-Scalar-Plain">state=stopped</span>
 </pre></div>
@@ -134,57 +134,57 @@ run tor; add those lines to the playbook.</p>
 <h2>Tweak the system</h2>
 <p>Some configs need to be set in order to run a tor relay. Feel
 free to adapt those to your likings.</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">update limits</span>
-  <span class="l l-Scalar l-Scalar-Plain">pam_limits</span><span class="p p-Indicator">:</span>
+<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update limits</span>
+  <span class="nt">pam_limits</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">domain=*</span>
     <span class="l l-Scalar l-Scalar-Plain">limit_type=-</span>
     <span class="l l-Scalar l-Scalar-Plain">limit_item=nofile</span>
     <span class="l l-Scalar l-Scalar-Plain">value=120000</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set nic buffer size</span>
-  <span class="l l-Scalar l-Scalar-Plain">shell</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/sbin/ifconfig eth0 txqueuelen 20000</span>
-  <span class="l l-Scalar l-Scalar-Plain">become</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set nic buffer size</span>
+  <span class="nt">shell</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/sbin/ifconfig eth0 txqueuelen 20000</span>
+  <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set configs permanent</span>
-  <span class="l l-Scalar l-Scalar-Plain">lineinfile</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set configs permanent</span>
+  <span class="nt">lineinfile</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">dest=/etc/rc.local</span>
     <span class="l l-Scalar l-Scalar-Plain">regexp=&quot;^/sbin/ifconfig eth0 txqueuelen 20000$&quot;</span>
     <span class="l l-Scalar l-Scalar-Plain">line=&quot;/sbin/ifconfig eth0 txqueuelen 20000&quot;</span>
     <span class="l l-Scalar l-Scalar-Plain">insertbefore=&quot;^exit 0$&quot;</span>
-  <span class="l l-Scalar l-Scalar-Plain">become</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 1/6</span>
-  <span class="l l-Scalar l-Scalar-Plain">sysctl</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 1/6</span>
+  <span class="nt">sysctl</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=vm.min_free_kbytes</span>
     <span class="l l-Scalar l-Scalar-Plain">value=16384</span>
     <span class="l l-Scalar l-Scalar-Plain">state=present</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 2/6</span>
-  <span class="l l-Scalar l-Scalar-Plain">sysctl</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 2/6</span>
+  <span class="nt">sysctl</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=net.netfilter.nf_conntrack_max</span>
     <span class="l l-Scalar l-Scalar-Plain">value=1000000</span>
     <span class="l l-Scalar l-Scalar-Plain">state=present</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 3/6</span>
-  <span class="l l-Scalar l-Scalar-Plain">sysctl</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 3/6</span>
+  <span class="nt">sysctl</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=net.core.rmem_max</span>
     <span class="l l-Scalar l-Scalar-Plain">value=26214400</span>
     <span class="l l-Scalar l-Scalar-Plain">state=present</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 4/6</span>
-  <span class="l l-Scalar l-Scalar-Plain">sysctl</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 4/6</span>
+  <span class="nt">sysctl</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=net.core.wmem_max</span>
     <span class="l l-Scalar l-Scalar-Plain">value=26214400</span>
     <span class="l l-Scalar l-Scalar-Plain">state=present</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 5/6</span>
-  <span class="l l-Scalar l-Scalar-Plain">sysctl</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 5/6</span>
+  <span class="nt">sysctl</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=net.core.rmem_default</span>
     <span class="l l-Scalar l-Scalar-Plain">value=26214400</span>
     <span class="l l-Scalar l-Scalar-Plain">state=present</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 6/6</span>
-  <span class="l l-Scalar l-Scalar-Plain">sysctl</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set sysctl settings 6/6</span>
+  <span class="nt">sysctl</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=net.core.wmem_default</span>
     <span class="l l-Scalar l-Scalar-Plain">value=26214400</span>
     <span class="l l-Scalar l-Scalar-Plain">state=present</span>
@@ -194,31 +194,31 @@ free to adapt those to your likings.</p>
 <h2>Setup tor</h2>
 <p>Finally create the tasks that will setup tor and
 start it.</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">set rights</span>
-  <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">dest=/var/lib/tor owner=debian-tor recurse=yes</span>
+<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set rights</span>
+  <span class="nt">file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dest=/var/lib/tor owner=debian-tor recurse=yes</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">stat logrotate for tor</span>
-  <span class="l l-Scalar l-Scalar-Plain">stat</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">path=/etc/logrotate.d/tor</span>
-  <span class="l l-Scalar l-Scalar-Plain">register</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">logrotate_stat</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">stat logrotate for tor</span>
+  <span class="nt">stat</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">path=/etc/logrotate.d/tor</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">logrotate_stat</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">disable logrotate for tor</span>
-  <span class="l l-Scalar l-Scalar-Plain">command</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">mv /etc/logrotate.d/tor /etc/logrotate.d/tor.disabled</span>
-  <span class="l l-Scalar l-Scalar-Plain">when</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">logrotate_stat.stat.exists</span>
-  <span class="l l-Scalar l-Scalar-Plain">become</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">disable logrotate for tor</span>
+  <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">mv /etc/logrotate.d/tor /etc/logrotate.d/tor.disabled</span>
+  <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">logrotate_stat.stat.exists</span>
+  <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">setup torrc</span>
-  <span class="l l-Scalar l-Scalar-Plain">template</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">setup torrc</span>
+  <span class="nt">template</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">src=/tmp/torrc.j2</span>
     <span class="l l-Scalar l-Scalar-Plain">dest=/etc/tor/torrc</span>
-  <span class="l l-Scalar l-Scalar-Plain">become</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">enable tor</span>
-  <span class="l l-Scalar l-Scalar-Plain">service</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">enable tor</span>
+  <span class="nt">service</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=tor</span>
     <span class="l l-Scalar l-Scalar-Plain">enabled=yes</span>
 
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">start tor</span>
-  <span class="l l-Scalar l-Scalar-Plain">service</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">start tor</span>
+  <span class="nt">service</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=tor</span>
     <span class="l l-Scalar l-Scalar-Plain">state=restarted</span>
 </pre></div>

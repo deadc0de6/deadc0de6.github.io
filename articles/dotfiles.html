@@ -138,22 +138,22 @@ engine will choose the right branch and drop the rest such that the resulting fi
 is a clean dotfile.</p>
 <p>Moreover using the config file you are able to specify what needs to be installed
 with which profile:</p>
-<div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">config</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">backup</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="l l-Scalar l-Scalar-Plain">create</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="l l-Scalar l-Scalar-Plain">dotpath</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">dotfiles</span>
-<span class="l l-Scalar l-Scalar-Plain">dotfiles</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">f_xinitrc</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">dst</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.xinitrc</span>
-    <span class="l l-Scalar l-Scalar-Plain">src</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">xinitrc</span>
-  <span class="l l-Scalar l-Scalar-Plain">f_vimrc</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">dst</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.vimrc</span>
-    <span class="l l-Scalar l-Scalar-Plain">src</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">vimrc</span>
-<span class="l l-Scalar l-Scalar-Plain">profiles</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">home</span><span class="p p-Indicator">:</span>
+<div class="highlight"><pre><span></span><span class="nt">config</span><span class="p">:</span>
+  <span class="nt">backup</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="nt">create</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="nt">dotpath</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dotfiles</span>
+<span class="nt">dotfiles</span><span class="p">:</span>
+  <span class="nt">f_xinitrc</span><span class="p">:</span>
+    <span class="nt">dst</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.xinitrc</span>
+    <span class="nt">src</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">xinitrc</span>
+  <span class="nt">f_vimrc</span><span class="p">:</span>
+    <span class="nt">dst</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.vimrc</span>
+    <span class="nt">src</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">vimrc</span>
+<span class="nt">profiles</span><span class="p">:</span>
+  <span class="nt">home</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_xinitrc</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_vimrc</span>
-  <span class="l l-Scalar l-Scalar-Plain">office</span><span class="p p-Indicator">:</span>
+  <span class="nt">office</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_xinitrc</span>
 </pre></div>
 
