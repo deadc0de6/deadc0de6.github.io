@@ -51,15 +51,14 @@
                 </header>
             </section>
             <p>This is a write-up for the <em>Madagascar</em> challenge of r2con 2018 CTF.</p>
-<div class="highlight"><pre><span></span>Are you sure what you see?
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Are you sure what you see?
+</code></pre></div>
 
 <p>binary: <a href="https://gitlab.com/deadc0de6/ctf/tree/master/2018-r2con/madagascar">scrabble_ad92a0e308d220dc89c4bc133e0ce64c</a></p>
 <p>The string <em>"Wk2p2pm3wg7eo7d"</em> is quickly found using <code>strings</code> and naively inserted
 as a valid flag, obviously without success ;-)</p>
 <p>Open the binary with <a href="https://github.com/radare/radare2">radare2</a> and explore the functions and the <em>main</em>:</p>
-<div class="highlight"><pre><span></span>$ radare2 scrabble_ad92a0e308d220dc89c4bc133e0ce64c
+<div class="highlight"><pre><span></span><code>$ radare2 scrabble_ad92a0e308d220dc89c4bc133e0ce64c
 <span class="o">[</span>0x004004c0<span class="o">]</span>&gt; aaa
 <span class="o">[</span>0x004004c0<span class="o">]</span>&gt; e asm.pseudo <span class="o">=</span> <span class="m">1</span>
 <span class="o">[</span>0x004004c0<span class="o">]</span>&gt; e asm.bytes <span class="o">=</span> <span class="m">0</span>
@@ -81,22 +80,19 @@ as a valid flag, obviously without success ;-)</p>
 0x00400734    <span class="m">1</span> <span class="m">9</span>            sym._fini
 <span class="o">[</span>0x004004c0<span class="o">]</span>&gt; s main
 <span class="o">[</span>0x004005d6<span class="o">]</span>&gt; pdf
-</pre></div>
-
+</code></pre></div>
 
 <p>Looking at the <em>main</em> function shows interesting information.</p>
 <p>First <code>local_10h</code> is initialized with a pointer to the string <em>"Wk2p2pm3wg7eo7d"</em>,</p>
-<div class="highlight"><pre><span></span>0x0040060e      qword <span class="o">[</span>local_10h<span class="o">]</span> <span class="o">=</span> str.Wk2p2pm3wg7eo7d
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>0x0040060e      qword <span class="o">[</span>local_10h<span class="o">]</span> <span class="o">=</span> str.Wk2p2pm3wg7eo7d
+</code></pre></div>
 
 <p>and below block loops through all chars until <code>\0</code> is hit.</p>
-<div class="highlight"><pre><span></span>0x00400666      <span class="nv">rax</span> <span class="o">=</span> qword <span class="o">[</span>local_10h<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>0x00400666      <span class="nv">rax</span> <span class="o">=</span> qword <span class="o">[</span>local_10h<span class="o">]</span>
 0x0040066a      <span class="nv">eax</span> <span class="o">=</span> byte <span class="o">[</span>rax<span class="o">]</span>
 0x0040066d      <span class="nv">var</span> <span class="o">=</span> al <span class="p">&amp;</span> al
 0x0040066f      <span class="k">if</span> <span class="o">(</span>var<span class="o">)</span> goto 0x400626
-</pre></div>
-
+</code></pre></div>
 
 <p>The block at address <code>0x00400626</code> called for each valid char in the string is
 decomposed below.</p>
@@ -106,7 +102,7 @@ decomposed below.</p>
 <li><code>local_30h</code> is a pointer to argv</li>
 <li><code>local_18h</code> is an int initialized to 0</li>
 </ul>
-<div class="highlight"><pre><span></span>0x00400626      <span class="nv">rax</span> <span class="o">=</span> qword <span class="o">[</span>local_10h<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>0x00400626      <span class="nv">rax</span> <span class="o">=</span> qword <span class="o">[</span>local_10h<span class="o">]</span>
 0x0040062a      <span class="nv">eax</span> <span class="o">=</span> byte <span class="o">[</span>rax<span class="o">]</span>
 Load char pointed by local_10h
 
@@ -141,11 +137,10 @@ add rax to local_14h
 0x0040065d      qword <span class="o">[</span>local_10h<span class="o">]</span> +<span class="o">=</span> <span class="m">1</span>
 0x00400662      dword <span class="o">[</span>local_18h<span class="o">]</span> +<span class="o">=</span> <span class="m">1</span>
 increment the pointer/counter
-</pre></div>
-
+</code></pre></div>
 
 <p>In other words:</p>
-<div class="highlight"><pre><span></span><span class="nb">input</span> <span class="o">=</span> <span class="s2">&quot;AAAAA&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nb">input</span> <span class="o">=</span> <span class="s2">&quot;AAAAA&quot;</span>
 <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;Wk2p2pm3wg7eo7d&quot;</span>
 <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -154,25 +149,22 @@ increment the pointer/counter
   <span class="n">i</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xf</span>
   <span class="n">res</span> <span class="o">+=</span> <span class="p">(</span><span class="n">s</span><span class="o">-</span><span class="n">i</span><span class="p">)</span>
   <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Finally the test that defines if we found the correct flag is done
 in block at <code>0x00400671</code></p>
-<div class="highlight"><pre><span></span>0x00400671      <span class="nv">var</span> <span class="o">=</span> dword <span class="o">[</span>local_14h<span class="o">]</span> - <span class="m">0</span>
+<div class="highlight"><pre><span></span><code>0x00400671      <span class="nv">var</span> <span class="o">=</span> dword <span class="o">[</span>local_14h<span class="o">]</span> - <span class="m">0</span>
 0x00400675      <span class="k">if</span> <span class="o">(</span>!var<span class="o">)</span> goto 0x400688
-</pre></div>
-
+</code></pre></div>
 
 <p>where <code>local_14h</code> should be 0 in order to win.</p>
 <p>That means that each input char must be equal to each respective char
 of the internal string xored with 0x03.</p>
 <p>Here's a small python one-liner to find the flag:</p>
-<div class="highlight"><pre><span></span>$ python
+<div class="highlight"><pre><span></span><code>$ python
 &gt;&gt;&gt; <span class="s1">&#39;&#39;</span>.join<span class="o">([</span>chr<span class="o">(</span>ord<span class="o">(</span>x<span class="o">)</span>^0x3<span class="o">)</span> <span class="k">for</span> x in <span class="s2">&quot;Wk2p2pm3wg7eo7d&quot;</span><span class="o">])</span>
 <span class="s1">&#39;Th1s1sn0td4fl4g&#39;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Enter the flag and win!</p>
 <p>I then tried to solve this with <a href="https://github.com/angr/angr">angr</a> as an exercise.
@@ -186,13 +178,13 @@ multiple.
 Still only one flag was valid for scoring that challenge. If that was purposely
 used to avoid the use of angr, it worked ;-)</p>
 <p>Below my angr script as a reference</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python2</span>
 
 <span class="kn">import</span> <span class="nn">angr</span>
 <span class="kn">import</span> <span class="nn">claripy</span>
 
 <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;./scrabble_ad92a0e308d220dc89c4bc133e0ce64c&#39;</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">angr</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">load_options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;auto_load_libs&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">})</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">angr</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">load_options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;auto_load_libs&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">})</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">entry_state</span><span class="p">()</span>
 
 <span class="c1"># construct the argument</span>
@@ -202,7 +194,7 @@ used to avoid the use of angr, it worked ;-)</p>
 <span class="n">argv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pwd</span><span class="p">)</span>
 
 <span class="n">state</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">entry_state</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">argv</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
     <span class="n">current_byte</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">get_byte</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
     <span class="n">state</span><span class="o">.</span><span class="n">add_constraints</span><span class="p">(</span>
         <span class="n">claripy</span><span class="o">.</span><span class="n">Or</span><span class="p">(</span>
@@ -218,8 +210,8 @@ used to avoid the use of angr, it worked ;-)</p>
     <span class="c1"># we have a valid path to success</span>
     <span class="n">found</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">found</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">found</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">eval_upto</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">,</span> <span class="n">cast_to</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-    <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-</pre></div>
+    <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</code></pre></div>
 <footer class="footer">
     <p>
     &copy; 2015 deadc0de

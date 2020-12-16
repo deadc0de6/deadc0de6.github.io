@@ -53,32 +53,27 @@
 useful to be able to choose which key to use: a local SSH key (defaults to <code>~/.ssh/id_rsa</code>)
 or the one on the YubiKey.</p>
 <p>The common way of selecting a specific SSH key with <code>ssh</code> is to specify it with the <code>-i</code> switch:</p>
-<div class="highlight"><pre><span></span>ssh -i ~/.ssh/id_rsa user@somehost
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>ssh -i ~/.ssh/id_rsa user@somehost
+</code></pre></div>
 
 <p>Or for example for cloning a repository:</p>
-<div class="highlight"><pre><span></span><span class="nv">GIT_SSH_COMMAND</span><span class="o">=</span><span class="s1">&#39;ssh -i ~/.ssh/id_rsa&#39;</span> git clone git@&lt;somehost&gt;:&lt;someuser&gt;/&lt;somerepo&gt;.git
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="nv">GIT_SSH_COMMAND</span><span class="o">=</span><span class="s1">&#39;ssh -i ~/.ssh/id_rsa&#39;</span> git clone git@&lt;somehost&gt;:&lt;someuser&gt;/&lt;somerepo&gt;.git
+</code></pre></div>
 
 <p>Another solution would be to insert this config in <code>~/.ssh/config</code>, for example</p>
-<div class="highlight"><pre><span></span>Host &lt;somehost&gt;
+<div class="highlight"><pre><span></span><code>Host &lt;somehost&gt;
    IdentityFile ~/.ssh/id_rsa
-</pre></div>
-
+</code></pre></div>
 
 <p>When you however want to force <code>ssh</code> to use the SSH key from your YubiKey instead of a
 local key, you'd have to specify it in some way, here's how.</p>
 <p>First extract the SSH public key from your YubiKey. Either using gpg2 with</p>
-<div class="highlight"><pre><span></span>gpg2 --export-ssh-key &lt;keyid&gt; &gt; ~/.ssh/id_rsa_yubi.pub
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>gpg2 --export-ssh-key &lt;keyid&gt; &gt; ~/.ssh/id_rsa_yubi.pub
+</code></pre></div>
 
 <p>or through ssh-agent</p>
-<div class="highlight"><pre><span></span>ssh-add -L <span class="p">|</span> grep <span class="s2">&quot;cardno&quot;</span> &gt; ~/.ssh/id_rsa_yubi.pub
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>ssh-add -L <span class="p">|</span> grep <span class="s2">&quot;cardno&quot;</span> &gt; ~/.ssh/id_rsa_yubi.pub
+</code></pre></div>
 
 <p>That public key (<code>~/.ssh/id_rsa_yubi.pub</code>) can then be used with the usual SSH switch <code>-i</code> like
 the above to force <code>ssh</code> to use the key from your YubiKey.</p>

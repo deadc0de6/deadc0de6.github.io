@@ -114,7 +114,7 @@ to reflect what you want.</p>
 <p>A template for jinja2 needs to be set up for <em>.xinitrc</em> such that different versions of
 that file are installed using dotdrop (no worry it's straight forward and doesn't
 need much to be efficient):</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
 
 <span class="c1"># load Xresources</span>
 <span class="nv">userresources</span><span class="o">=</span><span class="nv">$HOME</span>/.Xresources
@@ -128,8 +128,7 @@ need much to be efficient):</p>
 <span class="o">{</span>%@@ <span class="k">elif</span> <span class="nv">profile</span> <span class="o">==</span> <span class="s2">&quot;office&quot;</span> @@%<span class="o">}</span>
 <span class="nb">exec</span> bspwm
 <span class="o">{</span>%@@ endif @@%<span class="o">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When the above dotfile is deployed it will result in two different file depending
 if you are running it from the <em>home</em> profile or the <em>office</em> one
@@ -138,7 +137,7 @@ engine will choose the right branch and drop the rest such that the resulting fi
 is a clean dotfile.</p>
 <p>Moreover using the config file you are able to specify what needs to be installed
 with which profile:</p>
-<div class="highlight"><pre><span></span><span class="nt">config</span><span class="p">:</span>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
   <span class="nt">backup</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
   <span class="nt">create</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
   <span class="nt">dotpath</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dotfiles</span>
@@ -155,8 +154,7 @@ with which profile:</p>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_vimrc</span>
   <span class="nt">office</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f_xinitrc</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Hope this tool will be useful to some. If you have issues using it or want to contribute,
 feel free to do a PR or create an issue on <a href="https://github.com/deadc0de6/dotdrop">dotdrop's page on github</a>.</p>

@@ -52,38 +52,34 @@
             <p>Some neat unix tricks</p>
 <h2>port scanning using the shell</h2>
 <p>It is easy to port scan using simple unix tools</p>
-<div class="highlight"><pre><span></span>$ <span class="nv">host</span><span class="o">=</span><span class="s2">&quot;some host&quot;</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nv">host</span><span class="o">=</span><span class="s2">&quot;some host&quot;</span>
 $ <span class="nv">port</span><span class="o">=</span><span class="s2">&quot;some port&quot;</span>
 $ timeout <span class="m">3</span> bash -c <span class="s2">&quot;echo &gt;/dev/tcp/</span><span class="nv">$host</span><span class="s2">/</span><span class="nv">$port</span><span class="s2">&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> open <span class="o">||</span> <span class="nb">echo</span> closed
-</pre></div>
-
+</code></pre></div>
 
 <h2>sed in-place replacement with backup</h2>
 <p>Sed is often used to act on file in-place. It is very convenient to be able
 on a single command line to also backup the file.</p>
-<div class="highlight"><pre><span></span><span class="c1"># replace SOMETHING by ELSE in the file</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># replace SOMETHING by ELSE in the file</span>
 <span class="c1"># and create a backup file named bar.txt.bak</span>
 $ sed -i.bak <span class="s1">&#39;s/SOMETHING/ELSE/g&#39;</span> bar.txt
 <span class="c1"># remove from the third to the last line of the file</span>
 <span class="c1"># and create a backup file named bar.txt.bak</span>
 $ sed -i.bak <span class="s1">&#39;3,$d&#39;</span> bar.txt
-</pre></div>
-
+</code></pre></div>
 
 <h2>remove empty lines in file</h2>
 <p>Getting rid of empty lines in a file is easy with sed.
 <code>/^$/</code> will find lines with nothing between the beginning of the line (<code>^</code>)
 and the end of it (<code>$</code>) and then <code>d</code> deletes it:</p>
-<div class="highlight"><pre><span></span>$ sed <span class="s1">&#39;/^$/d&#39;</span> &lt;file-path&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ sed <span class="s1">&#39;/^$/d&#39;</span> &lt;file-path&gt;
+</code></pre></div>
 
 <h2>insert file in vim</h2>
 <p>It sometimes happen you want to insert a entire file at the cursor position
 in vim. This is the command that will do that:</p>
-<div class="highlight"><pre><span></span>:r &lt;file-path&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>:r &lt;file-path&gt;
+</code></pre></div>
 
 <h2>remove file with weird names</h2>
 <p>Sometimes you have files that get created (or you created them by error) that
@@ -91,18 +87,16 @@ are not that easy to remove without potentially messing things up
 like for example <em>--</em>, <em>~</em>, <em>/</em>, ...</p>
 <p>The trick is first to retrieve the inode number of that file by listing
 all files in the directory:</p>
-<div class="highlight"><pre><span></span>$ ls -i
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ ls -i
+</code></pre></div>
 
 <p>And then remove the file by its inode number using find:</p>
-<div class="highlight"><pre><span></span>$ find . -inum &lt;inode-num&gt; -exec rm <span class="o">{}</span> <span class="se">\;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ find . -inum &lt;inode-num&gt; -exec rm <span class="o">{}</span> <span class="se">\;</span>
+</code></pre></div>
 
 <h2>reverse lines in file</h2>
 <p>You probably know <code>cat</code>, well there's also <code>tac</code>:</p>
-<div class="highlight"><pre><span></span>$ cat /tmp/foo
+<div class="highlight"><pre><span></span><code>$ cat /tmp/foo
 Line <span class="m">1</span>
 Line <span class="m">2</span>
 Line <span class="m">3</span>
@@ -110,32 +104,29 @@ $ tac /tmp/foo
 Line <span class="m">3</span>
 Line <span class="m">2</span>
 Line <span class="m">1</span>
-</pre></div>
-
+</code></pre></div>
 
 <h2>get N random lines from a file</h2>
 <p><code>randomize-lines</code> is a nice tool allowing to quickly (and easily) randomize
 lines of a file. After installation, its binary is <code>rl</code> (at least on debian).
 Combining it with <code>head</code> allows to retrieve N random lines from a file</p>
-<div class="highlight"><pre><span></span><span class="c1"># retrieveing 100 random lines from foo.txt</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># retrieveing 100 random lines from foo.txt</span>
 $ rl foo.txt <span class="p">|</span> head -100
-</pre></div>
-
+</code></pre></div>
 
 <h2>execute last command as root</h2>
 <p>I rarely use sudo, but when I need to, I usually forget it.
 This allows to execute latest command with sudo:</p>
-<div class="highlight"><pre><span></span>$ sudo !!
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ sudo !!
+</code></pre></div>
 
 <h2>get your bandwidth from the cli</h2>
 <p>The tool <a href="https://github.com/sivel/speedtest-cli">speedtest-cli</a> is very useful
 to retrieve the current download/upload speed.</p>
-<div class="highlight"><pre><span></span>$ speedtest-cli <span class="p">|</span> grep <span class="s1">&#39;Download\|Upload&#39;</span>
+<div class="highlight"><pre><span></span><code>$ speedtest-cli <span class="p">|</span> grep <span class="s1">&#39;Download\|Upload&#39;</span>
 Download: <span class="m">711</span>.94 Mbit/s
 Upload: <span class="m">264</span>.28 Mbit/s
-</pre></div>
+</code></pre></div>
 <footer class="footer">
     <p>
     &copy; 2015 deadc0de

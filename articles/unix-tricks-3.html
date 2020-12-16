@@ -53,54 +53,46 @@
 <h2>scp when there are too many arguments</h2>
 <p>Sometimes you want to retrieve a lot of files from a remote location but
 the expension of star (*) in bash returns the following error</p>
-<div class="highlight"><pre><span></span>Argument list too long
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Argument list too long
+</code></pre></div>
 
 <p>One way of fixing it is to leverage <code>find</code> and its nice <em>-exec</em> switch:</p>
-<div class="highlight"><pre><span></span>$ ssh &lt;user&gt;@&lt;remote-host&gt; <span class="s1">&#39;find &lt;path-where-files-are&gt; -type f -name &quot;&lt;some-regex&gt;&quot; | tar czvf - --files-from -&#39;</span> <span class="p">|</span> tar zxvf - -C &lt;local-destination&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ ssh &lt;user&gt;@&lt;remote-host&gt; <span class="s1">&#39;find &lt;path-where-files-are&gt; -type f -name &quot;&lt;some-regex&gt;&quot; | tar czvf - --files-from -&#39;</span> <span class="p">|</span> tar zxvf - -C &lt;local-destination&gt;
+</code></pre></div>
 
 <p>As a reminder, following command allows to retrieve the max number of arguments
 that can be passed to a command:</p>
-<div class="highlight"><pre><span></span>$ getconf ARG_MAX
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ getconf ARG_MAX
+</code></pre></div>
 
 <h2>Reload groups without logging out</h2>
 <p>Simple trick to avoid to log out to apply new groups</p>
-<div class="highlight"><pre><span></span>$ id
+<div class="highlight"><pre><span></span><code>$ id
 $ su - <span class="nv">$USER</span>
 $ id
-</pre></div>
-
+</code></pre></div>
 
 <h2>Find file newer or older than a specific date</h2>
 <p>Create a file with the to-be-tested timestamp
 (format: YYYYMMDDHHMM, see also the manpage)</p>
-<div class="highlight"><pre><span></span>$ touch -t <span class="m">201501010000</span> /tmp/timestamp
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ touch -t <span class="m">201501010000</span> /tmp/timestamp
+</code></pre></div>
 
 <p>Then query with find</p>
-<div class="highlight"><pre><span></span>$ find &lt;some-path&gt; -newer /tmp/timestamp
+<div class="highlight"><pre><span></span><code>$ find &lt;some-path&gt; -newer /tmp/timestamp
 $ find &lt;some-path&gt; -not -newer /tmp/timestamp
-</pre></div>
-
+</code></pre></div>
 
 <h2>Chown symlink</h2>
 <p>How to chown a symlink</p>
-<div class="highlight"><pre><span></span>$ chown -h &lt;user&gt;:&lt;group&gt; &lt;symlink&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ chown -h &lt;user&gt;:&lt;group&gt; &lt;symlink&gt;
+</code></pre></div>
 
 <h2>Gateway routing</h2>
 <p>Check which gateway would be used for routing a specific
 IP:</p>
-<div class="highlight"><pre><span></span>$ ip route get &lt;IP&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ ip route get &lt;IP&gt;
+</code></pre></div>
 
 <h2>Randomize-lines replacement</h2>
 <p>The package <code>Randomize-lines</code> that provides the quite useful <code>rl</code> for
@@ -108,21 +100,19 @@ randomizing lines has been removed in latest Ubuntu version
 (Xenial and newer).</p>
 <p>A replacement for this is the <code>shuf</code> tool.</p>
 <p>For example to retrieve a random line from a file</p>
-<div class="highlight"><pre><span></span>$ shuf -n <span class="m">1</span> &lt;some-file&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ shuf -n <span class="m">1</span> &lt;some-file&gt;
+</code></pre></div>
 
 <h2>script duration</h2>
 <p>Ever wanted to know the duration of a specific bash script ? The
 following oneliner allows to do that easily:</p>
-<div class="highlight"><pre><span></span>date -u -d @<span class="si">${</span><span class="nv">SECONDS</span><span class="si">}</span> +%T
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>date -u -d @<span class="si">${</span><span class="nv">SECONDS</span><span class="si">}</span> +%T
+</code></pre></div>
 
 <h2>ps tree-style</h2>
 <p>Display <code>ps</code> output with the processes hierarchy:</p>
-<div class="highlight"><pre><span></span>ps aux --forest
-</pre></div>
+<div class="highlight"><pre><span></span><code>ps aux --forest
+</code></pre></div>
 <footer class="footer">
     <p>
     &copy; 2015 deadc0de

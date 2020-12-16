@@ -50,7 +50,7 @@
                 </header>
             </section>
             <p>This is what happened to me the other day on my RAIDZ-1:</p>
-<div class="highlight"><pre><span></span>$ sudo zpool status apool -x
+<div class="highlight"><pre><span></span><code>$ sudo zpool status apool -x
   pool: apool
  state: DEGRADED
 status: One or more devices are faulted in response to persistent errors.
@@ -69,8 +69,7 @@ config:
       d       ONLINE       <span class="m">0</span>     <span class="m">0</span>    <span class="m">11</span>
 
 errors: No known data errors
-</pre></div>
-
+</code></pre></div>
 
 <p>It is as bad as it looks like. I had a ZFS pool with 3 disks and one decided to fail.
 I had seen some smart warning but never gave it the attention needed
@@ -80,15 +79,14 @@ I had seen some smart warning but never gave it the attention needed
 number using <a href="https://www.smartmontools.org/">smartctl</a>. Obviously if your disk is unreachable
 by <code>smartctl</code>, you'll have to get the healthy ones's serials and go by deduction from there.</p>
 <p>Here's the <code>smartctl</code> command to get a device's serial:</p>
-<div class="highlight"><pre><span></span>$ sudo smartctl -i /dev/sdXXX <span class="p">|</span> grep -i <span class="s1">&#39;Serial Number&#39;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ sudo smartctl -i /dev/sdXXX <span class="p">|</span> grep -i <span class="s1">&#39;Serial Number&#39;</span>
+</code></pre></div>
 
 <p>Another way is to use <code>ledctl</code> from the <a href="https://sourceforge.net/projects/ledmon/">ledmon</a>
 tool. A little software which will allow you to control storage leds and thus identify physically
 your device.</p>
 <p>Here's how the pool looks like once the failing disk has been removed:</p>
-<div class="highlight"><pre><span></span>$ sudo zpool status
+<div class="highlight"><pre><span></span><code>$ sudo zpool status
   pool: apool
  state: DEGRADED
 status: One or more devices could not be used because the label is missing or
@@ -107,14 +105,13 @@ config:
       c                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
 
 errors: No known data errors
-</pre></div>
-
+</code></pre></div>
 
 <p>It is still working but in a <em>degraded</em> state, what means that hopefully no other disk
 goes sick !</p>
 <h1>Replacing the disk in the pool</h1>
 <p>Once you get your new device, here's the process to replace it in the zfs pool.</p>
-<div class="highlight"><pre><span></span>$ sudo zpool status
+<div class="highlight"><pre><span></span><code>$ sudo zpool status
   pool: apool
  state: DEGRADED
 status: One or more devices could not be used because the label is missing or
@@ -133,21 +130,18 @@ config:
             d                     ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
 
 errors: No known data errors
-</pre></div>
-
+</code></pre></div>
 
 <p>First put the old device offline:</p>
-<div class="highlight"><pre><span></span>sudo zpool offline apool <span class="m">11743263287665849900</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>sudo zpool offline apool <span class="m">11743263287665849900</span>
+</code></pre></div>
 
 <p>And finally replace with the new mounted disk:</p>
-<div class="highlight"><pre><span></span>sudo zpool replace apool /dev/mapper/c
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>sudo zpool replace apool /dev/mapper/c
+</code></pre></div>
 
 <p>Now the pool is rebuilding using the new disk (<em>resilvering</em> in the zfs world):</p>
-<div class="highlight"><pre><span></span>$ sudo zpool status
+<div class="highlight"><pre><span></span><code>$ sudo zpool status
   pool: apool
  state: DEGRADED
 status: One or more devices is currently being resilvered.  The pool will
@@ -168,8 +162,7 @@ config:
             d                       ONLINE       <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span>
 
 errors: No known data errors
-</pre></div>
-
+</code></pre></div>
 
 <p>With the above command, you can see the progress <code>...resilvered, 2.49% done...</code> and the
 expected duration: <code>4h52m to go</code>.</p>

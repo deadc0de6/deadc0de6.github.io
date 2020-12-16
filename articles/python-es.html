@@ -67,7 +67,7 @@ features I've used and found very nice:</p>
 <h3>Filtering</h3>
 <p>With these libraries, constructing your query is now way easier than
 using some json:</p>
-<div class="highlight"><pre><span></span><span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="o">...</span>
 <span class="kn">import</span> <span class="nn">elasticsearch</span>
 <span class="kn">from</span> <span class="nn">elasticsearch_dsl</span> <span class="kn">import</span> <span class="n">Search</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">F</span>
 <span class="o">...</span>
@@ -85,8 +85,7 @@ using some json:</p>
 <span class="c1"># sort the results</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sort</span><span class="p">({</span><span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span><span class="p">}})</span>
 <span class="o">...</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>As shown above, you can think of any type of filters without having to
 fight with json syntax and stuff. For more info on the different types of
@@ -97,7 +96,7 @@ ES filter, see
 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html">scroll searches</a>.</p>
 <p>This is very efficient when you need to retrieve a bunch of documents/results on
 a very large index. And it's quite elegant in python:</p>
-<div class="highlight"><pre><span></span><span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="o">...</span>
 <span class="kn">import</span> <span class="nn">elasticsearch</span>
 <span class="kn">from</span> <span class="nn">elasticsearch_dsl</span> <span class="kn">import</span> <span class="n">Search</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">F</span>
 <span class="o">...</span>
@@ -121,8 +120,7 @@ a very large index. And it's quite elegant in python:</p>
     <span class="o">...</span>
     <span class="k">return</span> <span class="n">gotten</span>
 <span class="o">...</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Scroll searches provide you with a kind of snapshot of your data and
 allows you to retrieve it in batch. Called

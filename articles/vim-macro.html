@@ -53,13 +53,12 @@ Vim's macros allow you to repeat a <em>recording</em> of
 a sequence of command.</p>
 <p>For the following examples, I will use this content,
 the goal is to remove the spaces and the trailing commas.</p>
-<div class="highlight"><pre><span></span>a, 2,
+<div class="highlight"><pre><span></span><code>a, 2,
 b, 3,
 c, 4,
 d, 5,
 e, 6,
-</pre></div>
-
+</code></pre></div>
 
 <h2>Using visual block mode</h2>
 <p>Although this article is about using macros, I will start with the way I was doing it
@@ -69,16 +68,14 @@ applying a command to the entire column.</p>
 <ul>
 <li>
 <p>Select the spaces and delete them</p>
-<div class="highlight"><pre><span></span>f&lt;space&gt;&lt;CTRL&gt;v99jx
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>f&lt;space&gt;&lt;CTRL&gt;v99jx
+</code></pre></div>
 
 </li>
 <li>
 <p>Go to the end of the line, select the commas and delete them</p>
-<div class="highlight"><pre><span></span>$&lt;CTRL&gt;v99jx
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$&lt;CTRL&gt;v99jx
+</code></pre></div>
 
 </li>
 </ul>
@@ -136,11 +133,10 @@ the command with a count as for example <code>99@m</code>.</p>
 <h2>Using macro III</h2>
 <p>This is another nice example of the power of vim's macro.</p>
 <p>Our example file:</p>
-<div class="highlight"><pre><span></span>a,&quot;this is a&quot;
+<div class="highlight"><pre><span></span><code>a,&quot;this is a&quot;
 b,&quot;this is b&quot;
 c,&quot;this is c&quot;
-</pre></div>
-
+</code></pre></div>
 
 <p>The goal is to replace what is inside the quotes with <em>is no more</em>
 and add the first char of the line at the beginning of that text

@@ -63,7 +63,7 @@ to install and set up a tor relay.</p>
 <p>To get the <a href="https://docs.ansible.com/ansible/intro_installation.html#running-from-source">latest version of ansible</a>,
 run the following on Debian/Ubuntu. For other distribution,
 follow the <a href="https://docs.ansible.com/ansible/intro_installation.html#running-from-source">ansible <em>installation from source</em> doc</a>:</p>
-<div class="highlight"><pre><span></span>$ sudo apt-get update <span class="o">&amp;&amp;</span> sudo apt-get install python-pip python-dev git -y
+<div class="highlight"><pre><span></span><code>$ sudo apt-get update <span class="o">&amp;&amp;</span> sudo apt-get install python-pip python-dev git -y
 $ sudo pip install PyYAML jinja2 paramiko
 $ git clone https://github.com/ansible/ansible.git --recursive /tmp/ansible
 $ <span class="nb">cd</span> /tmp/ansible
@@ -72,26 +72,23 @@ $ sudo mkdir -p /etc/ansible
 $ sudo cp /tmp/ansible/examples/hosts /etc/ansible/.
 $ <span class="nb">cd</span> -
 $ sudo rm -rf /tmp/ansible
-</pre></div>
-
+</code></pre></div>
 
 <p>Then make sure you're running the latest version with</p>
-<div class="highlight"><pre><span></span>$ ansible --version
+<div class="highlight"><pre><span></span><code>$ ansible --version
 ansible <span class="m">2</span>.2.0
-</pre></div>
-
+</code></pre></div>
 
 <p>We will be using <a href="https://docs.ansible.com/ansible/playbooks.html">ansible-playbook</a> in order
 to run the different tasks on the Raspberry Pi.</p>
 <p>Create a playbook in a file named <code>rpitor.yml</code> and copy the following
 lines to it:</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpitor</span>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span> <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpitor</span>
   <span class="nt">vars</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">torport=TODO</span>
     <span class="l l-Scalar l-Scalar-Plain">dirport=TODO</span>
     <span class="l l-Scalar l-Scalar-Plain">nodename=TODO</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We will then need to complete this file with specific tasks that are to be executed from your host
 computer to your Raspberry Pi to setup the tor relay.</p>
@@ -107,7 +104,7 @@ computer to your Raspberry Pi to setup the tor relay.</p>
 <h2>Update the system and install the packages</h2>
 <p>The following tasks will install the needed packages to
 run tor; add those lines to the playbook.</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpi update</span>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpi update</span>
   <span class="nt">shell</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpi-update</span>
   <span class="nt">become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 
@@ -128,13 +125,12 @@ run tor; add those lines to the playbook.</p>
   <span class="nt">service</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=tor</span>
     <span class="l l-Scalar l-Scalar-Plain">state=stopped</span>
-</pre></div>
-
+</code></pre></div>
 
 <h2>Tweak the system</h2>
 <p>Some configs need to be set in order to run a tor relay. Feel
 free to adapt those to your likings.</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update limits</span>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update limits</span>
   <span class="nt">pam_limits</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">domain=*</span>
     <span class="l l-Scalar l-Scalar-Plain">limit_type=-</span>
@@ -188,13 +184,12 @@ free to adapt those to your likings.</p>
     <span class="l l-Scalar l-Scalar-Plain">name=net.core.wmem_default</span>
     <span class="l l-Scalar l-Scalar-Plain">value=26214400</span>
     <span class="l l-Scalar l-Scalar-Plain">state=present</span>
-</pre></div>
-
+</code></pre></div>
 
 <h2>Setup tor</h2>
 <p>Finally create the tasks that will setup tor and
 start it.</p>
-<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set rights</span>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set rights</span>
   <span class="nt">file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dest=/var/lib/tor owner=debian-tor recurse=yes</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">stat logrotate for tor</span>
@@ -221,13 +216,12 @@ start it.</p>
   <span class="nt">service</span><span class="p">:</span>
     <span class="l l-Scalar l-Scalar-Plain">name=tor</span>
     <span class="l l-Scalar l-Scalar-Plain">state=restarted</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The jinja <a href="https://docs.ansible.com/ansible/template_module.html">template</a> used for the <code>torrc</code>
 file is the following and has to be
 saved in a file named <code>/tmp/torrc.j2</code> (it is referenced in the above <em>setup torrc</em> task):</p>
-<div class="highlight"><pre><span></span><span class="x">Log notice file /var/log/tor/notices.log</span>
+<div class="highlight"><pre><span></span><code><span class="x">Log notice file /var/log/tor/notices.log</span>
 <span class="x">RunAsDaemon 1</span>
 <span class="x">ControlPort 9051</span>
 <span class="x">ORPort </span><span class="cp">{{</span> <span class="nv">torport</span> <span class="cp">}}</span><span class="x"></span>
@@ -238,8 +232,7 @@ saved in a file named <code>/tmp/torrc.j2</code> (it is referenced in the above 
 <span class="x">DisableDebuggerAttachment 0</span>
 <span class="x">AvoidDiskWrites 1</span>
 <span class="x">SocksPort 0</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>For more information on the different options used on your tor relay,
 see the <a href="https://www.torproject.org/docs/tor-manual.html.en">official doc</a>
@@ -248,21 +241,18 @@ and the <a href="https://www.torproject.org/docs/faq">FAQ</a>.</p>
 <p>Now it's time to actually execute this playbook so that all the above defined
 tasks will be applied on the Raspberry Pi.</p>
 <p>Copy your public ssh key to your Raspberry Pi:</p>
-<div class="highlight"><pre><span></span>$ ssh-copy-id pi@&lt;rpi-IP&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ ssh-copy-id pi@&lt;rpi-IP&gt;
+</code></pre></div>
 
 <p>And make sure you're able to ssh to your Raspberry Pi with your key.</p>
 <p>create the inventory file:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">echo</span> <span class="s1">&#39;[rpitor]&#39;</span> &gt; /tmp/torpi.hosts
+<div class="highlight"><pre><span></span><code>$ <span class="nb">echo</span> <span class="s1">&#39;[rpitor]&#39;</span> &gt; /tmp/torpi.hosts
 $ <span class="nb">echo</span> <span class="s1">&#39;&lt;rpi-IP&gt;&#39;</span> &gt;&gt; /tmp/torpi.hosts
-</pre></div>
-
+</code></pre></div>
 
 <p>and then run the playbook:</p>
-<div class="highlight"><pre><span></span>$ ansible-playbook -u pi -i /tmp/torpi.hosts rpitor.yml
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ ansible-playbook -u pi -i /tmp/torpi.hosts rpitor.yml
+</code></pre></div>
 
 <p>You can of course run the same playbook multiple times since ansible provides
 idempotency (running multiple times will end up with the same result).</p>

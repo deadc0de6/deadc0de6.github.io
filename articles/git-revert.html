@@ -51,17 +51,16 @@
 reverting a merge if you plan on merging it some later times !</strong></p>
 <p>Let's consider an example in order to understand why this could be a problem.
 First create a repository:</p>
-<div class="highlight"><pre><span></span>mkdir repo<span class="p">;</span> <span class="nb">cd</span> repo<span class="p">;</span> git init
+<div class="highlight"><pre><span></span><code>mkdir repo<span class="p">;</span> <span class="nb">cd</span> repo<span class="p">;</span> git init
 <span class="nb">echo</span> <span class="s1">&#39;master-file-1&#39;</span> &gt; master-file-1
 git add *
 git commit -a -m <span class="s1">&#39;master-file-1&#39;</span>
 
 <span class="c1"># master --o--H</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now a new branch <em>branch</em> is created and two files are added to it</p>
-<div class="highlight"><pre><span></span>git checkout -b branch
+<div class="highlight"><pre><span></span><code>git checkout -b branch
 <span class="nb">echo</span> <span class="s1">&#39;branch-file-1&#39;</span> &gt; branch-file-1
 <span class="nb">echo</span> <span class="s1">&#39;branch-file-2&#39;</span> &gt; branch-file-2
 git add *
@@ -70,30 +69,27 @@ git commit -a -m <span class="s1">&#39;branch-file-*&#39;</span>
 <span class="c1"># master --o--H</span>
 <span class="c1">#           \</span>
 <span class="c1"># branch     o--H</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>At this time the <em>branch</em> branch is (supposingly) ready to be merged with master</p>
-<div class="highlight"><pre><span></span><span class="c1"># now comes the merge (M)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># now comes the merge (M)</span>
 git checkout master
 git merge branch
 
 <span class="c1"># master --o------M--H</span>
 <span class="c1">#           \    /</span>
 <span class="c1"># branch     o--o</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>However for some reason the merge needs to be reverted (issue with master, unstable, not the right
 time, etc)</p>
-<div class="highlight"><pre><span></span><span class="c1"># now comes the revert (W)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># now comes the revert (W)</span>
 git revert &lt;commit&gt;
 
 <span class="c1"># master --o------M--W--H</span>
 <span class="c1">#           \    /</span>
 <span class="c1"># branch     o--o</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This is not directly an error, but it could become an issue if you don't realize
 what was exactly done here. A revert will actually create a new commit that is the opposite
@@ -105,7 +101,7 @@ have been removed. This commit is more recent that the one that actually added t
 the first place. Thus if those file are not changed, they will never be added in a future
 merge.</p>
 <p>Let's see that with an example. One of the two files is updated in the <em>branch</em> branch</p>
-<div class="highlight"><pre><span></span><span class="c1"># update branch (C)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># update branch (C)</span>
 git checkout branch
 <span class="nb">echo</span> <span class="s1">&#39;some change&#39;</span> &gt; branch-file-2
 git commit -a -m <span class="s1">&#39;update&#39;</span>
@@ -113,19 +109,17 @@ git commit -a -m <span class="s1">&#39;update&#39;</span>
 <span class="c1"># master --o------M--W--H</span>
 <span class="c1">#           \    /</span>
 <span class="c1"># branch     o--o-------C--H</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>And the new version of the branch is merged</p>
-<div class="highlight"><pre><span></span><span class="c1"># and re-merge (Y)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># and re-merge (Y)</span>
 git checkout master
 git merge branch
 
 <span class="c1"># master --o------M--W---Y--H</span>
 <span class="c1">#           \    /      /</span>
 <span class="c1"># branch     o--o------C--H</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now two things are happening, first a conflict arises between the two versions of the <em>branch-file-2</em>,
 the one in master that was deleted and the one from branch <em>branch</em>  that was modified. That is expected and needs
@@ -135,7 +129,7 @@ in a commit that is more recent than the one that actually created it but it mig
 without having understood exactly what the first revert did.</p>
 <p>How to fix this then and actually have <strong>all changes</strong> from branch <em>branch</em> being merged into master ?
 Well the revert (W) needs to be reverted first and then the whole branch <em>branch</em> re-merged in Master.</p>
-<div class="highlight"><pre><span></span><span class="c1"># revert the revert (X) and merge (N)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># revert the revert (X) and merge (N)</span>
 git checkout master
 git revert &lt;revert-commit&gt;
 git merge branch
@@ -143,8 +137,7 @@ git merge branch
 <span class="c1"># master --o------M--W--X---N--H</span>
 <span class="c1">#           \    /         /</span>
 <span class="c1"># branch     o--o---------C--H</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>That's it, now all changes/files brought by branch <em>branch</em> are in master.</p>
 <p>References:</p>

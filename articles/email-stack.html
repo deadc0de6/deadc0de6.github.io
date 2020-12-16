@@ -159,7 +159,7 @@ at first but once setup, it is a killing email setup !</p>
 an IMAP server and store them locally. It also sync your changes
 back to the remote server.</p>
 <p>Here's my config file:</p>
-<div class="highlight"><pre><span></span><span class="c1"># author: deadc0de</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># author: deadc0de</span>
 <span class="p">[</span><span class="n">general</span><span class="p">]</span>
 <span class="n">accounts</span> <span class="o">=</span> <span class="n">personal</span>
 <span class="n">pythonfile</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c1"># path to below script</span>
@@ -199,15 +199,14 @@ back to the remote server.</p>
 <span class="n">sslcacertfile</span> <span class="o">=</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="n">certs</span><span class="o">/</span><span class="n">ca</span><span class="o">-</span><span class="n">certificates</span><span class="o">.</span><span class="n">crt</span>
 <span class="n">nametrans</span><span class="p">:</span> <span class="n">remote_to_local</span> <span class="c1"># ext call</span>
 <span class="n">idlefolders</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;INBOX&#39;</span><span class="p">]</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The script <code>maildir-notmuch-sync</code> used as a pre- and
 post-hook is described in its own section below.</p>
 <p>And the python script providing the functions for translating folder's names
 (<code>local_to_remote</code> and <code>remote_to_local</code>)
 and retrieving the password using gpg2 (<code>mailpasswd</code>):</p>
-<div class="highlight"><pre><span></span><span class="c1"># author: deadc0de</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># author: deadc0de</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 
@@ -225,27 +224,24 @@ and retrieving the password using gpg2 (<code>mailpasswd</code>):</p>
 <span class="k">def</span> <span class="nf">mailpasswd</span><span class="p">():</span>
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;TODO&quot;</span> <span class="c1"># gpg file path</span>
     <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;/usr/bin/gpg2&quot;</span><span class="p">,</span> <span class="s2">&quot;--batch&quot;</span><span class="p">,</span> <span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>For more information on how to configure/use offlineimap, see the
 <a href="http://www.offlineimap.org/documentation.html">official doc</a>.</p>
 <p>In order to avoid putting my password in clear text in the config, I used
 gpg-agent to query the password from a gpg encrypted file created with</p>
-<div class="highlight"><pre><span></span><span class="c1"># gpg key</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># gpg key</span>
 <span class="nb">echo</span> <span class="s2">&quot;YOURPASSWORD&quot;</span> <span class="p">|</span> gpg2 --encrypt --recipient <span class="s2">&quot;YOURNAME&quot;</span> -o &lt;password-file&gt;.gpg
-</pre></div>
-
+</code></pre></div>
 
 <p>or</p>
-<div class="highlight"><pre><span></span><span class="c1"># symmetric</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># symmetric</span>
 <span class="nb">echo</span> <span class="s2">&quot;YOURPASSWORD&quot;</span> <span class="p">|</span> gpg2 -c &gt; &lt;password-file&gt;.gpg
-</pre></div>
-
+</code></pre></div>
 
 <p>Offlineimap can easily be used as a service to continuously refresh and sync
 your emails with following systemd unit:</p>
-<div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><span class="o">[</span>Unit<span class="o">]</span>
 <span class="nv">Description</span><span class="o">=</span>Offlineimap daemon
 <span class="nv">Requires</span><span class="o">=</span>network-online.target
 <span class="nv">After</span><span class="o">=</span>network.target
@@ -258,8 +254,7 @@ your emails with following systemd unit:</p>
 
 <span class="o">[</span>Install<span class="o">]</span>
 <span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
-</pre></div>
-
+</code></pre></div>
 
 <h2>notmuch - the indexer</h2>
 <p><a href="https://notmuchmail.org/">notmuch</a> is a rewrite of <em>sup</em> with performance in
@@ -279,11 +274,10 @@ process all new emails right after calling <code>notmuch new</code>.</p>
 <p>First make sure you add a specific tag to new emails through
 notmuch's config <code>tags=...</code>. For the following example, the entry in notmuch
 config would be:</p>
-<div class="highlight"><pre><span></span>...
+<div class="highlight"><pre><span></span><code>...
 <span class="nv">tags</span><span class="o">=</span>new,tofilter
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>This means that after running <code>notmuch new</code>, any new email will be
 automatically tagged with two tags: <em>new</em> and <em>tofilter</em>. <em>tofilter</em> will be
@@ -291,9 +285,8 @@ used here to auto-tag emails while <em>new</em> will be used by <code>maildir-no
 described in following section.</p>
 <p>Now let's say you want all emails coming from
 <code>debian-bugs-rc@lists.debian.org</code> to be tagged with <em>debian</em>.</p>
-<div class="highlight"><pre><span></span>notmuch tag -tofilter +debian -- tag:tofilter and from:debian-bugs-rc@lists.debian.org
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>notmuch tag -tofilter +debian -- tag:tofilter and from:debian-bugs-rc@lists.debian.org
+</code></pre></div>
 
 <p>This will remove the tag <em>tofilter</em> and add the tag <em>debian</em> to all emails which
 are tagged <em>tofilter</em> and are from the <em>debian bugs mailing list</em>. For more information, see
@@ -301,9 +294,8 @@ the <a href="https://notmuchmail.org/initial_tagging/">doc about initial tagging
 <p>Since a new tag is added to all new emails (<em>tofilter</em> in this example),
 make sure you remove it from all emails that you don't process.
 Otherwise you will have mails hanging around with the tag <em>tofilter</em>:</p>
-<div class="highlight"><pre><span></span>notmuch tag -tofilter -- tag:tofilter
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>notmuch tag -tofilter -- tag:tofilter
+</code></pre></div>
 
 <p>Theses steps can be put in a bash script and run from <em>maildir-notmuch-sync</em> through
 the <em>TAG_SCRIPT</em> config.</p>
@@ -346,39 +338,35 @@ It is terminal based and fully compatible with notmuch.</p>
 <ul>
 <li>
 <p>sync INBOX folder and refresh when hitting comma</p>
-<div class="highlight"><pre><span></span><span class="p">,</span> <span class="o">=</span> <span class="n">shellescape</span> <span class="o">--</span><span class="n">refocus</span><span class="o">=</span><span class="n">true</span> <span class="s1">&#39;offlineimap -o -f INBOX&#39;</span><span class="p">;</span> <span class="n">search</span> <span class="n">tag</span><span class="p">:</span><span class="n">inbox</span> <span class="n">OR</span> <span class="n">tag</span><span class="p">:</span><span class="n">unread</span> <span class="n">OR</span> <span class="n">tag</span><span class="p">:</span><span class="n">flagged</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="p">,</span> <span class="o">=</span> <span class="n">shellescape</span> <span class="o">--</span><span class="n">refocus</span><span class="o">=</span><span class="n">true</span> <span class="s1">&#39;offlineimap -o -f INBOX&#39;</span><span class="p">;</span> <span class="n">search</span> <span class="n">tag</span><span class="p">:</span><span class="n">inbox</span> <span class="n">OR</span> <span class="n">tag</span><span class="p">:</span><span class="n">unread</span> <span class="n">OR</span> <span class="n">tag</span><span class="p">:</span><span class="n">flagged</span>
+</code></pre></div>
 
 </li>
 <li>
 <p>edit new email with vim</p>
-<div class="highlight"><pre><span></span><span class="n">editor_cmd</span> <span class="o">=</span> <span class="s1">&#39;vim -c &quot;set textwidth=72&quot; -c &quot;set wrap&quot; -c &quot;set spell&quot; -c &quot;set nocp&quot;&#39;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="n">editor_cmd</span> <span class="o">=</span> <span class="s1">&#39;vim -c &quot;set textwidth=72&quot; -c &quot;set wrap&quot; -c &quot;set spell&quot; -c &quot;set nocp&quot;&#39;</span>
+</code></pre></div>
 
 </li>
 <li>
 <p>use msmtp to send emails</p>
-<div class="highlight"><pre><span></span><span class="p">[</span><span class="n">accounts</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">accounts</span><span class="p">]</span>
     <span class="p">[[</span><span class="n">personal</span><span class="p">]]</span>
       <span class="n">realname</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c1"># your real name</span>
       <span class="n">address</span> <span class="o">=</span> <span class="n">TODO</span> <span class="c1"># your email address</span>
       <span class="n">sendmail_command</span> <span class="o">=</span> <span class="n">msmtp</span> <span class="o">--</span><span class="n">account</span><span class="o">=</span><span class="n">TODO</span> <span class="o">-</span><span class="n">t</span>
       <span class="n">sent_box</span> <span class="o">=</span> <span class="n">maildir</span><span class="p">:</span><span class="o">//</span><span class="n">TODO</span> <span class="c1"># the sent maildir folder</span>
       <span class="n">draft_box</span> <span class="o">=</span> <span class="n">maildir</span><span class="p">:</span><span class="o">//</span><span class="n">TODO</span> <span class="c1"># the drafts maildir folder</span>
-</pre></div>
-
+</code></pre></div>
 
 </li>
 <li>
 <p>use abook to search for contacts</p>
-<div class="highlight"><pre><span></span><span class="p">[</span><span class="n">accounts</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">accounts</span><span class="p">]</span>
   <span class="p">[[[</span><span class="n">abook</span><span class="p">]]]</span>
     <span class="nb">type</span> <span class="o">=</span> <span class="n">abook</span>
     <span class="n">abook_contacts_file</span> <span class="o">=</span> <span class="s2">&quot;TODO&quot;</span> <span class="c1"># path to abook file</span>
-</pre></div>
-
+</code></pre></div>
 
 </li>
 </ul>
@@ -397,9 +385,8 @@ as mentioned <a href="https://alot.readthedocs.org/en/latest/configuration/accou
 msmtp to help correctly configure msmtp.</p>
 <p>You can also use gpg2/gpg-agent to provide a password to msmtp without writing it in
 clear text in the config file.</p>
-<div class="highlight"><pre><span></span>passwordeval <span class="s2">&quot;gpg2 --quiet --for-your-eyes-only --no-tty --decrypt &lt;password-file&gt;.gpg&quot;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>passwordeval <span class="s2">&quot;gpg2 --quiet --for-your-eyes-only --no-tty --decrypt &lt;password-file&gt;.gpg&quot;</span>
+</code></pre></div>
 
 <h2>abook - the contact manager</h2>
 <p>One last thing missing to get a complete email stack is a contact manager. I

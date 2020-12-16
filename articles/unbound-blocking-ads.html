@@ -59,35 +59,30 @@ might also avoid being tracked.</p>
 useful and can be downloaded from <a href="https://github.com/StevenBlack/hosts">his github</a>.</p>
 <p>Here are the different steps to set it up for unbound:</p>
 <p>Download the list you're interested to block (for example ads+malwares+social networks)</p>
-<div class="highlight"><pre><span></span>$ wget https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/social/hosts
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ wget https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/social/hosts
+</code></pre></div>
 
 <p>Entries in the host file are in the form <code>0.0.0.0 &lt;domain&gt;</code> and unbound needs something like this:</p>
-<div class="highlight"><pre><span></span>local-zone: <span class="s2">&quot;&lt;domain&gt;&quot;</span> redirect
+<div class="highlight"><pre><span></span><code>local-zone: <span class="s2">&quot;&lt;domain&gt;&quot;</span> redirect
 local-data: <span class="s2">&quot;&lt;domain&gt; A 0.0.0.0&quot;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Following awk command will transform the list into something that unbound understands:</p>
-<div class="highlight"><pre><span></span>$ cat hosts <span class="p">|</span> grep <span class="s1">&#39;^0\.0\.0\.0&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{print &quot;local-zone: \&quot;&quot;$2&quot;\&quot; redirect\nlocal-data: \&quot;&quot;$2&quot; A 0.0.0.0\&quot;&quot;}&#39;</span> &gt; ads.conf
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ cat hosts <span class="p">|</span> grep <span class="s1">&#39;^0\.0\.0\.0&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{print &quot;local-zone: \&quot;&quot;$2&quot;\&quot; redirect\nlocal-data: \&quot;&quot;$2&quot; A 0.0.0.0\&quot;&quot;}&#39;</span> &gt; ads.conf
+</code></pre></div>
 
 <p>Finally copy the resulting file to pfsense (or to your DNS resolver running unbound).</p>
 <p>For pfsense, copy the file to <code>/var/unbound/</code> and paste following lines into the
 <code>Display Custom Option</code> field on Unbound config page on pfsense's web interface.</p>
-<div class="highlight"><pre><span></span><span class="c1"># Ads overrides</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Ads overrides</span>
 include: /var/unbound/ads.conf
-</pre></div>
-
+</code></pre></div>
 
 <p>For other unbound setups, edit the <code>unbound.conf</code> file and add previous lines (do not
 forget to update the path to the file as it might not be <code>/var/unbound</code>).</p>
 <p>You can then reload unbound config with the following command on pfsense:</p>
-<div class="highlight"><pre><span></span>$ unbound-control -c /var/unbound/unbound.conf reload
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ unbound-control -c /var/unbound/unbound.conf reload
+</code></pre></div>
 
 <p>That's it, added domains will resolve to 0.0.0.0 on your DNS resolver and thus
 would be blocked. Be aware that if some of those are already in the cache of your

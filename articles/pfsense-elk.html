@@ -73,9 +73,8 @@ able to draw a map of who's scanning you from which country.</p>
 the <a href="https://docs.docker.com/engine/installation/linux/">docker's installation doc</a>.</p>
 <p>Once docker's installed, retrieve the <a href="https://hub.docker.com/r/sebp/elk/">docker image</a>
 on which we will base our stack:</p>
-<div class="highlight"><pre><span></span>docker pull sebp/elk
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>docker pull sebp/elk
+</code></pre></div>
 
 <p>All the below files need to be put in the same folder to ease the setup
 with docker, so start by creating a folder, like for example <em>docker-elk</em>.</p>
@@ -86,7 +85,7 @@ viable structure for Elasticsearch.</p>
 be correctly parsed by Elasticsearch/kibana.</p>
 <p>This file is originally from
 <a href="https://gist.github.com/bradvido/4e6501222b8f7dbe3ba8">this gist</a>, save it into <code>docker-elk/pfsense.2.2.grok</code>.</p>
-<div class="highlight"><pre><span></span># GROK match pattern for logstash.conf filter: %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
+<div class="highlight"><pre><span></span><code># GROK match pattern for logstash.conf filter: %{LOG_DATA}%{IP_SPECIFIC_DATA}%{IP_DATA}%{PROTOCOL_DATA}
 
 # GROK Custom Patterns (add to patterns directory and reference in GROK filter for pfSense events):
 
@@ -134,8 +133,7 @@ ICMP_NEED_FLAG (%{IP:icmp_need_flag_ip}),(%{INT:icmp_need_flag_mtu})
 ICMP_TSTAMP (%{INT:icmp_tstamp_id}),(%{INT:icmp_tstamp_sequence})
 
 ICMP_TSTAMP_REPLY (%{INT:icmp_tstamp_reply_id}),(%{INT:icmp_tstamp_reply_sequence}),(%{INT:icmp_tstamp_reply_otime}),(%{INT:icmp_tstamp_reply_rtime}),(%{INT:icmp_tstamp_reply_ttime})
-</pre></div>
-
+</code></pre></div>
 
 <p>Then we need to setup the logstash config so that it:</p>
 <ul>
@@ -145,7 +143,7 @@ ICMP_TSTAMP_REPLY (%{INT:icmp_tstamp_reply_id}),(%{INT:icmp_tstamp_reply_sequenc
 <li>outputs to Elasticsearch</li>
 </ul>
 <p>Save the following into <code>docker-elk/pfsense.conf</code></p>
-<div class="highlight"><pre><span></span>input {
+<div class="highlight"><pre><span></span><code>input {
   udp {
     port =&gt; 5000
     type =&gt; &quot;syslog&quot;
@@ -175,22 +173,20 @@ output {
           idle_flush_time =&gt; 1
         }
 }
-</pre></div>
-
+</code></pre></div>
 
 <p>Pfsense usually uses <em>re{0-9}</em> as interface names. You could rename those fields
 directly in logstash by adding an entry like this in the above config under the <em>filter</em> element:</p>
-<div class="highlight"><pre><span></span>if [iface] == &quot;re0&quot; {
+<div class="highlight"><pre><span></span><code>if [iface] == &quot;re0&quot; {
   mutate {
     replace =&gt; [ &quot;iface&quot;, &quot;WAN&quot; ]
   }
 }
-</pre></div>
-
+</code></pre></div>
 
 <h2>Run the stack</h2>
 <p>Now that we have the configs, let's create the dockerfile as <em>docker-elk/dockerfile</em>:</p>
-<div class="highlight"><pre><span></span>FROM sebp/elk
+<div class="highlight"><pre><span></span><code>FROM sebp/elk
 
 # remove logstash config files
 RUN rm /etc/logstash/conf.d/01-lumberjack-input.conf
@@ -202,8 +198,7 @@ RUN rm /etc/logstash/conf.d/30-output.conf
 # add specific configs
 ADD ./pfsense.conf /etc/logstash/conf.d/pfsense.conf
 ADD ./pfsense.2.2.grok /etc/logstash/patterns/pfsense.2.2.grok
-</pre></div>
-
+</code></pre></div>
 
 <p>This tells docker to:</p>
 <ul>
@@ -212,14 +207,12 @@ ADD ./pfsense.2.2.grok /etc/logstash/patterns/pfsense.2.2.grok
 <li>add our specific config files (defined above)</li>
 </ul>
 <p>Having all the above files in the same folder, build the docker image with:</p>
-<div class="highlight"><pre><span></span>cd docker-elk/ &amp;&amp; docker build -t elk-pfsense .
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>cd docker-elk/ &amp;&amp; docker build -t elk-pfsense .
+</code></pre></div>
 
 <p>And finally run that container with:</p>
-<div class="highlight"><pre><span></span>docker run -p 5601:5601 -p 9200:9200 -p 5000:5000/udp -v elk-data:/var/lib/elasticsearch -it --name elk elk-pfsense
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>docker run -p 5601:5601 -p 9200:9200 -p 5000:5000/udp -v elk-data:/var/lib/elasticsearch -it --name elk elk-pfsense
+</code></pre></div>
 
 <p>This does the following:</p>
 <ul>
@@ -233,15 +226,13 @@ ADD ./pfsense.2.2.grok /etc/logstash/patterns/pfsense.2.2.grok
 Elasticsearch.</p>
 <p>Since we're running a single ES node, the number of replicas must be set to 0. This
 is done with following command:</p>
-<div class="highlight"><pre><span></span>curl -XPUT http://localhost:9200/_settings -d <span class="s1">&#39;{ &quot;number_of_replicas&quot; :0 }&#39;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>curl -XPUT http://localhost:9200/_settings -d <span class="s1">&#39;{ &quot;number_of_replicas&quot; :0 }&#39;</span>
+</code></pre></div>
 
 <p>You might also want to increase the queue to avoid timeouts on kibana when
 querying large quantity of data:</p>
-<div class="highlight"><pre><span></span>curl -XPUT localhost:9200/_cluster/settings -d <span class="s1">&#39;{&quot;transient&quot; : {&quot;threadpool.search.queue_size&quot; : 2000}}&#39;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>curl -XPUT localhost:9200/_cluster/settings -d <span class="s1">&#39;{&quot;transient&quot; : {&quot;threadpool.search.queue_size&quot; : 2000}}&#39;</span>
+</code></pre></div>
 
 <h2>Pfsense</h2>
 <p>Now that our ELK stack si ready, let's

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="deadc0de">
+    <meta name="description" content="deadc0de's blog">
+    <meta name="keywords" content="hacking,security,reverse engineering,exploitation,coding,dev,linux,opensource,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate"  href="https://deadc0de.re/feeds/all.atom.xml" type="application/atom+xml" title="deadc0de.re Atom Feed"/>
+    <link rel="alternate" href="https://deadc0de.re/feeds/all.rss.xml" type="application/rss+xml" title="deadc0de.re RSS Feed"/>
+    <title>Remotely reboot a host using full disk encryption // deadc0de.re // </title>
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/main.css">
+    <link rel="stylesheet" href="https://deadc0de.re/theme/css/pygments.css">
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img"                   style="background-image: url('/images/logo.png');"
+>
+
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <h1 class="brand-main"><a href="https://deadc0de.re/">deadc0de.re</a></h1>
+                              <p class="links"><a href="/pages/tags.html">Tags</a></p>
+                              <p class="links"><a href="/pages/archives.html">Archives</a></p>
+
+                                <p class="links"><a href="https://deadc0de.re/pages/about">About</a></p>
+                                <p class="links"><a href="https://deadc0de.re/pages/links">Links</a></p>
+
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Remotely reboot a host using full disk encryption</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="https://deadc0de.re/tag/luks.html">luks</a>
+                                <a class="post-category" href="https://deadc0de.re/tag/remote.html">remote</a>
+                            <br/>
+                            // Wed 16 December 2020
+                        </p>
+                </header>
+            </section>
+            <p>This is small walkthrough to reboot a host that is using full disk encryption (luks)
+without being able to enter the passphrase at boot (remote).</p>
+<p>Below walkthrough is based on arch linux.</p>
+<p>The idea is to create a keyfile, add it as a valid key to decrypt the root filesystem,
+let initramfs decrypt the disk using the key and continue the booting process.</p>
+<p>Once the reboot is done, the key is removed from the list of allowed keys.</p>
+<p>Create the key file</p>
+<div class="highlight"><pre><span></span><code>$ dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/crypto_keyfile.bin <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span><span class="m">8</span> <span class="nv">iflag</span><span class="o">=</span>fullblock
+$ chmod <span class="m">600</span> /crypto_keyfile.bin
+</code></pre></div>
+
+<p>Add the key as a valid key to unlock the partition</p>
+<div class="highlight"><pre><span></span><code>$ cryptsetup luksAddKey /dev/sdaXXX /crypto_keyfile.bin
+</code></pre></div>
+
+<p>You can identify which partition is the encrypted one by using <code>blkid</code>, <code>lsblk</code>, looking
+at the content of <code>/etc/crypttab</code> or even at the <code>GRUB_CMDLINE_LINUX_DEFAULT</code> entry in <code>/etc/default/grub</code>.</p>
+<p>Next initramfs needs to be told to embed the key file. Edit <code>/etc/mkinitcpio.conf</code>
+and add the key path in the <code>FILES</code> array:</p>
+<div class="highlight"><pre><span></span><code>FILES=(/crypto_keyfile.bin)
+</code></pre></div>
+
+<p>Also make sure the <code>encrypt</code> hook is present in the list of HOOKS.</p>
+<p>Note that the <code>encrypt</code> hook in the initramfs will per default look for a key
+named <code>crypto_keyfile.bin</code> so if you choose a different name, you need to add
+a <code>cryptkey</code> entry
+(see <a href="https://wiki.archlinux.org/index.php/dm-crypt/Device_encryption#With_a_keyfile_embedded_in_the_initramfs">this doc</a>)</p>
+<p>Finally regenereate your initramfs</p>
+<div class="highlight"><pre><span></span><code>$ mkinitcpio -p linux
+</code></pre></div>
+
+<p>And reboot the host.</p>
+<p>After the reboot, remove the key file</p>
+<div class="highlight"><pre><span></span><code>$ cryptsetup luksRemoveKey /dev/sdaXXX /crypto_keyfile.bin
+</code></pre></div>
+
+<p>Removing the keyfile is very important since it is embedded in the initramfs so
+anyone access to your host can extract the keyfile and unlock the disk.</p>
+<p>The solution provided above is temporary, if you need a more permanent (less hacky) solution, look
+at <a href="https://wiki.archlinux.org/index.php/Dm-crypt/Specialties#Remote_unlocking_of_the_root_(or_other)_partition">this page of the arch wiki</a>.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://wiki.archlinux.org/index.php/dm-crypt/Device_encryption#With_a_keyfile_embedded_in_the_initramfs">https://wiki.archlinux.org/index.php/dm-crypt/Device_encryption#With_a_keyfile_embedded_in_the_initramfs</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/Dm-crypt/Specialties#Remote_unlocking_of_the_root_(or_other)_partition">https://wiki.archlinux.org/index.php/Dm-crypt/Specialties#Remote_unlocking_of_the_root_(or_other)_partition</a></li>
+</ul>
+<footer class="footer">
+    <p>
+    &copy; 2015 deadc0de
+    <br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="/images/ccby.png" /></a>
+    This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+</body>
+</html>

