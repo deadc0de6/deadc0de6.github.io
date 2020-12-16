@@ -221,17 +221,6 @@ pre {
     position: relative;
 }
 
-code {
-    /*font-size: 100%;*/
-    /*color: #FDCE93;*/
-    color: #1c1c1c;
-    /*background-color: #3F3F3F;*/
-    background-color: #c9c9c9;
-    border: 3px solid #c9c9c9;
-    border-radius: 3px;
-    /*font-style: italic bold;*/
-}
-
 @media (max-width: 1024px) {
     .sidebar {
         width: 100%;
